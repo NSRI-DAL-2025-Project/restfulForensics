@@ -1,0 +1,29 @@
+app_server <- function(input, output, session) {
+   
+   rv <- reactiveValues()
+   
+   navigation_server(input, output, session)
+   
+   dashboard_server(input, output, session, rv)
+   
+   file_conversion_server(input, output, session, rv)
+   
+   snp_extraction_server(input, output, session, rv)
+   
+   filtering_server(input, output, session, rv)
+   
+   msa_server(input, output, session, rv)
+   
+   barcoding_server(input, output, session, rv)
+   
+   pop_stats_server(input, output, session, rv)
+   
+   forensic_params_server(input, output, session, rv)
+   
+   exploratory_analysis_server(input, output, session, rv)
+   
+   structure_analysis_server(input, output, session, rv)
+   
+   classification_server(input, output, session, rv)
+   
+}

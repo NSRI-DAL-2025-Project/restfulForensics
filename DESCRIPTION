@@ -1,0 +1,59 @@
+Package: restfulForensics
+Title: What the Package Does (One Line, Title Case)
+Version: 0.0.0.9000
+Authors@R: 
+    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"))
+Description: What the package does (one paragraph).
+License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
+    license
+Imports: 
+    ade4,
+    adegenet,
+    ape,
+    BarcodingR,
+    BiocGenerics,
+    Biostrings,
+    caret,
+    data.table,
+    DECIPHER,
+    dplyr,
+    DT,
+    e1071,
+    forcats,
+    ggplot2,
+    ggtree,
+    graphics,
+    hierfstat,
+    janitor,
+    msa,
+    msaR,
+    openxlsx,
+    pegas,
+    phangorn,
+    plyr,
+    poppr,
+    purrr,
+    pwalign,
+    QurvE,
+    RColorBrewer,
+    readr,
+    readxl,
+    rphast,
+    seqinr,
+    shinybusy,
+    shinyjs,
+    starmie,
+    stats,
+    stringr,
+    tibble,
+    tidypopgen,
+    tidyr,
+    tidyselect,
+    tools,
+    utils,
+    vcfR,
+    writexl,
+    zip
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
