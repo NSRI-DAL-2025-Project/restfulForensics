@@ -11,6 +11,19 @@ get_plink2_path <- function() {
    )
 }
 
+#' Get PLINK1.9 executable path
+#' 
+#' @returns The file path for PLINK 1.9.
+#' 
+#' @keywords internal
+get_plink_path <- function() {
+   system.file(
+      "plink",
+      "plink.exe",
+      package = "restfulForensics"
+   )
+}
+
 #' Unpack compressed files
 #'
 #' @param files The file path of the zipped file.
@@ -39,7 +52,7 @@ unpack_input_file <- function(files, output.dir = ".") {
       )
 
       data_path <- file.path(output.dir, "unpacked")
-      data_files <- list.files(path = data_path, full.names = TRUE)
+      data_files <- list.files(path = data_path, recursive = TRUE, full.names = TRUE, include.dirs = FALSE)
     } else if (tools::file_ext(files) == "tar") {
       untar(files, files = NULL, list = FALSE, exdir = file.path(output.dir, "unpacked"))
 
@@ -47,7 +60,7 @@ unpack_input_file <- function(files, output.dir = ".") {
       file.copy(from = new, to = file.path(output.dir, "unpacked"), overwrite = TRUE)
 
       data_path <- file.path(output.dir, "unpacked")
-      data_files <- list.files(path = data_path, full.names = TRUE)
+      data_files <- list.files(path = data_path, recursive = TRUE, full.names = TRUE, include.dirs = FALSE)
       
     } else {
        

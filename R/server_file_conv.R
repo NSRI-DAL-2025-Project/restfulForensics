@@ -268,6 +268,9 @@ file_conversion_server <- function(input, output, session, rv) {
             for_merging <- input$typePop_meta
          }
          
+         print(input_file)
+         print(input$genotypeFile$name)
+         
          prepared <- prepare_input_dataset(
             input_file = input_file,
             output.dir = output.dir

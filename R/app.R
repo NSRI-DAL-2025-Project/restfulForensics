@@ -1,3 +1,5 @@
+options(shiny.maxRequestSize = 5000 * 1024^2)
+
 #' Run restful Forensics app
 #' 
 #' @import shiny
@@ -8,7 +10,7 @@
 #' 
 #' @export
 run_app <- function(){
-   
+   options(shiny.maxRequestSize = 5000 * 1024^2)
    shiny::addResourcePath(
       "restful-www",
       system.file(

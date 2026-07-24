@@ -1,0 +1,31 @@
+---
+title: "restful_usage"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{restful_usage}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Overview
+
+The `restfulForensics` shiny package is an interactive interface with a collection of pre-processing and analysis functions for method validation of SNP analysis workflows.
+
+```{r setup}
+library(restfulForensics)
+```
+
+## Installation
+
+*R Installation*
+
+*RStudio installation*
+
+## Running the application

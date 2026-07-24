@@ -165,7 +165,7 @@ extract_by_pos_pgen <- function(pos_list,
    vcf_file <- paste0(out_prefix, ".vcf")
    
    if (!file.exists(vcf_file)) {
-      stop("PLINK extraction failed: no VCF generated.")
+      stop("PLINK extraction failed: no VCF generated. Check if using correct build for extraction.")
    }
    
    return(vcf_file)

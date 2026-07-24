@@ -162,6 +162,7 @@ convert_to_plink2 <- function(input.file,
       args <- c(
          "--bfile", input.file,
          "--make-pgen",
+         "--sort-vars",
          "--output-chr", output_chr,
          "--out", name
       )
@@ -170,6 +171,7 @@ convert_to_plink2 <- function(input.file,
       args <- c(
          input_flag, input.file,
          "--make-pgen",
+         "--sort-vars",
          "--output-chr", output_chr,
          "--out", name
       )
@@ -180,6 +182,42 @@ convert_to_plink2 <- function(input.file,
    res <- system2(plink_path, args = args, stdout = TRUE, stderr = TRUE)
    return(name)
 }
+
+#' Convert files to PLINK1.9 files
+#' 
+#' @param input.file The filepath of the dataset (either VCF, VCF.GZ, BCF, or PLINK1.9 files).
+#' @param output.dir The filename of the input file, NULL if PLINK files.
+#' @param isplink Indicates whether input file/s are PLINK files. Default is FALSE.
+#' @param name The prefix of the output file. 
+#' @param output_chr The chromosome formatting for output files based on PLINK2.0. Default is '26' indicating numeric codes.
+#' 
+#' @returns The prefix of PLINK2.0 files.
+#' 
+#' @export
+convert_to_plink <- function(input.file, name = "converted_to_plink") {
+   plink_path <- get_plink_path()
+   
+   file_extension <- tools::file_ext(input.file)
+   
+   if (file_extension == "bcf"){
+      system2(plink_path, args = c(
+         "--bcf", input.file,
+         "--make-bed",
+         "--out", name
+      ))
+   } else if (file_extension %in% c("vcf", "vcf.gz", ".gz")) {
+      system2(plink_path, args = c(
+         "--vcf", input.file,
+         "--make-bed",
+         "--out", name
+      ))
+   } else {
+      stop("Unsupported file type. Please provide a VCF, VCF.GZ, or BCF.")
+   }
+   
+   return(name)
+}
+
 
 #' Convert zipped files to PLINK 2.0 files
 #' 
@@ -204,25 +242,25 @@ prepare_input_dataset_archive <- function(input_file, output.dir = ".") {
    bed_files <- files[grepl("\\.bed", files, ignore.case = TRUE)]
    plink_prefixes <- tools::file_path_sans_ext(bed_files)
    
-   for (pref in plink_prefixes) {
-      out_pref <- file.path(work_dir, paste0(basename(pref), "_p2"))
-      
-      converted <- convert_to_plink2(
-         input.file = pref,
-         original_name = NULL,
-         isplink = TRUE,
-         name = out_pref
-      )
-   }
+
+   if (!is.null(bed_files)) {
+      for (pref in plink_prefixes) {
+         out_pref <- file.path(work_dir, paste0(basename(pref), "_p2"))
+         
+         converted <- convert_to_plink(
+            input.file = pref,
+            name = out_pref
+         )
+      }
+      }
    
    vcf_bcf_files <- files[grepl("\\.(vcf(\\.gz)?|bcf)$", files, ignore.case = TRUE)]
    
    for (f in vcf_bcf_files) {
-      base <- tools::file_path_sans_ext(basename(f))
+      base <- sub("\\.vcf(\\.gz)?$|\\.bcf$", "", basename(f), ignore.case = TRUE)
       out_pref <- file.path(work_dir, paste0(base, "_p2"))
-      converted <- convert_to_plink2(
+      converted <- convert_to_plink(
          input.file = f,
-         isplink = FALSE,
          name = out_pref
       )
       prefixes <- c(prefixes, converted)
@@ -232,13 +270,15 @@ prepare_input_dataset_archive <- function(input_file, output.dir = ".") {
       stop("No valid files in the directory.")
    }
    
-   writeLines(prefixes, con = merge_list_path)
+   writeLines(prefixes[-1], con = merge_list_path)
    merged_prefix <- file.path(work_dir, "merged_dataset")
    
-   merge_plink2_files(
+   merge_plink_files(
+      base_prefix = prefixes[1],
       merge_list = merge_list_path,
       output_prefix = merged_prefix
    )
+   print("files are merged")
    return(list(pgen_prefix = merged_prefix))
 }
 
@@ -344,7 +384,7 @@ convert_from_plink2 <- function(prefix,
    }
    
    if (output_type == "csv2") {
-      vcf_file <- convert_from_plink2(prefix, "vcf2", output.dir, plink2_path)
+      vcf_file <- convert_from_plink2(prefix, "vcf2", output.dir)
       csv <- vcf_to_csv(
          vcf_file,
          ref = ref,
@@ -354,7 +394,7 @@ convert_from_plink2 <- function(prefix,
    }
 }
 
-#' Merge PLINK2.0 files
+#' Merge PLINK files
 #' 
 #' @param merge_list The list of PLINK 2.0 files.
 #' @param output_prefix The prefix of the output (expected to be PLINK2.0).
@@ -363,17 +403,28 @@ convert_from_plink2 <- function(prefix,
 #' 
 #' @export
 #' @examples
-#' merge_plink2_files(merge_list = "plink_files.txt", output_prefix = "mergedFile")
-merge_plink2_files <- function(merge_list, output_prefix) {
+#' merge_plink_files(merge_list = "plink_files.txt", output_prefix = "mergedFile")
+merge_plink_files <- function(base_prefix, merge_list, output_prefix) {
    
+   plink_path <- get_plink_path()
    plink2_path <- get_plink2_path()
    
    args <- c(
-      "--pmerge-list", merge_list,
-      "--make-pgen",
+      "--bfile", base_prefix,
+      "--merge-list", merge_list,
+      "--make-bed",
       "--out", output_prefix
    )
-   system2(plink2_path, args = args)
+   system2(plink_path, args = args)
+   
+   args2 <- c(
+      "--bfile", output_prefix,
+      "--make-pfile",
+      "--out",
+      output_prefix
+   )
+   system2(plink2_path, args = args2)
+   
    return(output_prefix)
 }
 
@@ -393,6 +444,7 @@ merge_plink2_files <- function(merge_list, output_prefix) {
 #' @examples
 #' vcf_to_csv('extracted_markers.vcf', ref = reference_file)
 vcf_to_csv <- function(files, ref = NULL, output.dir = ".") {
+   print("running conversion to csv")
    extension <- tools::file_ext(files)
    
    if (extension %in% c("vcf", "gz")) {
@@ -406,23 +458,18 @@ vcf_to_csv <- function(files, ref = NULL, output.dir = ".") {
    
    if (is.null(ref)){
       return(as.data.frame(final_df))
-      
    } else {
-      if (length(ref) == 1){
-         final_df <- tibble::add_column(final_df, Population = ref, .after = 1)
-         
-      } else if (length(ref) > 1){
          ref_data <- data.frame(ref)
          ref_data <- dplyr::rename(ref_data, Sample = 1)
          cols <- colnames(ref_data)
+         col_for_merge <- subset(ref_data, cols)
          
          final_df <- final_df %>% 
             dplyr::left_join(ref_data, by = "Sample") %>%
-            tibble::add_column(cols, .after = "Sample")
-      }
-      
-      return(final_df)
+            tibble::add_column(col_for_merge, .after = "Sample") # changed to involve df instead of col names
+         
    }
+   return(final_df)
 }
 
 #' Convert SNP genotypes to dosages

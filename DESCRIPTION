@@ -1,8 +1,11 @@
 Package: restfulForensics
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
-Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"))
+Title: Tools for method validation of forensic SNP analyses
+Version: 0.0.0.1000
+Authors@R: c(
+    person("Leda Celeste", "Samin", "first.last@example.com", role = c("aut", "cre")),
+    person("Nelvie Fatima Jane", "Soliven", "first.last@example.com", role = c("aut", "cre")),
+    person("Jazelyn", "Salvador", "first.last@example.com", role = c("aut", "cre"))
+    )
 Description: What the package does (one paragraph).
 License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
     license
@@ -57,3 +60,7 @@ Imports:
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
