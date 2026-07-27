@@ -43,7 +43,7 @@ structure_analysis_server <- function(input, output, session, rv) {
       withProgress(message = "Running STRUCTURE analysis...", {
          incProgress(0.2, detail = "Loading input file...")
          df <- load_csv_xlsx_files(input$structureFile$datapath)
-         fsnps_gen <- convert_to_genind(df, to_str = TRUE)
+         fsnps_gen <- convert_to_genind(df, to_str = TRUE, popinfo = TRUE)
          
          incProgress(0.4, detail = "Converting to STRUCTURE file...")
          

@@ -2,9 +2,9 @@
 % Please edit documentation in R/file_conversions.R
 \name{merge_plink2_files}
 \alias{merge_plink2_files}
-\title{Merge PLINK2.0 files}
+\title{Merge PLINK files}
 \usage{
-merge_plink2_files(merge_list, output_prefix)
+merge_plink2_files(base_prefix, merge_list, output_prefix)
 }
 \arguments{
 \item{merge_list}{The list of PLINK 2.0 files.}
@@ -15,7 +15,7 @@ merge_plink2_files(merge_list, output_prefix)
 The file path of the output.
 }
 \description{
-Merge PLINK2.0 files
+Merge PLINK files
 }
 \examples{
 merge_plink2_files(merge_list = "plink_files.txt", output_prefix = "mergedFile")

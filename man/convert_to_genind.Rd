@@ -4,12 +4,14 @@
 \alias{convert_to_genind}
 \title{Convert dataframes to genind object}
 \usage{
-convert_to_genind(file, to_str = FALSE)
+convert_to_genind(file, to_str = FALSE, popinfo = TRUE)
 }
 \arguments{
 \item{file}{A dataframe containing sample, population, and genotype information.}
 
 \item{to_str}{To indicate whether input file will be used to generate .str files. Default is FALSE.}
+
+\item{popinfo}{To indicate if population metadata is present. Default is TRUE.}
 }
 \value{
 A genind object

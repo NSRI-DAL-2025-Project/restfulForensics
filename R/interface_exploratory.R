@@ -16,7 +16,10 @@ exploratory_tab <- function() {
             br(),
             numericInput("pcX", "PC Axis X", value = 1, min = 1),
             numericInput("pcY", "PC Axis Y", value = 2, min = 1),
-            actionButton("runPCA", "Run PCA Analysis", icon = icon("play"))
+            uiOutput("selectedPopulation"),
+            
+            actionButton("runPCA", "Run PCA Analysis", icon = icon("play")),
+            actionButton("recalcPCA", "Recalculate PCA for Selected Populations", icon = icon("filter"))
          ),
          tabBox(
             tabPanel(
@@ -58,10 +61,13 @@ exploratory_tab <- function() {
             width = 12,
             tabPanel(
                "Plots",
-               plotOutput("barPlot"),
-               plotOutput("pcaPlot"),
-               downloadButton("downloadbarPlot", "Download Bar Plot"),
+               plotly::plotlyOutput("pcaPlot"),
                downloadButton("downloadPCAPlot", "Download PCA Plot")
+            ),
+            tabPanel(
+               "Bar Plot",
+               plotOutput("barPlot"),
+               downloadButton("downloadbarPlot", "Download Bar Plot"),
             )
          )
       )

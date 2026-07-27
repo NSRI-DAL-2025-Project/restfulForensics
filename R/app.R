@@ -6,6 +6,7 @@ options(shiny.maxRequestSize = 5000 * 1024^2)
 #' @import shinyjs
 #' @import shinydashboard
 #' @import shinybusy
+#' @import plotly
 #' @import dplyr
 #' 
 #' @export

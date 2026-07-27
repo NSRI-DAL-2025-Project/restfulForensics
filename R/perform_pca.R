@@ -1,6 +1,7 @@
 #' Find principal components
 #' 
 #' @param fsnps_gen The genind data containing genotype and population information.
+#' @param popinfo To indicate if population metadata is present. Default is TRUE.
 #' 
 #' @returns A list of dataframes containing eigenvalues.
 #' 
@@ -11,9 +12,17 @@
 #' @export
 #' @examples
 #' compute_pca(genind_obj)
-compute_pca <- function(fsnps_gen) {
+compute_pca <- function(fsnps_gen, popinfo = TRUE) {
    
-   x <- tab(fsnps_gen, NA.method = "mean")
+   x <- adegenet::tab(fsnps_gen, NA.method = "mean")
+   
+   # remove SNPs with missing vals
+   x <- x[, colSums(is.na(x)) == 0]
+   
+   if (ncol(x) < 2){
+      stop("Not enough variable SNPs for PCA after filtering.")
+   }
+   
    set.seed(9999)
    pca1 <- ade4::dudi.pca(x, scannf = FALSE, scale = FALSE, nf = 7)
    percent <- pca1$eig / sum(pca1$eig) * 100
@@ -21,15 +30,21 @@ compute_pca <- function(fsnps_gen) {
    ind_coords <- as.data.frame(pca1$li)
    colnames(ind_coords) <- paste0("PC", seq_len(ncol(ind_coords)))
    ind_coords$Ind <- adegenet::indNames(fsnps_gen)
-   ind_coords$Site <- fsnps_gen@pop
    
-   centroid <- stats::aggregate(
-      ind_coords[, grep("^PC", names(ind_coords))],
-      by = list(ind_coords$Site),
-      FUN = mean
-   )
-   colnames(centroid)[1] <- "Site"
-   centroid <- as.data.frame(centroid)
+   if (isTRUE(popinfo)) {
+      ind_coords$Site <- fsnps_gen@pop
+      
+      centroid <- stats::aggregate(
+         ind_coords[, grep("^PC", names(ind_coords))],
+         by = list(ind_coords$Site),
+         FUN = mean
+      )
+      colnames(centroid)[1] <- "Site"
+      centroid <- as.data.frame(centroid)
+      
+   } else {
+      centroid <- NULL
+   }
    
    return(list(
       pca1 = pca1,
@@ -55,7 +70,7 @@ compute_pca <- function(fsnps_gen) {
 #' @export
 #' @examples
 #' get_labels(genind_obj, use_default = FALSE, label_file = "custom.xlsx")
-get_labels <- function(fsnps_gen, use_default = TRUE, label_file = NULL) {
+get_labels <- function(fsnps_gen, use_default = TRUE, label_file = NULL, popinfo = TRUE) {
    
    if (use_default) {
       labels <- levels(as.factor(fsnps_gen@pop))
@@ -118,6 +133,7 @@ get_labels <- function(fsnps_gen, use_default = TRUE, label_file = NULL) {
 #' @returns A PCA plot.
 #' 
 #' @import ggplot2
+#' @importFrom ggrepel geom_label_repel
 #' 
 #' @export
 #' @examples
@@ -129,11 +145,20 @@ plot_pca <- function(ind_coords,
                      width = 8,
                      height = 8,
                      pc_x = 1,
-                     pc_y = 2) {
+                     pc_y = 2,
+                     highlight_pop = NULL) {
    
    # Ensure data frames
    if (!is.data.frame(ind_coords)) ind_coords <- as.data.frame(ind_coords)
    if (!is.data.frame(centroid)) centroid <- as.data.frame(centroid)
+   
+   has_pop <- !is.null(labels_colors) && !is.null(centroid)
+   
+   if (!is.null(highlight_pop)) {
+      ind_coords$highlight <- ind_coords$Site %in% highlight_pop
+   } else {
+      ind_coords$highlight <- TRUE # or null?
+   }
    
    # Axis labels
    xlab <- paste("PC", pc_x, " (", format(round(percent[pc_x], 1), nsmall = 1), "%)", sep = "")
@@ -149,30 +174,46 @@ plot_pca <- function(ind_coords,
       plot.title = element_text(hjust = 0.5, size = 15)
    )
    
-   # Plot
-   plot <- ggplot(ind_coords, aes(
-      x = .data[[paste0("PC", pc_x)]],
-      y = .data[[paste0("PC", pc_y)]],
-      fill = Site,
-      shape = Site
-   )) +
-      geom_hline(yintercept = 0) +
-      geom_vline(xintercept = 0) +
-      geom_point(color = "black", size = 3, show.legend = FALSE) +
-      geom_label_repel(
-         data = centroid,
-         aes(
-            x = .data[[paste0("PC", pc_x)]],
-            y = .data[[paste0("PC", pc_y)]],
-            label = Site,
-            fill = Site
-         ),
-         color = "black",
-         size = 4, show.legend = FALSE
-      ) +
-      scale_fill_manual(values = labels_colors$colors) +
-      scale_shape_manual(values = labels_colors$shapes) +
-      labs(x = xlab, y = ylab) +
-      ggtheme
+   if (has_pop){
+      plot <- ggplot(ind_coords, aes(
+         x = .data[[paste0("PC", pc_x)]],
+         y = .data[[paste0("PC", pc_y)]],
+         fill = Site,
+         shape = Site
+      )) +
+         geom_hline(yintercept = 0) +
+         geom_vline(xintercept = 0) +
+         geom_point(aes(alpha = highlight),
+                    #color = "black",
+                    size = 3, 
+                    show.legend = FALSE) +
+         ggrepel::geom_label_repel(
+            data = centroid,
+            aes(
+               x = .data[[paste0("PC", pc_x)]],
+               y = .data[[paste0("PC", pc_y)]],
+               label = Site,
+               fill = Site
+            ),
+            color = "black",
+            size = 4, show.legend = FALSE
+         ) +
+         scale_fill_manual(values = labels_colors$colors) +
+         scale_shape_manual(values = labels_colors$shapes) +
+         scale_alpha_manual(values = c("TRUE" = 1, "FALSE" = 0.20)) +
+         labs(x = xlab, y = ylab) +
+         ggtheme
+   } else {
+      plot <- ggplot(ind_coords, aes(
+         x = .data[[paste0("PC", pc_x)]],
+         y = .data[[paste0("PC", pc_y)]]
+      )) +
+         geom_hline(yintercept = 0) +
+         geom_vline(xintercept = 0) +
+         geom_point(color = "black", size = 3, fill = "grey70", stroke = 0.4, shape = 21) +
+         labs(x = xlab, y = ylab) +
+         ggtheme
+   }
+   
    return(plot)
 }

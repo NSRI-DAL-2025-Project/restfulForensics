@@ -112,7 +112,7 @@ file_conversion_tab <- function() {
                   checkboxInput("isPLINKmeta", "Use PLINK files", value = FALSE),
                   conditionalPanel(
                      condition = "input.isPLINKmeta == false",
-                     fileInput("genotypeFile", "Genotype File (.vcf/.vcf.gz/.bcf)", accept = c(".vcf", ".bcf", ".vcf.gz"))
+                     fileInput("genotypeFile", "Genotype File (.vcf/.vcf.gz/.bcf) or zipped files", accept = c(".vcf", ".bcf", ".vcf.gz", ".zip", ".tar"))
                   ),
                   conditionalPanel(
                      condition = "input.isPLINKmeta == true",
@@ -191,6 +191,14 @@ file_conversion_tab <- function() {
                      ),
                      br(),
                      uiOutput("downloadBreakdown")
+                  ),
+                  tabPanel(
+                     title = "Samples without Metadata",
+                     div(
+                        style = "overflow-x: auto;",
+                        DT::dataTableOutput("previewMissingData")
+                     ),
+                     uiOutput("downloadMissing")
                   )
                )
             )

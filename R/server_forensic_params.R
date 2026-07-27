@@ -82,7 +82,7 @@ forensic_params_server <- function(input, output, session, rv){
       
       if (data_type == "gts") {
          file <- clean_input_data(snpsFile())
-         file <- convert_to_genind(file, to_str = FALSE)
+         file <- convert_to_genind(file, to_str = FALSE, popinfo = TRUE)
          computed_af <- compute_af(file)
          pop <- nrow(file)
       } else if (data_type == "freqs") {

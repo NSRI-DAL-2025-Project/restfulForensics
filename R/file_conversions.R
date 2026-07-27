@@ -51,6 +51,7 @@ clean_input_data <- function(file) {
 #'
 #' @param file A dataframe containing sample, population, and genotype information.
 #' @param to_str To indicate whether input file will be used to generate .str files. Default is FALSE.
+#' @param popinfo To indicate if population metadata is present. Default is TRUE.
 #' 
 #' @returns A genind object
 #'
@@ -59,9 +60,19 @@ clean_input_data <- function(file) {
 #' @export
 #' @examples
 #' convert_to_genind(file = my_table, to_str = FALSE)
-convert_to_genind <- function(file, to_str = FALSE) {
-   file <- dplyr::rename(file, Ind = 1, Pop = 2)
+convert_to_genind <- function(file, to_str = FALSE, popinfo = TRUE) {
+   
+   if (isFALSE(popinfo) && isTRUE(to_str)) {
+      stop("Population data are required when converting to STRUCTURE format.")
+   }
+   
    file <- clean_input_data(file)
+   
+   if (isTRUE(popinfo)) {
+      file <- dplyr::rename(file, Ind = 1, Pop = 2)
+   } else {
+      file <- dplyr::rename(file, Ind = 1)
+   }
    
    if (isTRUE(to_str)) {
       # For Plotting
@@ -77,11 +88,11 @@ convert_to_genind <- function(file, to_str = FALSE) {
       pop_df_unique <- as.data.frame(pop_df[!duplicated(pop_df), ]) %>%
          dplyr::rename(pops = 1)
       # add row names as numbers
-      pop_df_unique$num <- rownames(pop_df_unique)
+      pop_df_unique$num <- seq_len(nrow(pop_df_unique))
       # write.csv(pop_df_unique, file = "population_order.csv") # RETURN THIS FOR DOWNLOAD
       
       # replace the pops in the original df (pop_df) with the numbers
-      pop_df_corr <- left_join(pop_df, pop_df_unique, by = "pops")
+      pop_df_corr <- dplyr::left_join(pop_df, pop_df_unique, by = "pops")
       pops <- pop_df_corr$num
       
       ### Change Ind to numeric
@@ -94,10 +105,15 @@ convert_to_genind <- function(file, to_str = FALSE) {
       
    } else {
       
-      ind <- as.character(file$Ind)
-      pop <- as.character(file$Pop)
-      fsnps_geno <- file[, 3:ncol(file)]
-      
+      if (isFALSE(popinfo)) {
+         ind <- as.character(file$Ind)
+         pop <- NULL
+         fsnps_geno <- file[, 2:ncol(file)]
+      } else {
+         ind <- as.character(file$Ind)
+         pop <- as.character(file$Pop)
+         fsnps_geno <- file[, 3:ncol(file)]
+      }
    }
    
    fsnps_gen <- adegenet::df2genind(fsnps_geno,
@@ -110,22 +126,30 @@ convert_to_genind <- function(file, to_str = FALSE) {
    )
    
    if (isTRUE(to_str)) {
-      
       fsnps_gen@pop <- as.factor(pop)
-      
       return(list(
          fsnps_gen = fsnps_gen,
          populations = pop_df_unique,
          pop_labels = populations_df
       ))
+   }  
       
-   } else {
-      
+   if (isTRUE(popinfo)) { 
       fsnps_gen@pop <- as.factor(file$Pop)
-      
-      return(fsnps_gen)
-      
    }
+   
+   return(fsnps_gen)
+}
+
+#' Subset populations for PCA recalculation
+#' 
+#' @param fsnps_gen The genind object containing sample, population, and genotype data.
+#' @param pops The populations to be used for PCA recalculation.
+#' @return Genind object
+#' @keywords internal
+subset_genind_pop <- function(fsnps_gen, pops) {
+   keep <- adegenet::pop(fsnps_gen) %in% pops
+   fsnps_gen[keep,]
 }
 
 #' Convert files to PLINK2.0 files
@@ -273,7 +297,7 @@ prepare_input_dataset_archive <- function(input_file, output.dir = ".") {
    writeLines(prefixes[-1], con = merge_list_path)
    merged_prefix <- file.path(work_dir, "merged_dataset")
    
-   merge_plink_files(
+   merge_plink2_files(
       base_prefix = prefixes[1],
       merge_list = merge_list_path,
       output_prefix = merged_prefix
@@ -403,8 +427,8 @@ convert_from_plink2 <- function(prefix,
 #' 
 #' @export
 #' @examples
-#' merge_plink_files(merge_list = "plink_files.txt", output_prefix = "mergedFile")
-merge_plink_files <- function(base_prefix, merge_list, output_prefix) {
+#' merge_plink2_files(merge_list = "plink_files.txt", output_prefix = "mergedFile")
+merge_plink2_files <- function(base_prefix, merge_list, output_prefix) {
    
    plink_path <- get_plink_path()
    plink2_path <- get_plink2_path()
@@ -450,6 +474,8 @@ vcf_to_csv <- function(files, ref = NULL, output.dir = ".") {
    if (extension %in% c("vcf", "gz")) {
       raw_file <- load_vcf_files(files, output.dir = output.dir)
       raw_file <- dplyr::rename(raw_file, Sample = 1)
+      raw_file$Sample <- gsub("HGDP([0-9]+)_HGDP\\1$", "HG\\1", raw_file$Sample) 
+      raw_file$Sample <- trimws(raw_file$Sample, which = "right")
    } else {
       stop("Input is not a VCF file.")
    }
@@ -461,15 +487,27 @@ vcf_to_csv <- function(files, ref = NULL, output.dir = ".") {
    } else {
          ref_data <- data.frame(ref)
          ref_data <- dplyr::rename(ref_data, Sample = 1)
-         cols <- colnames(ref_data)
-         col_for_merge <- subset(ref_data, cols)
          
-         final_df <- final_df %>% 
-            dplyr::left_join(ref_data, by = "Sample") %>%
-            tibble::add_column(col_for_merge, .after = "Sample") # changed to involve df instead of col names
+         samples_vcf <- final_df$Sample
+         samples_ref <- ref_data$Sample
+         
+         if (sum(samples_vcf %in% samples_ref) == 0) {
+            stop("Sample IDS do not match between VCF and metadata.")
+         }
+         
+         cols <- colnames(ref_data)
+         
+         with_meta_data <- final_df %>% 
+            dplyr::inner_join(ref_data, by = "Sample") %>%
+            relocate(cols, .after = 1) # changed to involve df instead of col names
+         
+         missing_meta <- final_df %>% dplyr::anti_join(ref_data, by = "Sample")
          
    }
-   return(final_df)
+   return(list(
+      with_meta = with_meta_data,
+      missing = missing_meta
+      ))
 }
 
 #' Convert SNP genotypes to dosages

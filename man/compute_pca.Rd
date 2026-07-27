@@ -4,10 +4,12 @@
 \alias{compute_pca}
 \title{Find principal components}
 \usage{
-compute_pca(fsnps_gen)
+compute_pca(fsnps_gen, popinfo = TRUE)
 }
 \arguments{
 \item{fsnps_gen}{The genind data containing genotype and population information.}
+
+\item{popinfo}{To indicate if population metadata is present. Default is TRUE.}
 }
 \value{
 A list of dataframes containing eigenvalues.

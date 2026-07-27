@@ -12,7 +12,8 @@ plot_pca(
   width = 8,
   height = 8,
   pc_x = 1,
-  pc_y = 2
+  pc_y = 2,
+  highlight_pop = NULL
 )
 }
 \arguments{

@@ -199,10 +199,11 @@ file_conversion_server <- function(input, output, session, rv) {
    )
    
    convertedCSV <- reactiveVal(NULL)
+   missingData <- reactiveVal(NULL)
    convertedBreakdown <- reactiveVal(NULL)
    output.dir <- tempdir()
    timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
-   outputName <- paste0("converted_", timestamp, ".csv")
+   #outputName <- paste0("converted_", timestamp, ".csv")
    
    observe({
       fileready <- !is.null(input$genotypeFile) || (!is.null(input$firstPLINK) && !is.null(input$secondPLINK) && !is.null(input$thirdPLINK))
@@ -219,7 +220,7 @@ file_conversion_server <- function(input, output, session, rv) {
    })
    
    output$metaHeader <- renderUI({
-      req(columns_target)
+      req(columns_target())
       checkboxGroupInput(
          inputId = "col_targets",
          label = "Choose columns to be merged with sample and genotype data",
@@ -234,11 +235,12 @@ file_conversion_server <- function(input, output, session, rv) {
    })
    
    output$selectMetaHeader <- renderUI({
-      req(column_for_breakdown)
+      req(input$col_targets)
+      req(input$breakdownPop == "YesBreakdown")
       selectInput(
          "popForBreakdown",
          label = "Choose column as basis for tally",
-         choices = column_for_breakdown
+         choices = input$col_targets
       )
    })
    
@@ -282,17 +284,17 @@ file_conversion_server <- function(input, output, session, rv) {
             output.dir = output.dir,
             ref = for_merging
          )
-         convertedCSV(result)
+         convertedCSV(result$with_meta)
+         missingData(result$missing)
          
          if (input$breakdownPop == "YesBreakdown"){
             req(input$popForBreakdown)
-            csv_data <- result
             
             if (length(input$popForBreakdown) <= 0){
                stop("No column selected.")
             }
             
-            breakdown_results <- pop_breakdown(csv_data, input$popForBreakdown)
+            breakdown_results <- pop_breakdown(convertedCSV(), input$popForBreakdown)
             convertedBreakdown(breakdown_results)
          }
       },  # end for try catch
@@ -304,7 +306,7 @@ file_conversion_server <- function(input, output, session, rv) {
    
    output$downloadConvertedCSV <- downloadHandler(
       filename = function() {
-         outputName
+         paste0("converted_", timestamp, ".csv")
       },
       content = function(file) {
          req(convertedCSV())
@@ -314,11 +316,21 @@ file_conversion_server <- function(input, output, session, rv) {
    
    output$downloadPopBreakdown <- downloadHandler(
       filename = function() {
-         outputName
+         paste0("pop_breakdown_", timestamp, ".csv")
       },
       content = function(file) {
          req(convertedBreakdown())
          readr::write_csv(convertedBreakdown(), file)
+      }
+   )
+   
+   output$downloadMissingMeta <- downloadHandler(
+      filename = function() {
+         paste0("missing_meta_", timestamp, ".csv")
+      },
+      content = function(file) {
+         req(missingData())
+         readr::write_csv(missingData(), file)
       }
    )
    
@@ -344,6 +356,17 @@ file_conversion_server <- function(input, output, session, rv) {
       )
    )
    
+   output$previewMissingData <- DT::renderDataTable(
+      {
+         req(missingData())
+         missingData()
+      },
+      options = list(
+         scrollX = TRUE,
+         pageLength = 10
+      )
+   )
+   
    output$downloadCSV_UI <- renderUI({
       req(convertedCSV())
       downloadButton("downloadConvertedCSV", "Download CSV File")
@@ -351,7 +374,12 @@ file_conversion_server <- function(input, output, session, rv) {
    
    output$downloadBreakdown <- renderUI({
       req(convertedBreakdown())
-      downloadButton("downloadPopBreakdown", "Download Pop Breakdown")
+      downloadButton("downloadPopBreakdown", "Download Population Breakdown Count")
+   })
+   
+   output$downloadMissing <- renderUI({
+      req(missingData())
+      downloadButton("downloadMissingMeta", "Download Samples without Metadata")
    })
    
    # ================== Widen GT file ====================#
@@ -602,7 +630,7 @@ file_conversion_server <- function(input, output, session, rv) {
          tryCatch({
             req(input$tostrFile$datapath, input$systemFile)
             csv_file <- load_csv_xlsx_files(input$tostrFile$datapath)
-            genind <- convert_to_genind(csv_file, to_str = TRUE)
+            genind <- convert_to_genind(csv_file, to_str = TRUE, popinfo = TRUE)
             csv_revised(genind$new_file)
             strconvert(genind$fsnps_gen)
             directory <- tempdir()

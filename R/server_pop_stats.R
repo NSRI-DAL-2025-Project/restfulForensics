@@ -40,7 +40,7 @@ pop_stats_server <- function(input, output, session, rv) {
       req(input$popStatsFile)
       df <- load_csv_xlsx_files(input$popStatsFile$datapath)
       cleaned <- clean_input_data(df)
-      convert_to_genind(cleaned, to_str = FALSE)
+      convert_to_genind(cleaned, to_str = FALSE, popinfo = TRUE)
    })
    
    observeEvent(input$runPopStats, {

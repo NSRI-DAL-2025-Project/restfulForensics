@@ -82,7 +82,6 @@ unpack_input_file <- function(files, output.dir = ".") {
 #' @keywords internal
 #'
 #' @importFrom tools file_ext
-#' @importFrom readr read_csv
 #' @importFrom readxl read_excel
 load_csv_xlsx_files <- function(input) {
    
@@ -92,11 +91,11 @@ load_csv_xlsx_files <- function(input) {
    
   if (tools::file_ext(input) == "csv") {
      
-    return(readr::read_csv(input))
+    return(utils::read.csv(input, check.names = FALSE))
      
   } else if (tools::file_ext(input) == "xlsx") {
      
-    return(readxl::read_excel(input))
+    return(openxlsx::read.xlsx(input, check.names = FALSE))
      
   } else if (tools::file_ext(input) == "txt") {
      

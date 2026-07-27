@@ -531,7 +531,8 @@ calc_iisnps_params <- function(geno_freqs, profile = NULL, theta = 0) {
 #' pop_breakdown(info_with_meta, column = "Population")
 pop_breakdown <- function(file, column) {
    col_name <- as.character(column)
-   
+   print(col_name)
+   print(colnames(file))
    if (!(col_name %in% colnames(file))) {
       stop("Ensure specified column is present in the dataset.")
    }

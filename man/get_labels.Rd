@@ -4,7 +4,7 @@
 \alias{get_labels}
 \title{Set up labels for PCA plotting}
 \usage{
-get_labels(fsnps_gen, use_default = TRUE, label_file = NULL)
+get_labels(fsnps_gen, use_default = TRUE, label_file = NULL, popinfo = TRUE)
 }
 \arguments{
 \item{fsnps_gen}{The genind data containing genotype and population information.}
