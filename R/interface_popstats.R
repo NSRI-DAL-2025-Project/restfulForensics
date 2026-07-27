@@ -7,6 +7,8 @@ popstats_tab <- function() {
          box(
             fileInput("popStatsFile", "Upload CSV or XLSX Dataset", accept = c(".zip", ".tar")),
             actionButton("runPopStats", "Analyze", icon = icon("magnifying-glass-chart")),
+            selectInput("correctionModel", "Select Correction Model", choices = c("Bonferroni" = "Bonferroni", "FDR" = "FDR")),
+            numericInput("alphaValue", "Set Alpha Value", value = 0.05, min = 0.00, max = 1),
             uiOutput("downloadStatsXLSX_UI")
          ),
          tabBox(
@@ -68,7 +70,11 @@ popstats_tab <- function() {
                h4("HWE P-value Summary"),
                DT::dataTableOutput("hwe_summary_text"),
                h4("Population-wise HWE Chi-Square Table"),
-               DT::dataTableOutput("hwe_chisq_table")
+               DT::dataTableOutput("hwe_chisq_table"),
+               h4("Loci out of HWE"),
+               DT::dataTableOutput("hwe_loci"),
+               h4("Populations out of HWE"),
+               DT::dataTableOutput("hwe_pop")
             ),
             tabPanel(
                "7. Fst Values",

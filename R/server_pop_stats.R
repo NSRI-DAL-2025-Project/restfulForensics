@@ -73,7 +73,7 @@ pop_stats_server <- function(input, output, session, rv) {
                
                ## HWE
                incProgress(0.8, detail = "Running HWE and FST calculations...")
-               hardy_weinberg_stats <- compute_hwe(fsnps_gen())
+               hardy_weinberg_stats <- compute_hwe(fsnps_gen(), correction = input$correctionModel, alpha = input$alphaValue)
                hardyWeinberg(hardy_weinberg_stats)
                
                ## FST
@@ -162,6 +162,20 @@ pop_stats_server <- function(input, output, session, rv) {
    output$hwe_chisq_table <- DT::renderDataTable(
       {
          hardyWeinberg()$hw_dataframe
+      },
+      options = list(scrollX = TRUE)
+   )
+   
+   output$hwe_loci <- DT::renderDataTable(
+      {
+         hardyWeinberg()$loci_HWE_failure
+      },
+      options = list(scrollX = TRUE)
+   )
+   
+   output$hwe_pop <- DT::renderDataTable(
+      {
+         hardyWeinberg()$pops_out_of_HWE
       },
       options = list(scrollX = TRUE)
    )

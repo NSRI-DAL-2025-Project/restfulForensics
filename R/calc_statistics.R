@@ -144,6 +144,8 @@ compute_af <- function(fsnps_gen) {
 #' Perform HWE test
 #' 
 #' @inheritParams compute_pop_stats
+#' @param correction The method of correction to be applied in calculating the alpha to identify out of HWE. Default is Bonferroni.
+#' @param alpha The alpha value for the threshold. Default is 0.05.
 #' 
 #' @returns A list of HWE stats results.
 #' 
@@ -154,7 +156,7 @@ compute_af <- function(fsnps_gen) {
 #' @export
 #' @examples
 #' compute_hwe(fsnps_gen = my_genind)
-compute_hwe <- function(fsnps_gen) {
+compute_hwe <- function(fsnps_gen, correction = "Bonferroni", alpha = 0.05) {
    # Hardy-Weinberg Equilibrium (List for export)
    fsnps_hwe <- as.data.frame(round(pegas::hw.test(fsnps_gen, B = 1000), 6))
    fsnps_hwe <- data.frame(rownames(fsnps_hwe), fsnps_hwe)
@@ -167,12 +169,78 @@ compute_hwe <- function(fsnps_gen) {
       function(ls) pegas::hw.test(ls, B = 0)[, 3]
    ))
    
-   fsnps_hwe_chisq_matrix <- as.matrix(fsnps_hwe_test)
-   fsnps_hwe_chisq_df <- as.data.frame(t(fsnps_hwe_chisq_matrix)) %>% tibble::rownames_to_column("Population")
+   fsnps_hwe_chisq_matrix <- t(data.matrix(fsnps_hwe_test))
+   fsnps_hwe_chisq_df <- as.data.frame(fsnps_hwe_chisq_matrix) %>% tibble::rownames_to_column("Population")
+   
+   # Monte Carlo: p value
+   fsnps_hwe_mc <- data.frame(sapply(adegenet::seppop(fsnps_gen),
+                                     function (ls) pegas::hw.test(ls, B = 10000)[,4]
+                                     ))
+   fsnps_hwe_mc <- t(data.matrix(fsnps_hwe_mc))
+   fsnps_hwe_mc_df <- data.frame(t(fsnps_hwe_mc))
+   fsnps_hwe_mc_df <- tibble::rownames_to_column(fsnps_hwe_mc_df, var = "rsID")
+   
+   loc_total = adegenet::nLoc(fsnps_gen)
+   alpha_value = alpha / loc_total
+   # loci out of HWE
+   if (is.null(correction)) {
+      loci_HWE_failure <- data.frame(
+         rsID = colnames(fsnps_hwe_chisq_matrix),
+         Chisq = apply(fsnps_hwe_chisq_matrix < alpha, 2, mean),
+         MC = apply(fsnps_hwe_mc < alpha_value, 2, mean))
+      
+      pops_out_of_HWE <- data.frame(
+         Populations = rownames(fsnps_hwe_chisq_matrix),
+         Chisq = apply(fsnps_hwe_chisq_matrix < alpha, 1, mean),
+         MC = apply(fsnps_hwe_mc < alpha_value, 1, mean))
+      
+   } else if (correction == "Bonferroni") {
+
+      loci_HWE_failure <- data.frame(
+         rsID = colnames(fsnps_hwe_chisq_matrix),
+         Chisq = apply(fsnps_hwe_chisq_matrix < alpha_value, 2, mean),
+         MC = apply(fsnps_hwe_mc < alpha_value, 2, mean))
+      
+      pops_out_of_HWE <- data.frame(
+         Populations = rownames(fsnps_hwe_chisq_matrix),
+         Chisq = apply(fsnps_hwe_chisq_matrix < alpha_value, 1, mean),
+         MC = apply(fsnps_hwe_mc < alpha_value, 1, mean))
+      
+   } else if (correction == "FDR") {
+      Chisq_FDR <- apply(fsnps_hwe_chisq_matrix, 1, p.adjust, method = "fdr")
+      Chisq_FDR <- t(Chisq_FDR)
+      
+      MC_FDR <- apply(fsnps_hwe_mc, 1, p.adjust, method = "fdr")
+      MC_FDR <- t(MC_FDR)
+      
+      loci_HWE_failure <- data.frame(
+         rsID = colnames(fsnps_hwe_chisq_matrix),
+         Chisq = apply(fsnps_hwe_chisq_matrix < alpha_value, 2, mean),
+         MC = apply(fsnps_hwe_mc < alpha_value, 2, mean),
+         Chisq_FDR = apply(Chisq_FDR < alpha_value, 2, mean),
+         MC_FDR = apply(MC_FDR < alpha_value, 2, mean)
+      )
+      
+      pops_out_of_HWE <- data.frame(
+         Populations = rownames(fsnps_hwe_chisq_matrix),
+         Chisq = apply(fsnps_hwe_chisq_matrix < alpha_value, 1, mean),
+         MC = apply(fsnps_hwe_mc < alpha_value, 1, mean),
+         Chisq_FDR = apply(Chisq_FDR < alpha_value, 1, mean),
+         MC_FDR = apply(MC_FDR < alpha_value, 1, mean)
+                                     )
+   } else {
+      stop("Correction method not supported")
+   }
+   
+   rownames(loci_HWE_failure) <- NULL
+   rownames(pops_out_of_HWE) <- NULL
    
    return(list(
       hw_summary = fsnps_hwe,
-      hw_dataframe = fsnps_hwe_chisq_df
+      hw_dataframe = fsnps_hwe_chisq_df,
+      hw_mc = fsnps_hwe_mc_df,
+      loci_HWE_failure = loci_HWE_failure,
+      pops_out_of_HWE = pops_out_of_HWE
    ))
 }
 
@@ -320,7 +388,10 @@ export_pop_results <- function(allele_freq, priv_alleles, stats_matrix, hw_matri
       "Inbreeding Coefficient" = as.data.frame(stats_matrix$inbreeding_coeff),
       "Allele Frequencies" = allele_freq,
       "Hardy-Weinberg Equilibrium" = as.data.frame(hw_matrix$hw_summary),
-      "Chi-square Test Results" = as.data.frame(hw_matrix$hw_dataframe),
+      "Chi-square test HWE" = as.data.frame(hw_matrix$hw_dataframe),
+      "Monte Carlo test HWE" = as.data.frame(hw_matrix$hw_mc),
+      "Loci out of HWE" = as.data.frame(hw_matrix$loci_HWE_failure),
+      "Pops out of HWE" = as.data.frame(hw_matrix$pops_out_of_HWE),
       "Pairwise Fst Matrix" = as.data.frame(fst_matrix$fst_matrix)
    )
    
