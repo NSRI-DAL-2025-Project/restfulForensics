@@ -847,7 +847,6 @@ to_snipper <- function(input,
 #' 
 #' @importFrom tools file_ext
 #' @importFrom ape read.dna as.DNAbin
-#' @importFrom rphast read.msa guess.format.msa
 #' 
 #' @export
 #' @examples
@@ -855,7 +854,7 @@ to_snipper <- function(input,
 alignment_to_dnabin <- function(path) {
    ext <- tolower(tools::file_ext(path))
    
-   if (ext %in% c("fasta", "fa", "fas", "aln")) {
+   if (ext %in% c("fasta", "fa", "fas")) {
       alignment <- ape::read.dna(
          file = path,
          format = "fasta",
@@ -863,21 +862,27 @@ alignment_to_dnabin <- function(path) {
          skip = 0,
          as.matrix = FALSE
       )
-      return(ape::as.DNAbin(alignment))
-   } else if (ext == "msa") {
-      msa_alignment <- rphast::read.msa(
-         path,
-         format = rphast::guess.format.msa(path, method = "content")
-      )
+   } else {
       
-      seqs <- msa_alignment$seq
-      names <- msa_alignment$nam
+      if (ext == "mase") {
+         alignment <- seqinr::read.alignment(path, format = "mase")
+         
+      } else if (ext == "aln") {
+         alignment <- seqinr::read.alignment(path, format = "clustal")
+         
+      } else if (ext == "msf") {
+         alignment <- seqinr::read.alignment(path, format = "msf")
+         
+      } else if (ext == "phylip") {
+         alignment <- seqinr::read.alignment(path, format = "phylip")
+      } else {
+         stop("Unsupported file format: ", ext)
+      }
       
-      matrix <- do.call(rbind, lapply(seqs, function(x) {
-         strsplit(toupper(x), "")[[1]]
-      }))
-      rownames(matrix) <- names
-      return(ape::as.DNAbin(matrix))
+      mat <- do.call(rbind, strsplit(alignment$seq, ""))
+      rownames(mat) <- alignment$nam
+      alignment <- ape::as.DNAbin(mat)
    }
-   stop("Unsupported file format: ", ext)
+
+   return(alignment)
 }
