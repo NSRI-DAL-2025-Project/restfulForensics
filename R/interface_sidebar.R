@@ -5,7 +5,7 @@ restful_sidebar <- function() {
       sidebarMenu(
          id = "tabs",
          tags$head(tags$style("img {max-width: 100%; height: auto; }")),
-         tags$img(src = "restful-www/readme/full.png", height = "auto", width = "300px"),
+         tags$img(src = "readme/full.png", height = "auto", width = "300px", height = "100px"),
          menuItem("Homepage", tabName = "dashboard", icon = icon("dashboard")),
          menuItem("File Conversion", tabName = "FileConv", icon = icon("arrows-rotate")),
          menuItem("SNP Data Extraction", tabName = "markerExtract", icon = icon("dna")),

@@ -17,7 +17,7 @@ dashboard_server <- function(input, output, session, rv){
    
    output$workplanImg <- renderUI({
       tags$img(
-         src = "restful-www/readme/chart.png",
+         src = "readme/chart.png",
          style = paste0(
             "transform: scale(", zoom(), ");",
             "transform-origin: top center;",
@@ -37,7 +37,7 @@ dashboard_server <- function(input, output, session, rv){
    
    output$fileConvTable <- renderUI({
       tags$img(
-         src = "restful-www/fileconv.png",
+         src = "fileconv.png",
          style = paste0(
             "transform: scale(", zoom(), ");",
             "transform-origin: top center;",

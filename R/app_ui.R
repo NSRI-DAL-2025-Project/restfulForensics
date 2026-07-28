@@ -6,7 +6,7 @@ app_ui <- function(request = NULL){
       dashboardBody(
          useShinyjs(),
          tags$head(
-            tags$link(rel = "stylesheet", type = "text/css", href = "restful-www/custom.css")
+            includeCSS("www/custom.css")
          ),
          shinybusy::add_busy_spinner(spin = "fading-circle", position = "full-page"),
          tags$style(HTML("

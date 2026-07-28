@@ -5,15 +5,12 @@ library(shinybusy)
 library(plotly)
 library(dplyr)
 
-   options(shiny.maxRequestSize = 5000 * 1024^2)
-   shiny::addResourcePath(
-      "restful-www",
-      system.file(
-         "www", package = "restfulForensics"
-      )
-   )
+options(shiny.maxRequestSize = 5000 * 1024^2)
+
+source_files <- list.files("R", pattern = "\\.R$", full.names = TRUE)
+invisible(lapply(source_files, source))
    
-   shiny::shinyApp(
+shinyApp(
       ui = app_ui,
       server = app_server
    )
