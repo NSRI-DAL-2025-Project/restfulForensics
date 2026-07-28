@@ -1,7 +1,7 @@
 # when adding new packages, just do renv::install()
 # use "github::username/repository" for github
 # or "BiocManager::BiocVersion"
-library(ade4)
+suppressPackageStartupMessages({library(ade4)
 library(adegenet)
 library(ape)
 library(BarcodingR)
@@ -46,4 +46,4 @@ library(tools)
 library(utils)
 library(vcfR)
 library(writexl)
-library(zip)
+library(zip)})
