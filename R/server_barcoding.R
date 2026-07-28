@@ -73,11 +73,6 @@ barcoding_server <- function(input, output, session, rv) {
       
       Sys.sleep(1.5)
       
-      # barcoding_ref <- rphast::read.msa(
-      #   input$optimizeKmerRef$datapath,
-      #   format = rphast::guess.format.msa(input$optimizeKmerRef$datapath, method = "content")
-      #   )
-      # kmer_File <- ape::as.DNAbin(as.character(barcoding_ref))
       kmer_File <- ape::read.dna(
          input$optimizeKmerRef$datapath,
          format = "fasta"

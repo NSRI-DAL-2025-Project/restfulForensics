@@ -4,10 +4,14 @@
 \alias{compute_hwe}
 \title{Perform HWE test}
 \usage{
-compute_hwe(fsnps_gen)
+compute_hwe(fsnps_gen, correction = "Bonferroni", alpha = 0.05)
 }
 \arguments{
 \item{fsnps_gen}{The genind data containing genotype and population information.}
+
+\item{correction}{The method of correction to be applied in calculating the alpha to identify out of HWE. Default is Bonferroni.}
+
+\item{alpha}{The alpha value for the threshold. Default is 0.05.}
 }
 \value{
 A list of HWE stats results.
