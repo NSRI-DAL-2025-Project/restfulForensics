@@ -4,11 +4,7 @@
 #' 
 #' @keywords internal
 get_plink2_path <- function() {
-   system.file(
-      "plink",
-      "plink2.exe",
-      package = "restfulForensics"
-   )
+   return(Sys.which("plink2"))
 }
 
 #' Get PLINK1.9 executable path
@@ -17,11 +13,7 @@ get_plink2_path <- function() {
 #' 
 #' @keywords internal
 get_plink_path <- function() {
-   system.file(
-      "plink",
-      "plink.exe",
-      package = "restfulForensics"
-   )
+   return(Sys.which("plink"))
 }
 
 #' Unpack compressed files
