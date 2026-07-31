@@ -13,7 +13,7 @@
 #' @returns A list of file paths of range files.
 #' 
 #' @keywords internal
-create_range_file <- function(pos_input, addID = FALSE, output_dir = ".") {
+create_range_file <- function(pos_input, addID = FALSE) {
    
    if (is.character(pos_input)) {
       pos_df <- load_csv_xlsx_files(pos_input)
@@ -24,9 +24,9 @@ create_range_file <- function(pos_input, addID = FALSE, output_dir = ".") {
    pos_df <- as.data.frame(pos_df)
    
    if (isTRUE(addID)) {
-      chr <- as.character(pos_df[[2]])
+      chr <- as.character(trimws(pos_df[[2]]))
       pos <- as.numeric(pos_df[[3]])
-      label <- as.character(pos_df[[1]])
+      label <- as.character(trimws(pos_df[[1]]))
       
       range_df <- data.frame(
          CHR = chr,
@@ -36,7 +36,7 @@ create_range_file <- function(pos_input, addID = FALSE, output_dir = ".") {
          stringsAsFactors = FALSE
       )
       
-      range_file <- file.path(output_dir, "range.txt")
+      range_file <- tempfile(pattern = "range", fileext = ".txt")
       
       write.table(
          range_df,
@@ -53,7 +53,7 @@ create_range_file <- function(pos_input, addID = FALSE, output_dir = ".") {
          stringsAsFactors = FALSE
       )
       
-      updated_file <- file.path(output_dir, "update_name.txt")
+      updated_file <- tempfile(pattern = "update_name", fileext = ".txt")
       
       write.table(
          update_name,
@@ -67,8 +67,8 @@ create_range_file <- function(pos_input, addID = FALSE, output_dir = ".") {
       return(list(range_file = range_file, updated_file = updated_file))
       
    } else {
-      chr <- as.character(pos_df[[1]])
-      pos <- as.numeric(pos_df[[2]])
+      chr <- as.character(pos_df[[2]])
+      pos <- as.numeric(pos_df[[3]])
       
       range_df <- data.frame(
          CHR = chr,
@@ -77,7 +77,7 @@ create_range_file <- function(pos_input, addID = FALSE, output_dir = ".") {
          stringsAsFactors = FALSE
       )
       
-      range_file <- file.path(output_dir, "range.txt")
+      range_file <- tempfile(pattern = "range", fileext = ".txt")
       
       write.table(
          range_df,
@@ -120,11 +120,12 @@ extract_by_ID_pgen <- function(pgen_prefix,
       "--out", shQuote(out_prefix)
    )
    
-   system(cmd)
+   #system(cmd)
+   status <- system(cmd, intern = FALSE, ignore.stdout = FALSE, ignore.stderr = FALSE)
    vcf_file <- paste0(out_prefix, ".vcf")
    
-   if (!file.exists(vcf_file)) {
-      stop("PLINK extraction failed: no VCF generated.")
+   if (status != 0) {
+      stop("PLINK failed:", status)
    }
    
    return(vcf_file)
@@ -149,9 +150,11 @@ extract_by_pos_pgen <- function(pos_list,
                                 merged_file = "extracted_file") {
    
    plink_path <- get_plink2_path()
-   range_file <- create_range_file(pos_list, addID = FALSE, output_dir)
+   range_file <- create_range_file(pos_list, addID = FALSE)
    
    out_prefix <- file.path(output_dir, merged_file)
+   
+   print(read.delim(range_file$range_file, header = FALSE))
    
    cmd <- paste(
       shQuote(plink_path),
@@ -161,11 +164,11 @@ extract_by_pos_pgen <- function(pos_list,
       "--out", shQuote(out_prefix)
    )
    
-   system(cmd)
+   status <- system(cmd, intern = FALSE, ignore.stdout = FALSE, ignore.stderr = FALSE)
    vcf_file <- paste0(out_prefix, ".vcf")
    
-   if (!file.exists(vcf_file)) {
-      stop("PLINK extraction failed: no VCF generated. Check if using correct build for extraction.")
+   if (status != 0) {
+      stop("PLINK failed:", status)
    }
    
    return(vcf_file)
@@ -188,7 +191,7 @@ extract_POStoID_pgen <- function(pos_list,
                                  output_dir = ".") {
    
    plink_path <- get_plink2_path()
-   range_file <- create_range_file(pos_list, addID = TRUE, output_dir)
+   range_file <- create_range_file(pos_list, addID = TRUE)
    
    extracted_prefix <- file.path(output_dir, "pos_extract")
    cmd_extract <- paste(
