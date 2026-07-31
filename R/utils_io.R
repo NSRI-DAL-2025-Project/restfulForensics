@@ -4,7 +4,7 @@
 #' 
 #' @keywords internal
 get_plink2_path <- function() {
-   return(Sys.which("plink2"))
+   return("./plink/plink2.exe")
 }
 
 #' Get PLINK1.9 executable path
@@ -13,7 +13,7 @@ get_plink2_path <- function() {
 #' 
 #' @keywords internal
 get_plink_path <- function() {
-   return(Sys.which("plink"))
+   return("./plink/plink.exe")
 }
 
 #' Unpack compressed files
