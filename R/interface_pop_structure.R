@@ -26,7 +26,7 @@ structure_tab <- function() {
          ),
          tabBox(
             tabPanel(
-               "Instructions",
+               title = "Instructions",
                p(
                   "This runs the basic Windows implementation of STRUCTURE v2.3.4 without a front-end and allows immediate
                                    visualization of results using revised functions from the ",
@@ -49,11 +49,11 @@ structure_tab <- function() {
                )
             ),
             tabPanel(
-               "Sample Input File",
+               title = "Sample Input File",
                DT::dataTableOutput("examplePop_STR2UI")
             ),
             tabPanel(
-               "Download Sample File",
+               title = "Download Sample File",
                h4("Download Sample File"),
                tags$ul(
                   tags$a("Sample CSV file", href = "sample.csv", download = "sample.csv")

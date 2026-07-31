@@ -595,7 +595,6 @@ file_conversion_server <- function(input, output, session, rv) {
    )
    
    # ==================== CSV to STR =======================#
-   
    examplePop_STR <- data.frame(
       Sample = c("Sample1", "Sample2", "Sample3", "Sample4", "..."),
       Population = c("POP1", "POP2", "POP3", "POP4", "..."),
@@ -692,5 +691,108 @@ file_conversion_server <- function(input, output, session, rv) {
       req(str_file())
       downloadButton("downloadSTRfile", "Download .str File")
    })
+   
+   # ==================== To Arlequin-compatible file =======================#
+   exampleTableSnipper2 <- data.frame(
+      Ind = c("sample1", "sample2", "sample3", "sample4", "..."),
+      Pop = c("sub_pop1", "sub_pop2", "sub_pop3", "sub_pop4", "..."),
+      Superpop = c("region1", "region1", "region2", "region3", "..."),
+      rs101 = c("A/A", "A/T", "T/T", "A/T", "..."),
+      rs102 = c("G/C", "G/C", "G/G", "G/C", "..."),
+      rs103 = c("C/C", "C/G", "G/G", "G/G", "..."),
+      rs_n = c("...", "...", "...", "...", "...")
+   )
+   
+   output$exampleTableSnipper2 <- DT::renderDataTable(
+      {
+         req(exampleTableSnipper2)
+         exampleTableSnipper2
+      },
+      options = list(
+         scrollX = TRUE,
+         pageLength = 10
+      )
+   )
+   
+   #======== REVISE
+   
+   convertedSNIPPER <- reactiveVal(NULL)
+   outputName <- "snipper.xlsx"
+   
+   observe({
+      shinyjs::toggleState("convert2Arle", !is.null(input$toArleFile))
+   })
+   
+   observeEvent(input$convert2Arle, {
+      disable("convert2Arle")
+      
+      tosnipper_file <- load_csv_xlsx_files(input$toArleFile$datapath)
+      
+      tosnipper_file <- dplyr::rename(tosnipper_file, Sample = 1)
+      
+      if (!is.null(input$refProvided)) {
+         inputPath <- tosnipper_file[, -c(2, 3)]
+         refPath <- tosnipper_file[, 2:3]
+      } else {
+         inputPath <- tosnipper_file
+         refPath <- load_csv_xlsx_files(input$refFile$datapath)
+      }
+      
+      refPath <- dplyr::rename(refPath, Sample = 1)
+      targetSet <- input$targetPop
+      targetName <- if (targetSet) input$targetPopName else NULL
+      inputData <- colnames(inputPath)
+      numMarkers <- length(inputData) - 1
+      
+      withProgress(message = "Converting to SNIPPER-analysis ready file...", value = 0, {
+         snipper.file <- tryCatch(
+            {
+               to_snipper(
+                  input = inputPath,
+                  references = refPath,
+                  target.pop = targetSet,
+                  population.name = targetName,
+                  markers = numMarkers
+               )
+            },
+            error = function(e) {
+               showNotification(paste("Conversion failed:", e$message), type = "error")
+               NULL
+            }
+         )
+         
+         if (!is.null(snipper.file)) {
+            convertedSNIPPER(snipper.file)
+            
+            enable("convert2Arle")
+         }
+         enable("convert2Arle")
+      })
+   })
+   
+   output$downloadConverted <- downloadHandler(
+      filename = function() {
+         outputName
+      },
+      content = function(file) {
+         openxlsx::write.xlsx(convertedSNIPPER(), file)
+      }
+   )
+   
+   output$downloadSNIPPER <- renderUI({
+      req(convertedSNIPPER())
+      downloadButton("downloadConverted", "Download SNIPPER-ready file")
+   })
+   
+   output$previewTableSNIPPER <- DT::renderDataTable(
+      {
+         req(convertedSNIPPER())
+         convertedSNIPPER()
+      },
+      options = list(
+         scrollX = TRUE,
+         pageLength = 10
+      )
+   )
    
 }

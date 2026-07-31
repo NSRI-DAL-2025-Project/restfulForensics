@@ -6,7 +6,7 @@ references_tab <- function() {
       tabBox(
          width = 12,
          tabPanel(
-            "References",
+            title = "References",
             div(
                style = "height: 80vh; overflow-y:scroll;",
                uiOutput("referenceTexts")

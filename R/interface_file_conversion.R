@@ -6,7 +6,7 @@ file_conversion_tab <- function() {
       tabsetPanel(
          # Format conversion submodule ==========================================================
          tabPanel(
-            "Convert Files",
+            title = "Convert Files",
             fluidRow(
                box(
                   title = "File Conversion Options",
@@ -62,7 +62,7 @@ file_conversion_tab <- function() {
                ),
                tabBox(
                   tabPanel(
-                     "Instructions",
+                     title = "Instructions",
                      h4("This interconverts common genetic files and formats with or without population information."),
                      p(strong("Input file/s:")),
                      p("Required: VCF, BCF, or PLINK (.bed, .bim, .fam) files. It also accepts zipped files as long as it contains the same file type, except if using PLINK files."),
@@ -75,14 +75,14 @@ file_conversion_tab <- function() {
                      p("Maximum accepted file size: 5GB. It is recommended to split files with sizes larger than 5GB into multiple smaller files.")
                   ),
                   tabPanel(
-                     "Sample Input Format/s",
+                     title = "Sample Input Format/s",
                      h4("For File to VCF conversion, a separate file on marker information is needed."),
                      h4("Required marker info format:"),
                      DT::dataTableOutput("ExampleCSVFormat"),
                      DT::dataTableOutput("markerInfoFormat")
                   ),
                   tabPanel(
-                     "Download Sample Files",
+                     title = "Download Sample Files",
                      tags$a("A. Sample VCF", href = "sample_hgdp.vcf", download = "sample_hgdp.vcf"),
                      br(),
                      tags$a("B. Sample zipped file (VCF files)", href = "vcf_sample_files.zip", download = "vcf_sample_files.zip"),
@@ -97,7 +97,7 @@ file_conversion_tab <- function() {
                tabBox(
                   width = 12,
                   tabPanel(
-                     "Download Results",
+                     title = "Download Results",
                      uiOutput("downloadVCF_UI"),
                      uiOutput("downloadPLINK_UI")
                   )
@@ -106,7 +106,7 @@ file_conversion_tab <- function() {
          ),
          
          tabPanel(
-            "Add Metadata",
+            title = "Add Metadata",
             fluidRow(
                box(
                   checkboxInput("isPLINKmeta", "Use PLINK files", value = FALSE),
@@ -149,7 +149,7 @@ file_conversion_tab <- function() {
                ),
                tabBox(
                   tabPanel(
-                     "Instructions",
+                     title = "Instructions",
                      h4("This merges select metadata to genotype data."),
                      p(strong("Input file/s:")),
                      tags$ul(
@@ -159,12 +159,12 @@ file_conversion_tab <- function() {
                      p(strong("Expected output file/s:"), "CSV file of sample with metadata.")
                   ),
                   tabPanel(
-                     "Sample Input Format/s",
+                     title = "Sample Input Format/s",
                      h4("To convert to a CSV file with population metadata:"),
                      DT::dataTableOutput("ExampleRefFile"),
                   ),
                   tabPanel(
-                     "Download Sample Files",
+                     title = "Download Sample Files",
                      tags$a("A. Sample VCF", href = "sample_hgdp.vcf", download = "sample_hgdp.vcf"),
                      br(),
                      tags$a("B. Sample zipped file (VCF files)", href = "vcf_sample_files.zip", download = "vcf_sample_files.zip"),
@@ -206,7 +206,7 @@ file_conversion_tab <- function() {
          
          # Widen long genotype file submodule ===================================================
          tabPanel(
-            "Widen SNP calls",
+            title = "Widen SNP calls",
             fluidRow(
                box(
                   fileInput("uas_zip", "Upload ZIP or TAR file",
@@ -220,13 +220,13 @@ file_conversion_tab <- function() {
                ),
                tabBox(
                   tabPanel(
-                     "Instructions",
+                     title = "Instructions",
                      h4("This converts zipped excel (.xlsx) files containing SNP calls in long format into a single excel file in a wide format."),
                      p(strong("Input file/s:"), "Compressed folder (.zip or .tar) containing .xlsx files."),
                      p(strong("Expected output file/s:"), "Single CSV file (merged .xlsx files).")
                   ),
                   tabPanel(
-                     "Sample Input Format/s",
+                     title = "Sample Input Format/s",
                      h4("Sample input file. All alleles of available SNPs per sample are listed in a long format."),
                      tableOutput("exampleXLSX")
                   )
@@ -251,7 +251,7 @@ file_conversion_tab <- function() {
          
          # Convert file to SNIPPER compatible file submodule ====================================
          tabPanel(
-            "Convert to SNIPPER analysis-ready file",
+            title = "Convert to SNIPPER analysis-ready file",
             fluidRow(
                box(
                   width = 6,
@@ -272,7 +272,7 @@ file_conversion_tab <- function() {
                ),
                tabBox(
                   tabPanel(
-                     "Instructions",
+                     title = "Instructions",
                      p(
                         "The ",
                         tags$a("SNIPPER app suite",
@@ -291,7 +291,7 @@ file_conversion_tab <- function() {
                      p(strong("Expected output file/s:"), ".xlsx")
                   ),
                   tabPanel(
-                     "Sample Input Format/s",
+                     title = "Sample Input Format/s",
                      h4("Sample Input File"),
                      p("Format if input file does", strong("not"), "contain population metadata:"),
                      DT::dataTableOutput("exampleTableSnipper1"),
@@ -303,7 +303,7 @@ file_conversion_tab <- function() {
                      DT::dataTableOutput("exampleRefSnipper")
                   ),
                   tabPanel(
-                     "Download Sample File",
+                     title = "Download Sample File",
                      h4("Downloadable Sample"),
                      tags$ul(
                         tags$a("Sample zipped file", href = "sample_snipper.csv", download = "sample_snipper.csv")
@@ -330,7 +330,7 @@ file_conversion_tab <- function() {
          
          # Convert file to standard STRUCTURE compatible file ===================================
          tabPanel(
-            "To STRUCTURE file",
+            title = "To STRUCTURE file",
             fluidRow(
                box(
                   width = 6,
@@ -343,7 +343,7 @@ file_conversion_tab <- function() {
                ),
                tabBox(
                   tabPanel(
-                     "Instructions",
+                     title = "Instructions",
                      p(tags$a("STRUCTURE",
                               href = "https://web.stanford.edu/group/pritchardlab/structure.html",
                               target = "_blank"
@@ -371,7 +371,68 @@ file_conversion_tab <- function() {
                      )
                   ),
                   tabPanel(
-                     "Sample Input Format",
+                     title = "Sample Input Format",
+                     DT::dataTableOutput("examplePop_STRUI")
+                  )
+               )
+            ),
+            fluidRow(
+               tabBox(
+                  title = "Conversion Result",
+                  width = 12,
+                  tabPanel(
+                     title = "Preview and Download",
+                     tableOutput("revisedCSV"),
+                     tableOutput("strFile"),
+                     br(),
+                     uiOutput("downloadrevised_UI"),
+                     uiOutput("downloadSTRfile_UI")
+                  )
+               )
+            )
+         ),
+         
+         # Convert file to Arlequin compatible file ===================================
+         tabPanel(
+            title = "To Arlequin file",
+            fluidRow(
+               box(
+                  width = 6,
+                  fileInput("toArleFile", "Upload CSV/XLSX file", accept = c(".xlsx", ".csv")),
+                  helpText("Use the 'Convert files to CSV' file if using VCF, BCF, or PLINK files. Population data is necessary."),
+                  actionButton("convert2Arle", "Generate Arlequin-compatible File", icon = icon("arrow-up-right-from-square"))
+               ),
+               tabBox( #=========== FOR REVISION
+                  tabPanel(
+                     title = "Instructions",
+                     p(tags$a("STRUCTURE",
+                              href = "https://web.stanford.edu/group/pritchardlab/structure.html",
+                              target = "_blank"
+                     ), " is a free software package for investigating population structure using
+                                              multi-locus genotype data (Stephen and Donnelly, 2000; Falush et al., 2003;
+                                              Falush et al., 2007; Hubisz et al., 2009)."),
+                     br(),
+                     p("This converts CSV files into standard STRUCTURE-compatible files. This module was tested on STRUCTURE version 2.3.4."),
+                     p(strong("Input file/s:"), "CSV file containing marker and population data.
+                                              Each row should represent multi-locus data for an individual sample."),
+                     p(strong("Parameter/s:"), "User's operating system (for STRUCTURE input compatibility)"),
+                     p(strong("Expected output file/s:")),
+                     tags$ul(
+                        tags$li("structure (.str) file"),
+                        tags$li("revised input file")
+                     ),
+                     br(),
+                     p("STRUCTURE generally can't handle sample labels with alphabets, the function converts sample labels to their associated row number."),
+                     p(
+                        "For users who opt to use STRUCTURE via the terminal or GUI, instructions can be found here: ",
+                        tags$a("STRUCTURE v2.3.4 documentation",
+                               href = "https://web.stanford.edu/group/pritchardlab/structure_software/release_versions/v2.3.4/html/structure.html",
+                               target = "_blank"
+                        )
+                     )
+                  ),
+                  tabPanel(
+                     title = "Sample Input Format",
                      DT::dataTableOutput("examplePop_STRUI")
                   )
                )
@@ -391,6 +452,8 @@ file_conversion_tab <- function() {
                )
             )
          )
+         
+         
       )
    )
    

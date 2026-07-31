@@ -79,7 +79,7 @@ filtering_tab <- function() {
          ),
          tabBox(
             tabPanel(
-               "Instructions",
+               title = "Instructions",
                h4("This filters individuals and variants using standard options in PLINK 2.0 (Chang et al., 2015)."),
                p(strong("Input file/s:"), ".vcf, .vcf.gz, .bcf, or PLINK (bed/bim/fam) files"),
                p(strong("Parameter/s:")),
@@ -108,22 +108,22 @@ filtering_tab <- function() {
                )
             ),
             tabPanel(
-               "Download sample files",
+               title = "Download sample files",
                tags$a("Sample VCF", href = "sample_hgdp.vcf", download = "sample_hgdp.vcf")
             )
          ),
          tabBox(
             tabPanel(
-               "PLINK Commands Preview",
+               title = "PLINK Commands Preview",
                verbatimTextOutput("plinkCommandPreview"),
             ),
             tabPanel(
-               "Depth Plots",
+               title = "Depth Plots",
                imageOutput("depthMarkerPlot"),
                imageOutput("depthSamplePlot")
             ),
             tabPanel(
-               "Download Files",
+               title = "Download Files",
                uiOutput("depthMarkerPlot_UI"),
                uiOutput("depthSamplePlot_UI"),
                uiOutput("downloadFilteredFile_UI")

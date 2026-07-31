@@ -23,7 +23,7 @@ exploratory_tab <- function() {
          ),
          tabBox(
             tabPanel(
-               "Instructions",
+               title = "Instructions",
                h4("This runs principal component analysis using the ade4 (Dray and Dufour, 2007) package in R."),
                br(),
                p(strong("Input file:"), "CSV or XLSX file and color labels (optional)"),
@@ -42,12 +42,12 @@ exploratory_tab <- function() {
                p(strong("Expected output file:"), "PNG plots")
             ),
             tabPanel(
-               "Sample Input Format/s",
+               title = "Sample Input Format/s",
                h4("Example: PCA Input Format"),
                tableOutput("examplePCA")
             ),
             tabPanel(
-               "Download sample files",
+               title = "Download sample files",
                h4("Sample File"),
                tags$ul(
                   tags$a("Sample file", href = "sample.csv", download = "sample.csv")
@@ -60,12 +60,12 @@ exploratory_tab <- function() {
             title = "PCA Results",
             width = 12,
             tabPanel(
-               "Plots",
+               title = "Plots",
                plotly::plotlyOutput("pcaPlot"),
                downloadButton("downloadPCAPlot", "Download PCA Plot")
             ),
             tabPanel(
-               "Bar Plot",
+               title = "Bar Plot",
                plotOutput("barPlot"),
                downloadButton("downloadbarPlot", "Download Bar Plot"),
             )

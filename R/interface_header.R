@@ -7,7 +7,7 @@ restful_header <- function() {
          )
       ),
       titleWidth = 300,
-      tags$li(
+      header = tags$li(
          class = "dropdown",
          style = "font-family: 'Carmen', sans-serif; padding: 10px;",
          actionButton("refreshApp", "Refresh App", icon = icon("rotate"))
