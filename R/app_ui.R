@@ -22,7 +22,9 @@ app_ui <- function(request = NULL){
             filtering_tab(),
             exploratory_tab(),
             popstats_tab(),
-            structure_tab(),
+            #structure_tab(), to separate into two
+            structure_runs(),
+            plot_structure_runs(),
             forensic_params_tab(),
             classification_tab(),
             msa_tab(),

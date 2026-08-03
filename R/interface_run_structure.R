@@ -1,8 +1,8 @@
-structure_tab <- function() {
+structure_runs <- function() {
    
    # POPULATION STRUCTURE MODULE ===========================================================================
    tabItem(
-      tabName = "PopStructure",
+      tabName = "StructureRun",
       fluidRow(
          box(
             fileInput("structureFile", "Upload Input File (CSV/XLSX)", accept = c(".csv", ".xlsx")),
@@ -59,18 +59,6 @@ structure_tab <- function() {
                   tags$a("Sample CSV file", href = "sample.csv", download = "sample.csv")
                )
             )
-         )
-      ),
-      fluidRow(
-         box(
-            width = 12,
-            title = "STRUCTURE Results",
-            uiOutput("structurePlotPreview")
-         ),
-         box(
-            width = 12,
-            title = "Evanno Plots",
-            uiOutput("evannoPlotPreview")
          )
       )
    )

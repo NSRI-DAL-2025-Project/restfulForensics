@@ -22,7 +22,9 @@ app_server <- function(input, output, session) {
    
    exploratory_analysis_server(input, output, session, rv)
    
-   structure_analysis_server(input, output, session, rv)
+   run_structure_analysis(input, output, session, rv)
+   
+   plot_structure_server(input, output, session, rv)
    
    classification_server(input, output, session, rv)
    
