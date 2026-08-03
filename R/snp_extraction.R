@@ -125,7 +125,7 @@ extract_by_ID_pgen <- function(pgen_prefix,
    vcf_file <- paste0(out_prefix, ".vcf")
    
    if (status != 0) {
-      stop("PLINK failed:", status)
+      stop("PLINK failed: ", status)
    }
    
    return(vcf_file)
@@ -168,7 +168,7 @@ extract_by_pos_pgen <- function(pos_list,
    vcf_file <- paste0(out_prefix, ".vcf")
    
    if (status != 0) {
-      stop("PLINK failed:", status)
+      stop("PLINK failed: ", status)
    }
    
    return(vcf_file)

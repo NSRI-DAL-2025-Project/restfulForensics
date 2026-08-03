@@ -138,7 +138,6 @@ file_conversion_tab <- function() {
                         condition = "input.breakdownPop == 'YesBreakdown'",
                         helpText("Specify column name to serve as a basis for the summary count."),
                         uiOutput("selectMetaHeader")
-                        #textAreaInput("breakdown_column_plink", "Enter column name", rows = 1)
                      )
                   ),
                   conditionalPanel(
@@ -214,7 +213,7 @@ file_conversion_tab <- function() {
                   ),
                   helpText("*Accepts compressed files containing XLSX files."),
                   fileInput("ref_file", "Optional Reference File (CSV or XLSX)",
-                            accept = c(".csv", ".xlsx")
+                            accept = c(".csv", ".xlsx", ".zip", ".tar")
                   ),
                   actionButton("run_uas2csv", "Run Conversion")
                ),
@@ -400,6 +399,20 @@ file_conversion_tab <- function() {
                   width = 6,
                   fileInput("toArleFile", "Upload CSV/XLSX file", accept = c(".xlsx", ".csv")),
                   helpText("Use the 'Convert files to CSV' file if using VCF, BCF, or PLINK files. Population data is necessary."),
+                  checkboxInput("genotypicData", "Using Genotypic Data? (Untick if haplotypic data)", value = TRUE),
+                  checkboxInput("gameticPhase", "Gametic Phase known?", value = FALSE),
+                  checkboxInput("recessiveData", "Using co-dominant data?", value = FALSE),
+                  textInput("locusSep", "Symbol that separates alleles", value = "/"),
+                  #selectInput("dataTypeArlecore", "Type of Data to be Analyzed", 
+                  #            choices = c(
+                  #               "DNA" = "DNA",
+                  #               "STANDARD" = "STANDARD",
+                  #               "FREQUENCY" = "FREQUENCY",
+                  #               "MICROSAT" = "MICROSAT",
+                  #               "RFLP" = "RFLP"
+                  #            ),
+                  #            selected = "STANDARD"),
+                  checkboxInput("calcLD", "Perform linkage disequilibrium test?", value = FALSE),
                   actionButton("convert2Arle", "Generate Arlequin-compatible File", icon = icon("arrow-up-right-from-square"))
                ),
                tabBox( #=========== FOR REVISION
@@ -433,7 +446,7 @@ file_conversion_tab <- function() {
                   ),
                   tabPanel(
                      title = "Sample Input Format",
-                     DT::dataTableOutput("examplePop_STRUI")
+                     DT::dataTableOutput("exampleForArlecore")
                   )
                )
             ),

@@ -892,19 +892,29 @@ build_arp_per_population <- function(df,
                                      genotypic_data = 1,
                                      gametic_phase = 0,
                                      recessive_data = 0,
-                                     locus_sep = "/",
-                                     output.dir = ".",
-                                     output.file = "arp_file.arp",
+                                     locus_sep = "WHITESPACE",
+                                     output.prefix = "arp_file",
                                      data_type = "STANDARD") {
+   
+   #workdir <- tempfile("arlequin_")
+   #dir.create(workdir)
+   out_path <- file.path(".", paste0(output.prefix, ".arp"))
+   
+   if (file.exists(out_path)) {
+      file.remove(out_path)
+   }
    
    # get snps
    names(df) <- tolower(trimws(names(df)))
+   names(df)[2] <- "population"
+   
+   # need to ensure no XML reserved characters sa population (<, >, or &)
+   df$population <- gsub("&", "and", df$population) 
+   #df <- as.data.frame(df)
+   
+   subgroups <- unique(df$population)
    loci <- colnames(df)[-c(1,2)]
-   
-   # get subgroups
-   subgroups <- unique(df[2])
-   #df.columns.values[2] <- "population"
-   
+
    # Base Arlequin header
    arp <- c("[Profile]", 
             paste0('Title="Structure Analysis per Population"'), 
@@ -932,9 +942,9 @@ build_arp_per_population <- function(df,
          allele1_row <- c(); allele2_row <- c()
          
          for (loc in loci) {
-            val <- sub_df[i, loc]
+            val <- sub_df[[loc]][i]
             
-            if (is.na(val) || val == "" || val == "?") {
+            if (is.na(val) || val %in% c("", "?")) {
                allele1_row <- c(allele1_row, "?")
                allele2_row <- c(allele2_row, "?")
                next
@@ -961,4 +971,24 @@ build_arp_per_population <- function(df,
       }
       arp <- c(arp, "}", "")
    }
+   
+#   arp <- c(arp,
+#            "",
+#            "[[Structure]]",
+#            "",
+#            'StructureName="Population Structure"',
+#            paste0("NbGroups=", length(subgroups)))
+   
+#   for (sub in subgroups) {
+#      arp <- c(
+#         arp,
+#         "Group={",
+#         paste0('"', sub, '"'),
+#         "}"
+#      )
+#   }
+   
+   writeLines(arp, out_path)
+   message("SUCCESS: Generated Arlequin project file:", out_path)
+   return(out_path)
 }
