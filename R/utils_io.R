@@ -16,6 +16,7 @@ get_plink_path <- function() {
    return("./plink/plink.exe")
 }
 
+
 #' Unpack compressed files
 #'
 #' @param files The file path of the zipped file.

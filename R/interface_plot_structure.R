@@ -4,19 +4,26 @@ plot_structure_runs <- function() {
       tabName = "PlotStructure",
       fluidRow(
          box(
-            fileInput("zippedMatrices", "Upload STRUCTURE results (zipped matrices)", accept = c("zip", "tar")),
+            checkboxInput("plotSR", "Use STRUCTURE results", value = TRUE),
+            conditionalPanel(
+               condition = "input.plotSR == false",
+               fileInput("structureFilesZipped", "Upload zipped file of STRUCTURE results", accept = c("zip", "tar"))
+            ),
             numericInput("kChoice", "Target K Value", value = 2, min = 1),
+            helpText("To see other K values, run CLUMPP again."),
             selectInput("greedyAlgo", "Choose Algorithm",
-                        choices = c("Full Search" = "fullSearch", "Greedy" = "greedy", "Large K" = "largeK"),
+                        choices = c("Full Search" = "full.search", "Greedy" = "greedy", "Large K" = "large.k"),
                         selected = "greedy"),
             radioButtons("simStat", "Pairwise matrix similarity statistics",
                          choices = c("g" = "g", "g.prime" = "g.prime")
             ),
             conditionalPanel(
-               condition = "input.greedyAlgo %in% c('greedy', 'largeK')",
+               condition = "input.greedyAlgo == 'greedy' || input.greedyAlgo == 'large.k'",
                radioButtons("greedyOption", "Input order of the runs to be tested",
-                            choices = c("All" = "all", "ran order" = "ranOrder")
+                            choices = c("All" = "all", "ran order" = "ran.order"),
+                            selected = "ran.order"
                ),
+               numericInput("repeatsClumpp", "Number of input orders of runs for testing", value = 100, min = 0)
             ),
             numericInput("orderRun", "Permute clusters according to cluster order?", value = 0),
             actionButton("plotStructureResults", "Run CLUMPP", icon = icon("play"))
@@ -26,35 +33,20 @@ plot_structure_runs <- function() {
             tabPanel(
                "Instructions",
                p(
-                  "This runs the basic Windows implementation of STRUCTURE v2.3.4 without a front-end and allows immediate
-                                   visualization of results using revised functions from the ",
-                  tags$a("starmie",
-                         href = "https://github.com/sa-lee/starmie",
+                  "This runs CLUMPP (Jakobsson & Rosenberg, 2007) and plots STRUCTURE results using the ",
+                  tags$a("strataG",
+                         href = "https://github.com/EricArcher/strataG/tree/master",
                          target = "_blank"
-                  ), "R package. This generates STRUCTURE input files and qmatrices files compatible for
-                                   other visualization programs such as pong (Behr et al., 2016)."
+                  ), "R package."
                ),
-               p("Some functions were revised and adapted from the strataG and dartR packages such as 'gl.run.structure', '.structureParseQmat', 'structureRead', and 'utils.structure.evanno'"),
-               # h4("Generate STRUCTURE input files and pong compatible files. Visualize the possible results"),
-               p(strong("Input file:"), "CSV or XLSX file"),
-               p(strong("Expected output file:"), "Zipped qmatrices, individual files, and PNG plots"),
-               p(
-                  "See ",
-                  tags$a("STRUCTURE v2.3.4 Documentation",
-                         href = "https://web.stanford.edu/group/pritchardlab/structure_software/release_versions/v2.3.4/structure_doc.pdf",
-                         target = "_blank"
-                  )
-               )
-            ),
-            tabPanel(
-               "Sample Input File",
-               DT::dataTableOutput("examplePop_STR2UI")
+               p(strong("Input file:"), "Zipped structure files or structure result from Run STRUCTURE v2.3.4 tab."),
+               p(strong("Expected output file:"), "PNG plot")
             ),
             tabPanel(
                "Download Sample File",
                h4("Download Sample File"),
                tags$ul(
-                  tags$a("Sample CSV file", href = "sample.csv", download = "sample.csv")
+                  tags$a("Sample STRUCTURE results", href = "structure_results.csv", download = "structure_results.csv")
                )
             )
          )
@@ -63,16 +55,9 @@ plot_structure_runs <- function() {
          tabBox(
             width = 12,
             tabPanel(
-               "Prediction Table",
-               verbatimTextOutput("predictionTableResult")
-            ),
-            tabPanel(
-               "Statistics by Population",
-               verbatimTextOutput("statbyClassResult")
-            ),
-            tabPanel(
-               "Overall Statistics",
-               verbatimTextOutput("overallStatResult")
+               "CLUMPP results",
+               uiOutput("downloadStructure_UI"),
+               plotOutput("structure_result_plots")
             )
          )
       )

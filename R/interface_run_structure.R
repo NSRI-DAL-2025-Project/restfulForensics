@@ -12,14 +12,13 @@ structure_runs <- function() {
             numericInput("numKRep", "Replicates per K", value = 10, min = 1),
             numericInput("burnin", "Burn-in Period", value = 100000),
             numericInput("numreps", "MCMC Reps After Burn-in", value = 100000),
-            numericInput("ploidy", "Ploidy Level", value = 2),
-            checkboxInput("noadmix", "Use 'No Admixture' Model", value = FALSE),
-            checkboxInput("phased", "Phased Genotype", value = FALSE),
-            checkboxInput("linkage", "Use Linkage Model", value = FALSE),
-            checkboxInput("useAlpha", "Use default alpha value", value = TRUE),
+            checkboxInput("noadmix", "Use 'No Admixture' Model", value = TRUE),
+            checkboxInput("freqScore", "Use 'Correlated Frequencies' Model?", value = FALSE),
+            checkboxInput("advancedStructure", "See Advanced Parameters", value = FALSE),
             conditionalPanel(
-               condition = "!input.useAlpha",
-               textInput("alphaval", "Alpha Value (integers only)", value = 1)
+              condition = "input.advancedStructure == 'true' && input.noadmix == 'false'",
+              checkboxInput("inferAlpha", "Infer the value of model parameters", value = FALSE),
+              numericInput("alphaValStructure", "Alpha Value", value = 0.05, max = 1)
             ),
             actionButton("runStructure", "Run STRUCTURE", icon = icon("play")),
             uiOutput("downloadButtons")
@@ -29,17 +28,15 @@ structure_runs <- function() {
                "Instructions",
                p(
                   "This runs the basic Windows implementation of STRUCTURE v2.3.4 without a front-end and allows immediate
-                                   visualization of results using revised functions from the ",
-                  tags$a("starmie",
-                         href = "https://github.com/sa-lee/starmie",
+                                   visualization of results using the ",
+                  tags$a("strataG",
+                         href = "https://github.com/EricArcher/strataG/tree/master",
                          target = "_blank"
                   ), "R package. This generates STRUCTURE input files and qmatrices files compatible for
                                    other visualization programs such as pong (Behr et al., 2016)."
                ),
-               p("Some functions were revised and adapted from the strataG and dartR packages such as 'gl.run.structure', '.structureParseQmat', 'structureRead', and 'utils.structure.evanno'"),
-               # h4("Generate STRUCTURE input files and pong compatible files. Visualize the possible results"),
                p(strong("Input file:"), "CSV or XLSX file"),
-               p(strong("Expected output file:"), "Zipped qmatrices, individual files, and PNG plots"),
+               p(strong("Expected output file:"), "Zipped qmatrices and individual files"),
                p(
                   "See ",
                   tags$a("STRUCTURE v2.3.4 Documentation",
@@ -60,7 +57,16 @@ structure_runs <- function() {
                )
             )
          )
-      )
+      )#,
+      #fluidRow(
+      #   tabBox(
+      #      width = 12,
+      #      tabPanel(
+      #         "Status",
+      #         verbatimTextOutput("structure_log")
+      #      )
+      #   )
+      #)
    )
    
 }

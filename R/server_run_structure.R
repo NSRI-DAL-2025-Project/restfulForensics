@@ -1,5 +1,10 @@
 run_structure_analysis <- function(input, output, session, rv) {
    
+   structure_exec <- normalizePath(
+      "./structure/structure.exe",
+      mustWork = TRUE
+   )
+   
    examplePop_STR2 <- data.frame(
       Sample = c("Sample1", "Sample2", "Sample3", "Sample4", "..."),
       Population = c("POP1", "POP2", "POP3", "POP4", "..."),
@@ -25,66 +30,82 @@ run_structure_analysis <- function(input, output, session, rv) {
    })
    
    analysis_done <- reactiveVal(FALSE)
+   structureLog <- reactiveVal("")
    qmatrices_result <- reactiveVal(NULL)
-   output_dir <- tempdir()
-   out_path <- file.path(output_dir, "structure_input.str")
-   
+   output_dir <- tempfile("structure_")
+   dir.create(output_dir)
+   out_path <- output_dir
+
    observeEvent(input$runStructure, {
+      old_wd <- getwd()
+      setwd(output_dir)
+      on.exit(setwd(old_wd), add = TRUE)
       disable("runStructure")
       req(input$structureFile)
       Sys.sleep(1.5)
       
-      withProgress(message = "Running STRUCTURE analysis...", {
+      withProgress(message = "Analysis ongoing...", {
          incProgress(0.2, detail = "Loading input file...")
-         df <- load_csv_xlsx_files(input$structureFile$datapath)
-         df <- clean_input_data(df)
-         fsnps_gen <- convert_to_genind(df, to_str = TRUE, popinfo = TRUE)
+         df <- csv_to_gtype_format(input$structureFile$datapath)
+         df_gtype <- strataG::df2gtypes(df, ploidy = 2, id.col = 1, strata.col = 2, loc.col = 3)
          
-         incProgress(0.4, detail = "Converting to STRUCTURE file...")
-         
-         structure_df <- to_structure(fsnps_gen$fsnps_gen, include_pop = TRUE)
-         structure_df[] <- lapply(structure_df, function(col) as.numeric(as.character(col)))
-         
-         write.table(structure_df,
-                     file = out_path, quote = FALSE, sep = " ",
-                     row.names = FALSE, col.names = FALSE
-         )
-         
-         incProgress(0.6, detail = "Running STRUCTURE analysis...")
-         
-         if (isTRUE(input$useAlpha)) {
-            alphaValue <- 1
+         incProgress(0.4, detail = "Running STRUCTURE analysis...")
+         if (isTRUE(input$inferAlpha)){
+               sr <- strataG::structureRun(df_gtype,
+                                        k.range = input$kMin:input$kMax,
+                                        num.k.rep = input$numKRep,
+                                        burnin = input$burnin,
+                                        numreps = input$numreps,
+                                        noadmix = input$noadmix,
+                                        inferalpha = input$inferAlpha,
+                                        alpha = input$alphaValStructure,
+                                        exec = structure_exec,
+                                        delete.files = FALSE,
+                                        label = "structureRun"
+            )
          } else {
-            if (grepl("^-?[0-9]*\\.?[0-9]+$", input$alphaval)) {
-               alphaValue <- as.numeric(input$alphaval)
-            } else {
-               stop("Alpha value should strictly be integers/floats.")
-            }
+               sr <- strataG::structureRun(df_gtype,
+                                        k.range = input$kMin:input$kMax,
+                                        num.k.rep = input$numKRep,
+                                        burnin = input$burnin,
+                                        numreps = input$numreps,
+                                        noadmix = input$noadmix,
+                                        exec = structure_exec,
+                                        delete.files = FALSE,
+                                        label = "structureRun"
+            )
          }
+         stray_dir <- file.path(getwd(), "structureRun.structureRun")
          
-         result <- running_structure(out_path,
-                                     k.range = input$kMin:input$kMax,
-                                     num.k.rep = input$numKRep,
-                                     burnin = input$burnin,
-                                     numreps = input$numreps,
-                                     noadmix = input$noadmix,
-                                     phased = input$phased,
-                                     alpha_value = alphaValue,
-                                     ploidy = input$ploidy,
-                                     linkage = input$linkage,
-                                     structure_path = "structure/structure.exe",
-                                     output_dir = output_dir
-         )
+         if (dir.exists(stray_dir)) {
+            
+            dest <- file.path(out_path, "structure_files")
+            
+            dir.create(dest, recursive = TRUE, showWarnings = FALSE)
+            
+            file.copy(
+               list.files(stray_dir, full.names = TRUE),
+               dest,
+               recursive = TRUE,
+               overwrite = TRUE
+            )
+            
+            unlink(stray_dir, recursive = TRUE, force = TRUE)
+         }
+
+         rv$structureRes <- sr
          
+         # get the q matrices
          incProgress(0.8, detail = "Extracting q matrices...")
-         qmatrices_result(q_matrices(output_dir))
-         
-         populations_df <- fsnps_gen$pop_labels
-         str_files <- list.files(output_dir, pattern = "_f$", full.names = TRUE)
+         qmatrices_result(lapply(sr, function(x) x$q.mat))
          
          enable("runStructure")
       })
       analysis_done(TRUE)
+   })
+   
+   output$structure_log <- renderText({
+      structureLog()
    })
    
    output$downloadLogs <- downloadHandler(
@@ -92,7 +113,7 @@ run_structure_analysis <- function(input, output, session, rv) {
          paste0("structure_logs_", Sys.Date(), ".zip")
       },
       content = function(file) {
-         log_files <- list.files(output_dir, pattern = "_log.*$", full.names = TRUE)
+         log_files <- list.files(out_path, pattern = "_log.*$", full.names = TRUE)
          if (length(log_files) == 0) {
             return(NULL)
          }
@@ -116,11 +137,18 @@ run_structure_analysis <- function(input, output, session, rv) {
          paste0("structure_outputs_", Sys.Date(), ".zip")
       },
       content = function(file) {
-         f_files <- list.files(output_dir, full.names = TRUE)
-         f_files <- f_files[grepl("_f", basename(f_files))] # specify actual file name, check directory
+         
+         f_files <- list.files(
+            output_dir,
+            pattern = "_out_f$",
+            recursive = TRUE,
+            full.names = TRUE
+         )
+         
          if (length(f_files) == 0) {
-            return(NULL)
+            stop("No STRUCTURE output files found.")
          }
+         
          zip::zipr(zipfile = file, files = f_files)
       },
       contentType = "application/zip"
@@ -137,7 +165,7 @@ run_structure_analysis <- function(input, output, session, rv) {
          lapply(names(qmatrices_result()), function(name) {
             mat <- qmatrices_result()[[name]]
             if (!is.null(mat)) {
-               write.table(mat, file.path(q_files, paste0(name, ".txt")),
+               write.table(mat, file.path(q_files, paste0(name, ".indfile")),
                            row.names = FALSE, col.names = FALSE, quote = FALSE, sep = "\t"
                )
             }

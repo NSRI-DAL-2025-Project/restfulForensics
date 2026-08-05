@@ -1,6 +1,11 @@
 app_server <- function(input, output, session) {
    
-   rv <- reactiveValues()
+   rv <- reactiveValues(
+      structureRes = NULL,
+      alignmentMSA = NULL,
+      alignmentAdjusted = NULL,
+      alignmentStaggered = NULL
+   )
    
    navigation_server(input, output, session)
    
@@ -13,6 +18,8 @@ app_server <- function(input, output, session) {
    filtering_server(input, output, session, rv)
    
    msa_server(input, output, session, rv)
+   
+   phylogeny_server(input, output, session, rv)
    
    barcoding_server(input, output, session, rv)
    

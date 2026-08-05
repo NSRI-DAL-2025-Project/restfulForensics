@@ -117,7 +117,7 @@ phylogeny_tab <- function(){
                ),
                conditionalPanel(
                   condition = "input.treeType == 'Maximum Likelihood'",
-                  textInput("boostrapSamples", "Set number of bootstrap samples", placeholder = "100")
+                  textInput("bootstrapSamples", "Set number of bootstrap samples", placeholder = "100")
                ),
                textInput("outgroup", "Outgroup (optional)", placeholder = "e.g. Sample1"),
                textInput("seed", "Set Seed Value", placeholder = "123"),
@@ -337,7 +337,7 @@ barcoding_tab <- function() {
                      h4("This calculates the Species Membership Value in terms of
                                                   Two-Dimensional non-parametric resampling (TDR) using BarcodingR (Zhang et al., 2016)"),
                      p(strong("Input file/s:"), "CSV file with marker and population data."),
-                     p(strong("Parameter/s:"), "Boostrap value for query and reference samples.")
+                     p(strong("Parameter/s:"), "Bootstrap value for query and reference samples.")
                   ),
                   tabBox(
                      tableOutput("tdrValues")
