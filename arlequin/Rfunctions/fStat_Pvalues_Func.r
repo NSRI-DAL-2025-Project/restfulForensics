@@ -38,5 +38,9 @@ fStat_Pvalues_Func <- function(xmlText){
     numericMatrix <- rbind(numericMatrix, t(as.matrix(nextrow)))
   }
 
-  return(numericMatrix)
+  return(list(
+    type = "fstat_pvalues",
+    title = "F-statistics p-values",
+    data = numericMatrix
+  ))
 }

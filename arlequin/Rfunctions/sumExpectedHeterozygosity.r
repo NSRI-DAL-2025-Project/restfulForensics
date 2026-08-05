@@ -45,73 +45,88 @@ sumExpectedHeterozygosity <- function(xmlText, timeAttr, outfile=outfiles){
     }
   }
   
-  
-    # draw graphic ---------------------------------------------------------------
-  #get number of plots
-  nGraphics <- ncol(numericMatrix)-1
-  nRowGraphic <- ceiling(sqrt(nGraphics))
-
-  #define size of the labels
-  labSize <- 1
-  if(nRowGraphic != 1){
-    if(nRowGraphic == 2){
-      labSize <- 0.9
-    }
-    else{
-      labSize <- 0.75
-    }
+  #============== Revised section
+  colnames(numericMatrix) <- c("Locus", Names)
+  expected_heterozygosity <- as.data.frame(numericMatrix)
+  expected_heterozygosity$Locus <- as.integer(expected_heterozygosity$Locus)
+  for (i in 2:ncol(expected_heterozygosity)) {
+    expected_heterozygosity[[i]] <- as.numeric(expected_heterozygosity[[i]])
   }
+  
+  return(list(
+    type = "expected_heterozygosity",
+    title = "Expected Heterozygosity",
+    time = timeAttr,
+    data = expected_heterozygosity
+  ))
+  #==============================
+  
+#    # draw graphic ---------------------------------------------------------------
+#  #get number of plots
+#  nGraphics <- ncol(numericMatrix)-1
+#  nRowGraphic <- ceiling(sqrt(nGraphics))
 
-  outfileGraphic <- paste(outfile, "sumExpectedHeterozygosity ", timeAttr,
-                           ".png", sep="")
+#  #define size of the labels
+#  labSize <- 1
+#  if(nRowGraphic != 1){
+#    if(nRowGraphic == 2){
+#      labSize <- 0.9
+#    }
+#    else{
+#      labSize <- 0.75
+#    }
+#  }
 
-  #save graphic
-  png(outfileGraphic, width=1300, height=1300, res=144)
+#  outfileGraphic <- paste(outfile, "sumExpectedHeterozygosity ", timeAttr,
+#                           ".png", sep="")
 
-    op <- par(oma=c(0,0,2,0), mfrow=c(nRowGraphic, nRowGraphic))
+#  #save graphic
+#  png(outfileGraphic, width=1300, height=1300, res=144)
 
-      #draw graphic for each pop---------------
-      Nrow <- nrow(numericMatrix)
-      max_x <- max(numericMatrix[, 2:ncol(numericMatrix)])
+#    op <- par(oma=c(0,0,2,0), mfrow=c(nRowGraphic, nRowGraphic))
 
-      for(i in 2:ncol(numericMatrix)){
+#      #draw graphic for each pop---------------
+#      Nrow <- nrow(numericMatrix)
+#      max_x <- max(numericMatrix[, 2:ncol(numericMatrix)])
 
-        if((nRowGraphic == 1 && Nrow < 88) || (nRowGraphic == 2 && Nrow < 48) ||
-            (nRowGraphic == 3 && Nrow < 36) || (nRowGraphic == 4 && Nrow < 30) ||
-            (nRowGraphic >= 5 && Nrow < 16)){
+#      for(i in 2:ncol(numericMatrix)){
 
-            op1 <- par(mar=c(3, 3.5, 2, 1), mgp=c(3, 0, 0))
+#        if((nRowGraphic == 1 && Nrow < 88) || (nRowGraphic == 2 && Nrow < 48) ||
+#            (nRowGraphic == 3 && Nrow < 36) || (nRowGraphic == 4 && Nrow < 30) ||
+#            (nRowGraphic >= 5 && Nrow < 16)){
 
-            barplot(numericMatrix[,i] ,width=0.8, space=0.2, main=Names[[i-1]],
-                     col="blue3", pch=21, xlab="", ylim=c(0, max_x + (max_x/100*5)),
-                     names.arg=numericMatrix[,1], cex.axis=0.83, cex.names=0.83,
-                     axes=FALSE)
+#            op1 <- par(mar=c(3, 3.5, 2, 1), mgp=c(3, 0, 0))
 
-            axis(side=2, mgp=c(0,0.85,0))
-            mtext("Heterozygosity", side=2 , line=2, cex=labSize)
-            mtext("Locus", side=1, line=1.4, cex=labSize)
+#            barplot(numericMatrix[,i] ,width=0.8, space=0.2, main=Names[[i-1]],
+#                     col="blue3", pch=21, xlab="", ylim=c(0, max_x + (max_x/100*5)),
+#                     names.arg=numericMatrix[,1], cex.axis=0.83, cex.names=0.83,
+#                     axes=FALSE)
 
-            box()
-        } else {
-            op1 <- par(mar=c(3, 3.5, 2, 1), mgp=c(3, 0.9, 0))
+#            axis(side=2, mgp=c(0,0.85,0))
+#            mtext("Heterozygosity", side=2 , line=2, cex=labSize)
+#            mtext("Locus", side=1, line=1.4, cex=labSize)
 
-            plot(numericMatrix[,i], main=Names[[i-1]], col="blue3", pch=21,
-                 xlab="", ylab="", ylim=c(0, max_x + (max_x/100*5)), ps=0.8,
-                 axes=FALSE)
+#            box()
+#        } else {
+#            op1 <- par(mar=c(3, 3.5, 2, 1), mgp=c(3, 0.9, 0))
 
-            axis(side=2)
-            axis(side=1, at=c(1:Nrow), labels=numericMatrix[,1], mgp=c(3, 0.4, 0))
-            mtext("Heterozygosity", side=2 , line=2, cex=labSize)
-            mtext("Locus", side=1, line=1.6, cex=labSize)
+#            plot(numericMatrix[,i], main=Names[[i-1]], col="blue3", pch=21,
+#                 xlab="", ylab="", ylim=c(0, max_x + (max_x/100*5)), ps=0.8,
+#                 axes=FALSE)
 
-            box()
-        }
-        par(op1)   # reset par settings
-      }
-       title("Expected heterozygosity", outer=TRUE, cex.main=1.5)
+#            axis(side=2)
+#            axis(side=1, at=c(1:Nrow), labels=numericMatrix[,1], mgp=c(3, 0.4, 0))
+#            mtext("Heterozygosity", side=2 , line=2, cex=labSize)
+#            mtext("Locus", side=1, line=1.6, cex=labSize)
 
-    par(op)   # reset par settings
+#            box()
+#        }
+#        par(op1)   # reset par settings
+#      }
+#       title("Expected heterozygosity", outer=TRUE, cex.main=1.5)
 
-  dev.off()
+#    par(op)   # reset par settings
+
+#  dev.off()
 
 }

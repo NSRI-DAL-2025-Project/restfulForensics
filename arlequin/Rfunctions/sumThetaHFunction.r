@@ -46,73 +46,88 @@ sumThetaHFunction <- function(xmlText,timeAttr, outfile=outfiles){
       numericMatrix <- rbind(numericMatrix, t(as.matrix(nextrow)))
     }
   }
-
-
-# draw graphic ---------------------------------------------------------------
-  #get number of plots
-  nGraphics <- ncol(numericMatrix)-1
-  nRowGraphic <- ceiling(sqrt(nGraphics))
-
-  #define size of the labels
-  labSize <- 1
-  if(nRowGraphic != 1){
-    if(nRowGraphic == 2){
-      labSize <- 0.9
-    }
-    else{
-      labSize <- 0.75
-    }
+  
+  #============== Revised section
+  colnames(numericMatrix) <- c("Locus", Names)
+  theta_H <- as.data.frame(numericMatrix)
+  theta_H$Locus <- as.integer(theta_H$Locus)
+  for (i in 2:ncol(theta_H)) {
+    theta_H[[i]] <- as.numeric(theta_H[[i]])
   }
+  
+  return(list(
+    type = "theta_h",
+    title = "Theta_H at different loci",
+    time = timeAttr,
+    data = theta_H
+  ))
+  #==============================
 
-  outfileGraphic <- paste(outfile, "sumThetaH ", timeAttr, ".png", sep="") 
+## draw graphic ---------------------------------------------------------------
+#  #get number of plots
+#  nGraphics <- ncol(numericMatrix)-1
+#  nRowGraphic <- ceiling(sqrt(nGraphics))
 
-  #save graphic
-  png(outfileGraphic, width=1300, height=1300, res=144)
-    
-    op <- par(oma=c(0,0,2,0), mfrow=c(nRowGraphic, nRowGraphic))
+#  #define size of the labels
+#  labSize <- 1
+#  if(nRowGraphic != 1){
+#    if(nRowGraphic == 2){
+#      labSize <- 0.9
+#    }
+#    else{
+#      labSize <- 0.75
+#    }
+#  }
 
-      #draw graphic for each pop---------------
-      Nrow <- nrow(numericMatrix)
-      max_x <- max(numericMatrix[, 2:ncol(numericMatrix)],na.rm = TRUE)
-      
-      for(i in 2:ncol(numericMatrix)){
-                
-        if((nRowGraphic == 1 && Nrow < 88) || (nRowGraphic == 2 && Nrow < 48) ||
-            (nRowGraphic == 3 && Nrow < 36) || (nRowGraphic == 4 && Nrow < 30) ||
-            (nRowGraphic >= 5 && Nrow < 16)){
-            
-            op1 <- par(mar=c(3, 3.5, 2, 1), mgp=c(3, 0, 0))
-            
-            barplot(numericMatrix[,i] ,width=0.8, space=0.2, main=Names[[i-1]],
-                     col="blue3", pch=21, xlab="", ylim=c(0, max_x + (max_x/100*5)),
-                     names.arg=numericMatrix[,1], cex.axis=0.83, cex.names=0.83,
-                     axes=FALSE)
-    
-            axis(side=2, mgp=c(0,0.85,0))
-            mtext(expression(bold(theta[H])), side=2 , line=2, cex=labSize+0.2)
-            mtext("Locus", side=1, line=1.4, cex=labSize)
-    
-            box()
-        } else {
-            op1 <- par(mar=c(3, 3.5, 2, 1), mgp=c(3, 0.9, 0))
-        
-            plot(numericMatrix[,i], main=Names[[i-1]], col="blue3", pch=21,
-                 xlab="", ylab="", ylim=c(0, max_x + (max_x/100*5)), ps=0.8,
-                 axes=FALSE)
-    
-            axis(side=2)
-            axis(side=1, at=c(1:Nrow), labels=numericMatrix[,1], mgp=c(3, 0.4, 0))
-            mtext(expression(bold(theta[H])), side=2 , line=2, cex=labSize+0.2)
-            mtext("Locus", side=1, line=1.6, cex=labSize)
-    
-            box()        
-        }
-        par(op1)   # reset par settings
-      }
-       title(expression(bold(theta[H]~at~different~loci)), outer=TRUE, cex.main=1.5)
+#  outfileGraphic <- paste(outfile, "sumThetaH ", timeAttr, ".png", sep="") 
 
-    par(op)   # reset par settings
+#  #save graphic
+#  png(outfileGraphic, width=1300, height=1300, res=144)
+#    
+#    op <- par(oma=c(0,0,2,0), mfrow=c(nRowGraphic, nRowGraphic))
 
-  dev.off()
+#      #draw graphic for each pop---------------
+#      Nrow <- nrow(numericMatrix)
+#      max_x <- max(numericMatrix[, 2:ncol(numericMatrix)],na.rm = TRUE)
+#      
+#      for(i in 2:ncol(numericMatrix)){
+#                
+#        if((nRowGraphic == 1 && Nrow < 88) || (nRowGraphic == 2 && Nrow < 48) ||
+#            (nRowGraphic == 3 && Nrow < 36) || (nRowGraphic == 4 && Nrow < 30) ||
+#            (nRowGraphic >= 5 && Nrow < 16)){
+#            
+#            op1 <- par(mar=c(3, 3.5, 2, 1), mgp=c(3, 0, 0))
+#            
+#            barplot(numericMatrix[,i] ,width=0.8, space=0.2, main=Names[[i-1]],
+#                     col="blue3", pch=21, xlab="", ylim=c(0, max_x + (max_x/100*5)),
+#                     names.arg=numericMatrix[,1], cex.axis=0.83, cex.names=0.83,
+#                     axes=FALSE)
+#    
+#            axis(side=2, mgp=c(0,0.85,0))
+#            mtext(expression(bold(theta[H])), side=2 , line=2, cex=labSize+0.2)
+#            mtext("Locus", side=1, line=1.4, cex=labSize)
+#    
+#            box()
+#        } else {
+#            op1 <- par(mar=c(3, 3.5, 2, 1), mgp=c(3, 0.9, 0))
+#        
+#            plot(numericMatrix[,i], main=Names[[i-1]], col="blue3", pch=21,
+#                 xlab="", ylab="", ylim=c(0, max_x + (max_x/100*5)), ps=0.8,
+#                 axes=FALSE)
+#    
+#            axis(side=2)
+#            axis(side=1, at=c(1:Nrow), labels=numericMatrix[,1], mgp=c(3, 0.4, 0))
+#            mtext(expression(bold(theta[H])), side=2 , line=2, cex=labSize+0.2)
+#            mtext("Locus", side=1, line=1.6, cex=labSize)
+#    
+#            box()        
+#        }
+#        par(op1)   # reset par settings
+#      }
+#       title(expression(bold(theta[H]~at~different~loci)), outer=TRUE, cex.main=1.5)
+
+#    par(op)   # reset par settings
+
+#  dev.off()
   
 }

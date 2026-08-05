@@ -64,53 +64,57 @@ sumNumAllelesFunction <- function(xmlText,timeAttr, outfile=outfiles){
 
   outfileGraphic <- paste(outfile, "sumNumAlleles ", timeAttr, ".png", sep="")
 
-  #save graphic
-  png(outfileGraphic, width=1300, height=1300, res=144)
+  #============== Revised section
+  colnames(numericMatrix) <- c("Locus", Names)
+  numAlleles <- as.data.frame(numericMatrix)
+  numAlleles$Locus <- as.integer(numAlleles$Locus)
+  for (i in 2:ncol(numAlleles)) {
+    numAlleles[[i]] <- as.numeric(numAlleles[[i]])
+  }
+  
+  return(list(
+              type = "num_alleles",
+              data = numAlleles,
+              title = "Number of alleles at different loci",
+              time = timeAttr))
+  #==============================
+  
+#  #save graphic
+#  png(outfileGraphic, width=1300, height=1300, res=144)
+#    op <- par(oma=c(0,0,2,0), mfrow=c(nRowGraphic, nRowGraphic))
+#      #draw graphic for each pop---------------
+#      Nrow <- nrow(numericMatrix)
+#      max_x <- max(numericMatrix[, 2:ncol(numericMatrix)])
+#      for(i in 2:ncol(numericMatrix)){
+#        if((nRowGraphic == 1 && Nrow < 88) || (nRowGraphic == 2 && Nrow < 48) ||
+#            (nRowGraphic == 3 && Nrow < 36) || (nRowGraphic == 4 && Nrow < 30) ||
+#            (nRowGraphic >= 5 && Nrow < 16)){
+#            op1 <- par(mar=c(3, 3.5, 2, 1), mgp=c(3, 0, 0))
+#            barplot(numericMatrix[,i] ,width=0.8, space=0.2, main=Names[[i-1]],
+#                     col="blue3", pch=21, xlab="", ylim=c(0, max_x + (max_x/100*5)),
+#                     names.arg=numericMatrix[,1], cex.axis=0.83, cex.names=0.83,
+#                     axes=FALSE)
+#            axis(side=2, mgp=c(0,0.85,0))
+#            mtext("Number of alleles", side=2 , line=2, cex=labSize)
+#            mtext("Locus", side=1, line=1.4, cex=labSize)
+#            box()
+#        } else {
+#            op1 <- par(mar=c(3, 3.5, 2, 1), mgp=c(3, 0.9, 0))
+#            plot(numericMatrix[,i], main=Names[[i-1]], col="blue3", pch=21,
+#                 xlab="", ylab="", ylim=c(0, max_x + (max_x/100*5)), ps=0.8,
+#                 axes=FALSE)
+#            axis(side=2)
+#            axis(side=1, at=c(1:Nrow), labels=numericMatrix[,1], mgp=c(3, 0.4, 0))
+#            mtext("Number of alleles", side=2 , line=2, cex=labSize)
+#            mtext("Locus", side=1, line=1.6, cex=labSize)
+#            box()
+#        }
+#        par(op1)   # reset par settings
+#      }
+#       title("Number of alleles at different loci", outer=TRUE, cex.main=1.5)
 
-    op <- par(oma=c(0,0,2,0), mfrow=c(nRowGraphic, nRowGraphic))
+#    par(op)   # reset par settings
 
-      #draw graphic for each pop---------------
-      Nrow <- nrow(numericMatrix)
-      max_x <- max(numericMatrix[, 2:ncol(numericMatrix)])
-
-      for(i in 2:ncol(numericMatrix)){
-
-        if((nRowGraphic == 1 && Nrow < 88) || (nRowGraphic == 2 && Nrow < 48) ||
-            (nRowGraphic == 3 && Nrow < 36) || (nRowGraphic == 4 && Nrow < 30) ||
-            (nRowGraphic >= 5 && Nrow < 16)){
-
-            op1 <- par(mar=c(3, 3.5, 2, 1), mgp=c(3, 0, 0))
-
-            barplot(numericMatrix[,i] ,width=0.8, space=0.2, main=Names[[i-1]],
-                     col="blue3", pch=21, xlab="", ylim=c(0, max_x + (max_x/100*5)),
-                     names.arg=numericMatrix[,1], cex.axis=0.83, cex.names=0.83,
-                     axes=FALSE)
-
-            axis(side=2, mgp=c(0,0.85,0))
-            mtext("Number of alleles", side=2 , line=2, cex=labSize)
-            mtext("Locus", side=1, line=1.4, cex=labSize)
-
-            box()
-        } else {
-            op1 <- par(mar=c(3, 3.5, 2, 1), mgp=c(3, 0.9, 0))
-
-            plot(numericMatrix[,i], main=Names[[i-1]], col="blue3", pch=21,
-                 xlab="", ylab="", ylim=c(0, max_x + (max_x/100*5)), ps=0.8,
-                 axes=FALSE)
-
-            axis(side=2)
-            axis(side=1, at=c(1:Nrow), labels=numericMatrix[,1], mgp=c(3, 0.4, 0))
-            mtext("Number of alleles", side=2 , line=2, cex=labSize)
-            mtext("Locus", side=1, line=1.6, cex=labSize)
-
-            box()
-        }
-        par(op1)   # reset par settings
-      }
-       title("Number of alleles at different loci", outer=TRUE, cex.main=1.5)
-
-    par(op)   # reset par settings
-
-  dev.off()
+#  dev.off()
 
 }

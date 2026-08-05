@@ -83,157 +83,193 @@ pairwiseDiffMatrix <- function(xmlText, Labels=NULL, timeAttr,outfile=outfiles){
       }
   }
 
-
-
-  # graphic --------------------------------------------------------------------
-  a <- ncol(numericMatrix)
-  b <- nrow(numericMatrix)
-
-  x <- c(1:a)
-  y <- c(1:b)
-
-  # define colors
-  colorRampBlue <- colorRampPalette(c("white", "steelblue1", "blue3"))
-  colorRampGreen <- colorRampPalette(c("white", "green3", "darkgreen"))
-  colorRampOrange <- colorRampPalette(c("white", "orange", "orangered2"))
-  
-
   #----Mirror matrix (left-right)----
   mirror.matrix <- function(x) {
     xx <- as.data.frame(x);
     xx <- rev(xx);
     xx <- as.matrix(xx);
-    xx;
   }
-
+  
   #----Rotate matrix 270 clockworks----
   rotate270.matrix <- function(x) {
     mirror.matrix(t(x))
   }
-
-
-      underMatrix <- rotate270.matrix(underMatrix)
-      upperMatrix <- rotate270.matrix(upperMatrix)
-      diagonalMatrix <- rotate270.matrix(diagonalMatrix)
-
-
-  # draw graphic --------------------------------------------
-  outfileGraphic <- paste(outfile, "pairwiseDiffMatrix ", timeAttr, ".png",
-                            sep="")  
   
-  #save graphic
-  png(outfileGraphic, width=1300, height=1300, res=144)
-
-    # devide plot region in 4 parts
-    def.par <- par(no.readonly = TRUE) # save default, for resetting...
-      layout(rbind(c(1,2), c(1,3), c(1,4)),
-             heights=rbind(c(2,1), c(2,1), c(2,1)),
-             respect=rbind(c(0,1), c(0,0), c(0,0)))
-
-    # draw matrixe plots --------------------
-      op <- par(mar=c(7.6, 6.8, 8.6, 0.6))
-        image(x, y, underMatrix, col=colorRampBlue(64), xlab="", ylab="",
-               axes = FALSE)
-        image(x,y, upperMatrix, col=colorRampGreen(64), xlab="", ylab="",
-               axes = FALSE, add=TRUE)
-        image(x,y, diagonalMatrix, col=colorRampOrange(64), xlab="", ylab="",
-               axes = FALSE, add=TRUE)
-           box()
-           mtext(text="Average number of pairwise differences",
-                   line=4.5, cex=1.2, font=2)
-
-            #add labels
-            if(is.null(Labels)){
-              axis(1, at = c(1:a))
-              axis(2, at = c(1:b), labels=c(b:1))
-              mtext(text="Population", side=1, line=3)
-              mtext(text="Population", side=2, line=3)
-            }else{
-              axis(1, at = c(1:a), labels=Labels[1:ncol(Labels)], cex.axis=1.1,
-                     las=2)
-              axis(2, at = c(1:b), labels=Labels[ncol(Labels):1], cex.axis=1.1,
-                     las=2)
-            }
-      par(op)
-
-
-    # draw legends----------------------------
-    # upper legend --------
-      op2 <- par(mar=c(0, 1.2, 4.2, 6.2))
-        if(nCol >= 2){
-            # define parameters
-            Min <- min(upperMatrix, na.rm=TRUE)
-            Max <- max(upperMatrix, na.rm=TRUE)
-            binwidth <- (Max - Min) / 64
-            y <- seq(Min + binwidth/2, Max - binwidth/2, by = binwidth)
-            z <- matrix(y, nrow = 1, ncol = length(y))
-
-            image(1, y, z, col = colorRampGreen(64), axes=FALSE)
-
-                # adjust axis if only one value exists
-                if(Min == Max){
-                  axis(side=4, las = 2, at=Min, labels=round(Min, 2), cex.axis=1.1)
-                } else {
-                  axis(side=4, las = 2, cex.axis=1.1)
-                }
-
-                mtext(text="between populations", side=4, line=4, cex=1)
-                box()
-        }
-      par(op2)
-
-
-    # diagonal legend --------
-      op3 <- par(mar=c(1.3, 1.2, 1.9, 6.2))
-      
-        # define parameters
-        Min <- min(diagonalMatrix, na.rm=TRUE)
-        Max <- max(diagonalMatrix, na.rm=TRUE)
-        binwidth <- (Max - Min) / 64
-        y <- seq(Min + binwidth/2, Max - binwidth/2, by = binwidth)
-        z <- matrix(y, nrow = 1, ncol = length(y))
-       
-        image(1, y, z, col = colorRampOrange(64), axes=FALSE)
-        
-            # adjust axis if only one value exists
-            if(Min == Max){         
-              axis(side=4, las = 2, at=Min, labels=round(Min, 2), cex.axis=1.1)
-            } else {
-              axis(side=4, las = 2, cex.axis=1.1)
-            }
-             
-           mtext(text="within populations", side=4, line=4, cex=1)
-           box()
-      par(op3)
-
-
-    # under legend --------
-      op4 <- par(mar=c(3.6, 1.2, 0.6, 6.2))
-        if(nCol >= 2){
-            # define parameters
-            Min <- min(underMatrix, na.rm=TRUE)
-            Max <- max(underMatrix, na.rm=TRUE)
-            binwidth <- (Max - Min) / 64
-            y <- seq(Min + binwidth/2, Max - binwidth/2, by = binwidth)
-            z <- matrix(y, nrow = 1, ncol = length(y))
-
-            image(1, y, z, col = colorRampBlue(64), axes=FALSE)
-
-                # adjust axis if only one value exists
-                if(Min == Max){
-                  axis(side=4, las = 2, at=Min, labels=round(Min, 2), cex.axis=1.1)
-                } else {
-                  axis(side=4, las = 2, cex.axis=1.1)
-                }
-
-               mtext(text="Nei's distance (d)", side=4, line=4, cex=1)
-               box()
-        }
-      par(op4)
-
-
-    par(def.par)  #reset to default
+  underMatrix <- rotate270.matrix(underMatrix)
+  upperMatrix <- rotate270.matrix(upperMatrix)
+  diagonalMatrix <- rotate270.matrix(diagonalMatrix)
+  
+  if (!is.null(Labels)) {
+    Labels <- as.vector(Labels)
     
-  dev.off()
+    rownames(underMatrix) <- rev(Labels[seq_len(nrow(underMatrix))])
+    colnames(underMatrix) <- Labels[seq_len(ncol(underMatrix))]
+    
+    rownames(upperMatrix) <- rev(Labels[seq_len(nrow(upperMatrix))])
+    colnames(upperMatrix) <- Labels[seq_len(ncol(upperMatrix))]
+    
+    rownames(diagonalMatrix) <- rev(Labels[seq_len(nrow(diagonalMatrix))])
+    colnames(diagonalMatrix) <- Labels[seq_len(ncol(diagonalMatrix))]
+  }
+  
+  return(list(
+    type = "pairwise_differences",
+    title = "Average number of pairwise differences",
+    time = timeAttr,
+    nei_distance = underMatrix,
+    between_populations = upperMatrix, 
+    within_populations = diagonalMatrix
+  ))
+
+#  # graphic --------------------------------------------------------------------
+#  a <- ncol(numericMatrix)
+#  b <- nrow(numericMatrix)
+
+#  x <- c(1:a)
+#  y <- c(1:b)
+
+#  # define colors
+#  colorRampBlue <- colorRampPalette(c("white", "steelblue1", "blue3"))
+#  colorRampGreen <- colorRampPalette(c("white", "green3", "darkgreen"))
+#  colorRampOrange <- colorRampPalette(c("white", "orange", "orangered2"))
+#  
+
+#  #----Mirror matrix (left-right)----
+#  mirror.matrix <- function(x) {
+#    xx <- as.data.frame(x);
+#    xx <- rev(xx);
+#    xx <- as.matrix(xx);
+#    xx;
+#  }
+
+#  #----Rotate matrix 270 clockworks----
+#  rotate270.matrix <- function(x) {
+#    mirror.matrix(t(x))
+#  }
+
+
+#      underMatrix <- rotate270.matrix(underMatrix)
+#      upperMatrix <- rotate270.matrix(upperMatrix)
+#      diagonalMatrix <- rotate270.matrix(diagonalMatrix)
+
+
+#  # draw graphic --------------------------------------------
+#  outfileGraphic <- paste(outfile, "pairwiseDiffMatrix ", timeAttr, ".png",
+#                            sep="")  
+#  
+#  #save graphic
+#  png(outfileGraphic, width=1300, height=1300, res=144)
+
+#    # devide plot region in 4 parts
+#    def.par <- par(no.readonly = TRUE) # save default, for resetting...
+#      layout(rbind(c(1,2), c(1,3), c(1,4)),
+#             heights=rbind(c(2,1), c(2,1), c(2,1)),
+#             respect=rbind(c(0,1), c(0,0), c(0,0)))
+
+#    # draw matrixe plots --------------------
+#      op <- par(mar=c(7.6, 6.8, 8.6, 0.6))
+#        image(x, y, underMatrix, col=colorRampBlue(64), xlab="", ylab="",
+#               axes = FALSE)
+#        image(x,y, upperMatrix, col=colorRampGreen(64), xlab="", ylab="",
+#               axes = FALSE, add=TRUE)
+#        image(x,y, diagonalMatrix, col=colorRampOrange(64), xlab="", ylab="",
+#               axes = FALSE, add=TRUE)
+#           box()
+#           mtext(text="Average number of pairwise differences",
+#                   line=4.5, cex=1.2, font=2)
+
+#            #add labels
+#            if(is.null(Labels)){
+#              axis(1, at = c(1:a))
+#              axis(2, at = c(1:b), labels=c(b:1))
+#              mtext(text="Population", side=1, line=3)
+#              mtext(text="Population", side=2, line=3)
+#            }else{
+#              axis(1, at = c(1:a), labels=Labels[1:ncol(Labels)], cex.axis=1.1,
+#                     las=2)
+#              axis(2, at = c(1:b), labels=Labels[ncol(Labels):1], cex.axis=1.1,
+#                     las=2)
+#            }
+#      par(op)
+
+
+#    # draw legends----------------------------
+#    # upper legend --------
+#      op2 <- par(mar=c(0, 1.2, 4.2, 6.2))
+#        if(nCol >= 2){
+#            # define parameters
+#            Min <- min(upperMatrix, na.rm=TRUE)
+#            Max <- max(upperMatrix, na.rm=TRUE)
+#            binwidth <- (Max - Min) / 64
+#            y <- seq(Min + binwidth/2, Max - binwidth/2, by = binwidth)
+#            z <- matrix(y, nrow = 1, ncol = length(y))
+
+#            image(1, y, z, col = colorRampGreen(64), axes=FALSE)
+
+#                # adjust axis if only one value exists
+#                if(Min == Max){
+#                  axis(side=4, las = 2, at=Min, labels=round(Min, 2), cex.axis=1.1)
+#                } else {
+#                  axis(side=4, las = 2, cex.axis=1.1)
+#                }
+
+#                mtext(text="between populations", side=4, line=4, cex=1)
+#                box()
+#        }
+#      par(op2)
+
+
+#    # diagonal legend --------
+#      op3 <- par(mar=c(1.3, 1.2, 1.9, 6.2))
+#      
+#        # define parameters
+#        Min <- min(diagonalMatrix, na.rm=TRUE)
+#        Max <- max(diagonalMatrix, na.rm=TRUE)
+#        binwidth <- (Max - Min) / 64
+#        y <- seq(Min + binwidth/2, Max - binwidth/2, by = binwidth)
+#        z <- matrix(y, nrow = 1, ncol = length(y))
+#       
+#        image(1, y, z, col = colorRampOrange(64), axes=FALSE)
+#        
+#            # adjust axis if only one value exists
+#            if(Min == Max){         
+#              axis(side=4, las = 2, at=Min, labels=round(Min, 2), cex.axis=1.1)
+#            } else {
+#              axis(side=4, las = 2, cex.axis=1.1)
+#            }
+#             
+#           mtext(text="within populations", side=4, line=4, cex=1)
+#           box()
+#      par(op3)
+
+
+#    # under legend --------
+#      op4 <- par(mar=c(3.6, 1.2, 0.6, 6.2))
+#        if(nCol >= 2){
+#            # define parameters
+#            Min <- min(underMatrix, na.rm=TRUE)
+#            Max <- max(underMatrix, na.rm=TRUE)
+#            binwidth <- (Max - Min) / 64
+#            y <- seq(Min + binwidth/2, Max - binwidth/2, by = binwidth)
+#            z <- matrix(y, nrow = 1, ncol = length(y))
+
+#            image(1, y, z, col = colorRampBlue(64), axes=FALSE)
+
+#                # adjust axis if only one value exists
+#                if(Min == Max){
+#                  axis(side=4, las = 2, at=Min, labels=round(Min, 2), cex.axis=1.1)
+#                } else {
+#                  axis(side=4, las = 2, cex.axis=1.1)
+#                }
+
+#               mtext(text="Nei's distance (d)", side=4, line=4, cex=1)
+#               box()
+#        }
+#      par(op4)
+
+
+#    par(def.par)  #reset to default
+#    
+#  dev.off()
 
 }
