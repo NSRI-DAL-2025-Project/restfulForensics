@@ -1,6 +1,11 @@
 app_server <- function(input, output, session) {
    
-   rv <- reactiveValues()
+   rv <- reactiveValues(
+      structureRes = NULL,
+      alignmentMSA = NULL,
+      alignmentAdjusted = NULL,
+      alignmentStaggered = NULL
+   )
    
    navigation_server(input, output, session)
    
@@ -14,6 +19,8 @@ app_server <- function(input, output, session) {
    
    msa_server(input, output, session, rv)
    
+   phylogeny_server(input, output, session, rv)
+   
    barcoding_server(input, output, session, rv)
    
    pop_stats_server(input, output, session, rv)
@@ -22,7 +29,9 @@ app_server <- function(input, output, session) {
    
    exploratory_analysis_server(input, output, session, rv)
    
-   structure_analysis_server(input, output, session, rv)
+   run_structure_analysis(input, output, session, rv)
+   
+   plot_structure_server(input, output, session, rv)
    
    classification_server(input, output, session, rv)
    

@@ -3,10 +3,10 @@ msa_server <- function(input, output, session, rv) {
    # ============ MULTIPLE SEQUENCE ALIGNMENT ==============#
    
    fasta_data <- reactiveVal(NULL)
-   alignment_msa <- reactiveVal(NULL)
+   #alignment_msa <- reactiveVal(NULL)
    alignment_scores <- reactiveVal(NULL)
-   alignment_adjusted <- reactiveVal(NULL)
-   alignment_staggered <- reactiveVal(NULL)
+   #alignment_adjusted <- reactiveVal(NULL)
+   #alignment_staggered <- reactiveVal(NULL)
    directory <- tempdir()
    
    observeEvent(input$runMSA, {
@@ -18,25 +18,25 @@ msa_server <- function(input, output, session, rv) {
                           algorithm = input$substitutionMatrix
       )
       
-      alignment_msa(aligned$alignment)
+      rv$alignmentMSA <- aligned$alignment
+      rv$alignmentAdjusted <- aligned$adjusted
+      rv$alignmentStaggered  <- aligned$staggered
       alignment_scores(aligned$scores)
-      alignment_adjusted(aligned$adjusted)
-      alignment_staggered(aligned$staggered)
    })
    
    output$msaView <- msaR::renderMsaR({
-      req(alignment_msa())
-      msaR::msaR(alignment_msa())
+      req(rv$alignmentMSA)
+      msaR::msaR(rv$alignmentMSA)
    })
    
    output$adjustedAlignmentText <- renderPrint({
-      req(alignment_adjusted())
-      alignment_adjusted()
+      req(rv$alignmentAdjusted)
+      rv$alignmentAdjusted
    })
    
    output$staggeredAlignmentText <- renderPrint({
-      req(alignment_staggered())
-      alignment_staggered()
+      req(rv$alignmentStaggered)
+      rv$alignmentStaggered
    })
    
    output$alignmentScoresPreview <- renderPrint({
@@ -50,9 +50,9 @@ msa_server <- function(input, output, session, rv) {
       },
       content = function(file) {
          alignment <- switch(input$msaDownloadType,
-                             initial = alignment_msa(),
-                             adjusted = alignment_adjusted(),
-                             staggered = alignment_staggered()
+                             initial = rv$alignmentMSA,
+                             adjusted = rv$alignmentAdjusted,
+                             staggered = rv$alignmentStaggered
          )
          if (inherits(alignment, "MsaDNAMultipleAlignment")) {
             aln <- msa::msaConvert(alignment, type = "seqinr::alignment")
@@ -87,9 +87,9 @@ msa_server <- function(input, output, session, rv) {
       contentType = "application/pdf",
       content = function(file) {
          alignment <- switch(input$msaDownloadType,
-                             initial = alignment_msa(),
-                             adjusted = alignment_adjusted(),
-                             staggered = alignment_staggered()
+                             initial = rv$alignmentMSA,
+                             adjusted = rv$alignmentAdjusted,
+                             staggered = rv$alignmentStaggered
          )
          
          tmp_dir <- tempfile("msa_")

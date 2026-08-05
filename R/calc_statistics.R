@@ -622,39 +622,3 @@ pop_breakdown <- function(file, column) {
    
    return(total)
 }
-
-#' Calculate Q matrices from STRUCTURE v2.3.4 results
-#' 
-#' @param dir The directory containing the STRUCTURE results.
-#'
-#' @returns directory containing the q matrices files.
-#' 
-#' @export
-#' @examples
-#' q_matrices("./structure_res")
-q_matrices <- function(dir) {
-   output <- list.files(path = dir, pattern = "\\_f$", full.names = TRUE)
-   output_list <- lapply(output, function(filepath) {
-      lines <- readLines(filepath)
-      
-      start <- grep("Inferred ancestry of individuals", lines) + 2
-      end <- grep("^Estimated Allele Frequencies in each cluster", lines)[1] - 1
-      
-      qmatrices <- lines[start:end]
-      
-      qmatrices_data <- do.call(rbind, lapply(qmatrices, function(line) {
-         section <- unlist(strsplit(line, ":"))
-         
-         if (length(section) == 2) {
-            props <- as.numeric(strsplit(trimws(section[2]), "\\s+")[[1]])
-            return(props)
-         } else {
-            return(NULL)
-         }
-      }))
-      return(qmatrices_data)
-   })
-   
-   names(output_list) <- basename(output)
-   return(output_list)
-}

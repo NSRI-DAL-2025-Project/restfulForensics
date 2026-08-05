@@ -677,78 +677,158 @@ running_structure <- function(input_file,
    ))
 }
 
-#' Plot STRUCTURE results
+
+#' Calculate Q matrices from STRUCTURE v2.3.4 results
+#' 
+#' @param dir The directory containing the STRUCTURE results.
 #'
-#' @keywords internal
-plotQ <- function(qmat, populations_df) {
-   # Revised to be compatible with large list of matrices
-   facet <- FALSE
-   K <- qmat$K
-   Label <- seq_len(nrow(qmat$ancest_df))
+#' @returns directory containing the q matrices files.
+#' 
+#' @export
+#' @examples
+#' generate_ind_files("./structure_res")
+generate_ind_files <- function(dir) {
+   output <- list.files(path = dir, pattern = "\\_f$", full.names = TRUE)
    
-   clusters <- qmat$ancest_df %>%
-      as.data.frame() %>%
-      select(contains("Cluster"))
-   colnames(clusters) <- gsub(" ", ".", colnames(clusters))
-   
-   df <- data.frame(ID = as.data.frame(Label), clusters)
-   
-   if (is.null(populations_df)) {
-      # Generate a plot without any family information
-      # Q_melt <- reshape2::melt(Q, variable.name="Cluster")
-      Q_melt <- stats::reshape(
-         df,
-         varying = list(names(clusters)),
-         v.names = "Value",
-         timevar = "Cluster",
-         times = paste0("K", seq_len(K)),
-         direction = "long"
-      )
+   output_list <- lapply(output, function(filepath) {
+      lines <- readLines(filepath)
       
-      colnames(Q_melt) <- c("Label", "Cluster", "Value")
-   } else {
-      if (length(populations_df$Label) != length(rownames(df))) {
-         stop("Unequal sample size.")
-      }
-      colnames(populations_df) <- c("Label", "Population")
-      Q_merge <- merge(populations_df, df, by = "Label")
-      # Q_melt <- melt(Q_merge, id.vars=c("Label", "Population"), variable.name="Cluster")
+      start <- grep("Inferred ancestry of individuals", lines) + 2
+      end <- grep("^Estimated Allele Frequencies in each cluster", lines)[1] - 1
       
-      Q_melt <- stats::reshape(
-         Q_merge,
-         varying = list(names(clusters)),
-         v.names = "Value",
-         timevar = "Cluster",
-         times = paste0("K", seq_len(K)),
-         direction = "long"
-      )
+      qmatrices <- lines[start:end]
+      
+      qmatrices_data <- do.call(rbind, lapply(qmatrices, function(line) {
+         return(paste0(strsplit(trimws(line), split = "\\s+")[[1]], sep = " "))
+      }))
+      return(as.data.frame(qmatrices_data))
+   })
+   
+   names(output_list) <- basename(output)
+   return(output_list)
+}
+
+
+# for using CLUMPP
+# first combine the files with the same K
+combine_ind_files <- function(dir, k.value = 2) {
+   ind_result <- tempfile(pattern = paste0("combined_", k.value, "_"), fileext = ".ind")
+   
+   f_files <- list.files(dir, full.names = TRUE)
+   k_pattern <- paste0("k", k.value)
+   k_files <- f_files[grepl(k_pattern, f_files)]
+   
+   if (length(k_files) == 0) {
+      stop("No .ind files given K.")
    }
    
-   # Generate plot
-   # Updated to proper ggplot syntax
-   Q_melt <- Q_melt[order(Q_melt$Cluster), ]
-   Q_melt$Label <- factor(Q_melt$Label)
+   runs <- lapply(k_files, read.table, header = FALSE)
+   combined_runs <- dplyr::bind_rows(runs)
+   print(dim(combined_runs))
+   print(head(combined_runs))
    
-   gg <- ggplot(Q_melt, aes(x = Label, y = Value, fill = Cluster))
-   if (!is.null(populations_df)) {
-      if (facet) {
-         gg <- gg + facet_grid(Cluster ~ Population, scales = "free_x", space = "free_x")
+   write.table(combined_runs,
+               file = ind_result,
+               quote = FALSE,
+               row.names = FALSE,
+               col.names = FALSE)
+   
+   R <- length(k_files)
+   C <- nrow(runs[[1]])
+   pops <- levels(factor(combined_runs[[4]]))
+   ids <- levels(factor(combined_runs[[2]]))
+   
+   return(list(file = ind_result,
+               R_value = R,
+               C_value = C,
+               pops = pops,
+               ids = ids))
+}
+
+structureExportQmat <- function(sr, output.dir = ".", prefix = "run") {
+   if (!inherits(sr, "structure.result")) {
+      stop("'sr' must be a structure.result object.")
+   }
+   
+   out.files <- character(length(sr))
+   
+   for (i in seq_along(sr)) {
+      q.mat <- sr[[i]]$q.mat
+      
+      fname <- if (!is.null(sr[[i]]$label)) {
+         paste0(sr[[i]]$label, ".indfile")
       } else {
-         gg <- gg + facet_grid(. ~ Population, scales = "free_x", space = "free_x")
+         paste0(prefix, "_", i, ".indfile")
       }
-   } else {
-      if (facet) {
-         gg <- gg + facet_grid(Cluster ~ ., scales = "free_x", space = "free_x")
-      }
+      
+      outfile <- file.path(output.dir, fname)
+      
+      utils::write.table(
+         q.mat,
+         file = outfile,
+         sep = "\t",
+         quote = FALSE,
+         row.names = FALSE,
+         col.names = FALSE
+      )
+      
+      out.files[i] <- outfile
+      
    }
-   gg <- gg + geom_bar(stat = "identity", width = 1)
-   gg <- gg + scale_y_continuous(expand = c(0, 0), breaks = c(0.25, 0.75))
-   gg <- gg + coord_cartesian(ylim = c(0, 1))
-   gg <- gg + xlab("Sample ID") + ylab("Proportion of cluster")
-   gg <- gg + theme_bw()
-   gg <- gg + guides(fill = guide_legend(title = "Cluster"))
-   gg <- gg + theme(axis.text.x = element_text(angle = 90))
+   invisible(out.files)
+}
+
+
+structureImport <- function(files, pops = NULL) {
+   if (length(files) == 0) {
+      stop("No STRUCTURE files found.")
+   }
    
-   # ggplot2::ggsave(outfile, plot = gg, width = 12, height = 10, dpi = 600)
-   return(gg)
+   if (is.null(pops)) {
+      pops <- structure_get_populations(files[1])
+   }
+   
+    sr <- lapply(files, function(f) {
+       result <- strataG::structureRead(f, pops = pops)
+       
+       result$files <- f
+       result$label <- basename(f)
+       
+       result
+    })
+    
+    names(sr) <- vapply(sr, function(x) x$label, character(1))
+    sr <- sr[order(
+       as.numeric(sub(".*k([0-9]+).*", "\\1", names(sr))),
+       as.numeric(sub(".*r([0-9]+).*", "\\1", names(sr)))
+    )]
+    class(sr) <- c("structure.result", "list")
+
+    return(sr)
+}
+
+structure_get_populations <- function(file){
+   txt <- readLines(file)
+   
+   first <- grep("(%Miss)", txt, fixed = TRUE) + 1
+   last <- grep("Estimated Allele", txt, fixed = TRUE) - 1
+   
+   if (length(first) == 0 || length(last) == 0) {
+      stop("Cannot find STRUCTURE Q matrix in _f files.")
+   }
+   
+   q.txt <- txt[first:last]
+   
+   # same as structureRead()
+   q.txt <- sub("[\\*]+", "", q.txt)
+   q.txt <- sub("[(]", "", q.txt)
+   q.txt <- sub("[)]", "", q.txt)
+   q.txt <- sub("[|][ ]+$", "", q.txt)
+   
+   pops <- vapply(strsplit(q.txt, "\\s+"), function(x){
+      x <- x[x != ""]
+      x[4]
+   }, character(1))
+   
+   return(unique(pops))
 }

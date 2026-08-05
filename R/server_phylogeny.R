@@ -9,10 +9,14 @@ phylogeny_server <- function(input, output, session, rv) {
    observeEvent(input$buildTree, {
       disable("buildTree")
       
-      if (is.null(input$msaFileforPhylogen)) {
-         req(alignment_msa())
-         alignment_file <- alignment_msa()
-      } else {
+      if (isTRUE(input$uploadMSA)) {
+         alignment <- switch(input$treeAlignmentType,
+                             initial = rv$alignmentMSA,
+                             adjusted = rv$alignmentAdjusted,
+                             staggered = rv$alignmentStaggered
+         )
+         alignment_file <- alignment
+      } else if (!is.null(input$msaFileforPhylogen)) {
          file_ext_ref <- tools::file_ext(input$msaFileforPhylogen$name)
          if (file_ext_ref == "msa") {
             alignment_file <- Biostrings::ReadDNAStringSet(input$msaFileforPhylogen$datapath)
@@ -29,7 +33,7 @@ phylogeny_server <- function(input, output, session, rv) {
             {
                tree_type <- input$treeType
                outgroup <- input$outgroup
-               bs <- input$boostrapSamples
+               bs <- input$bootstrapSamples
                model <- input$model
                aligned <- alignment_file
                directory <- tempdir()

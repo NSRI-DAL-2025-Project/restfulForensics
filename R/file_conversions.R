@@ -722,7 +722,6 @@ revise_structure_file <- function(file, output.dir = ".", system = "Windows") {
       system(paste("tr '\t' ' '", shQuote(path), ">", shQuote(path)))
       system(paste("sed -e 's/ /\t/2' -e 's/ /\t/1'", shQuote(path), ">", shQuote(path)))
    }
-   
    return(path)
 }
 
@@ -991,4 +990,30 @@ build_arp_per_population <- function(df,
    writeLines(arp, out_path)
    message("SUCCESS: Generated Arlequin project file:", out_path)
    return(out_path)
+   }
+
+
+csv_to_gtype_format <- function(file) {
+   df <- load_csv_xlsx_files(file)
+   df <- clean_input_data(df)
+   Sample <- df[,1]
+   Pop <- df[,2]
+   data <- df[3:ncol(df)]
+   
+   data <- data %>%
+      mutate(across(everything(), as.character)) %>%
+      mutate(across(everything(), ~ case_when(
+         .x == "N" ~ "N/N",
+         TRUE ~ .x
+      )))
+   
+   data_clean <- data %>% tidyr::separate_wider_delim(
+      cols = everything(),
+      delim = "/",
+      names_sep = "."
+   )
+   
+   data_file <- dplyr::bind_cols(Sample, Pop, data_clean)
+   
+   return(data_file)
 }
