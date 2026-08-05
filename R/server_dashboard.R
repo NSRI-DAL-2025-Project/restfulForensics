@@ -164,6 +164,20 @@ dashboard_server <- function(input, output, session, rv){
             )
          ),
          p(
+            "Archer, F. (2025). strataG: An R package for manipulating, summarizing and analysing population genetic data. R package version 1.0.6. Zenodo.",
+            tags$a("http://doi.org/10.5281/zenodo.60416",
+                   href = "http://doi.org/10.5281/zenodo.60416",
+                   target = "_blank"
+            )
+         ),
+         p(
+            "Jakobsson, M., Rosenberg, N.A (2007). CLUMPP: a cluster matching and permutation program for dealing with label switching and multimodality in analysis of population structure. Bioinformatics, 23(14), 1801–1806",
+            tags$a("https://doi.org/10.1093/bioinformatics/btm233",
+                   href = "https://doi.org/10.1093/bioinformatics/btm233",
+                   target = "_blank"
+            )
+         ),
+         p(
             "Gouy, A., & Zieger, M. (n.d.). The STRAF Book: Statistical Forensics made easy.",
             tags$a("https://agouy.github.io/straf_book/index.html",
                    href = "https://agouy.github.io/straf_book/index.html",
