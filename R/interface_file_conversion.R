@@ -412,41 +412,30 @@ file_conversion_tab <- function() {
                   #               "RFLP" = "RFLP"
                   #            ),
                   #            selected = "STANDARD"),
-                  checkboxInput("calcLD", "Perform linkage disequilibrium test?", value = FALSE),
                   actionButton("convert2Arle", "Generate Arlequin-compatible File", icon = icon("arrow-up-right-from-square"))
                ),
                tabBox( #=========== FOR REVISION
                   tabPanel(
                      title = "Instructions",
-                     p(tags$a("STRUCTURE",
-                              href = "https://web.stanford.edu/group/pritchardlab/structure.html",
+                     p(tags$a("Arlequin",
+                              href = "https://cmpg.unibe.ch/software/arlequin35/",
                               target = "_blank"
-                     ), " is a free software package for investigating population structure using
-                                              multi-locus genotype data (Stephen and Donnelly, 2000; Falush et al., 2003;
-                                              Falush et al., 2007; Hubisz et al., 2009)."),
+                     ), " is a free software package for population genetic analysis, calculating intra-population and inter-population metrices (Excoffier & Lischer, 2010)."),
                      br(),
-                     p("This converts CSV files into standard STRUCTURE-compatible files. This module was tested on STRUCTURE version 2.3.4."),
                      p(strong("Input file/s:"), "CSV file containing marker and population data.
                                               Each row should represent multi-locus data for an individual sample."),
-                     p(strong("Parameter/s:"), "User's operating system (for STRUCTURE input compatibility)"),
-                     p(strong("Expected output file/s:")),
-                     tags$ul(
-                        tags$li("structure (.str) file"),
-                        tags$li("revised input file")
-                     ),
-                     br(),
-                     p("STRUCTURE generally can't handle sample labels with alphabets, the function converts sample labels to their associated row number."),
-                     p(
-                        "For users who opt to use STRUCTURE via the terminal or GUI, instructions can be found here: ",
-                        tags$a("STRUCTURE v2.3.4 documentation",
-                               href = "https://web.stanford.edu/group/pritchardlab/structure_software/release_versions/v2.3.4/html/structure.html",
-                               target = "_blank"
-                        )
-                     )
+                     p(strong("Expected output file/s: .ars file"))
                   ),
                   tabPanel(
                      title = "Sample Input Format",
                      DT::dataTableOutput("exampleForArlecore")
+                  ),
+                  tabPanel(
+                     title = "Download Sample Files",
+                     h4("Sample File"),
+                     tags$ul(
+                        tags$a("Sample CSV file", href = "sample.csv", download = "sample.csv")
+                     )
                   )
                )
             ),
@@ -455,18 +444,11 @@ file_conversion_tab <- function() {
                   title = "Conversion Result",
                   width = 12,
                   tabPanel(
-                     title = "Preview and Download",
-                     tableOutput("revisedCSV"),
-                     tableOutput("strFile"),
-                     br(),
-                     uiOutput("downloadrevised_UI"),
-                     uiOutput("downloadSTRfile_UI")
+                     uiOutput("downloadArpFile_UI")
                   )
                )
             )
          )
-         
-         
       )
    )
    

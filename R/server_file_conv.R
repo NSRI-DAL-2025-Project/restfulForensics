@@ -714,7 +714,7 @@ file_conversion_server <- function(input, output, session, rv) {
    
    #======== REVISE
    
-   arpFile <- reactiveVal(NULL)
+   arleFile <- reactiveVal(NULL)
    
    observe({
       shinyjs::toggleState("convert2Arle", !is.null(input$toArleFile))
@@ -723,98 +723,51 @@ file_conversion_server <- function(input, output, session, rv) {
    observeEvent(input$convert2Arle, {
       disable("convert2Arle")
       
-      for_arp <- load_csv_xlsx_files(input$toArleFile$datapath)
-      for_arp <- clean_input_data(for_arp)
-      
-      # All null values are "N", set to ""
-      for_arp <- for_arp %>%
-         mutate(across(everything(), ~ case_when(
-            . == "N" ~ "",
-            TRUE ~ .x
-         )))
-      for_arp <- as.data.frame(for_arp)
-      
-      # create the arp file
-      arp_file <- build_arp_per_population(for_arp,
-                                           genotypic_data = as.numeric(input$genotypicData),
-                                           gametic_phase = as.numeric(input$gameticPhase),
-                                           recessive_data = as.numeric(input$recessiveData),
-                                           locus_sep = input$locusSep,
-                                           output.prefix = "arp_file",
-                                           data_type = "STANDARD"
-                                           )
-      #run arlecore
-      if (isTRUE(input$calcLD)) {
-         results <- run_arlequin(arp_file, ld = TRUE)
-      } else {
-         results <- run_arlequin(arp_file, ld = FALSE)
-      }
-      
-   
-      
-      if (!is.null(input$refProvided)) {
-         inputPath <- tosnipper_file[, -c(2, 3)]
-         refPath <- tosnipper_file[, 2:3]
-      } else {
-         inputPath <- tosnipper_file
-         refPath <- load_csv_xlsx_files(input$refFile$datapath)
-      }
-      
-      refPath <- dplyr::rename(refPath, Sample = 1)
-      targetSet <- input$targetPop
-      targetName <- if (targetSet) input$targetPopName else NULL
-      inputData <- colnames(inputPath)
-      numMarkers <- length(inputData) - 1
-      
-      withProgress(message = "Converting to SNIPPER-analysis ready file...", value = 0, {
-         snipper.file <- tryCatch(
-            {
-               to_snipper(
-                  input = inputPath,
-                  references = refPath,
-                  target.pop = targetSet,
-                  population.name = targetName,
-                  markers = numMarkers
-               )
-            },
-            error = function(e) {
-               showNotification(paste("Conversion failed:", e$message), type = "error")
-               NULL
-            }
-         )
+         for_arp <- load_csv_xlsx_files(input$toArleFile$datapath)
+         for_arp <- clean_input_data(for_arp)
          
-         if (!is.null(snipper.file)) {
-            convertedSNIPPER(snipper.file)
-            
-            enable("convert2Arle")
-         }
-         enable("convert2Arle")
-      })
-   }) # end of observe event
+         # All null values are "N", set to ""
+         for_arp <- for_arp %>%
+            mutate(across(everything(), ~ case_when(
+               . == "N" ~ "",
+               TRUE ~ .x
+            )))
+         for_arp <- as.data.frame(for_arp)
+
+         # create the arp file
+         arp_file <- build_arp_per_population(for_arp,
+                                              genotypic_data = as.numeric(input$genotypicData),
+                                              gametic_phase = as.numeric(input$gameticPhase),
+                                              recessive_data = as.numeric(input$recessiveData),
+                                              locus_sep = input$locusSep,
+                                              output.prefix = "arp_file",
+                                              data_type = "STANDARD"
+                                              )
+         
+         
+         arleFile(arp_file)
+
+      enable("convert2Arle")
+   }) 
    
-   output$downloadConverted <- downloadHandler(
-      filename = function() {
-         outputName
-      },
-      content = function(file) {
-         openxlsx::write.xlsx(convertedSNIPPER(), file)
-      }
-   )
-   
-   output$downloadSNIPPER <- renderUI({
-      req(convertedSNIPPER())
-      downloadButton("downloadConverted", "Download SNIPPER-ready file")
+   output$fstTableArlecore <- renderTable({
+      req(arlequinResults())
+      get_fst_results(arlequinResults()$raw)
    })
    
-   output$previewTableSNIPPER <- DT::renderDataTable(
-      {
-         req(convertedSNIPPER())
-         convertedSNIPPER()
+   output$downloadArpFile <- downloadHandler(
+      filename = function() {
+         "arl_run.ars"
       },
-      options = list(
-         scrollX = TRUE,
-         pageLength = 10
-      )
+      content = function(file) {
+         req(arleFile())
+         file.copy(arleFile(), file)
+      }
    )
+   
+   output$downloadArpFile_UI <- renderUI({
+      req(arleFile())
+      downloadButton("downloadArpFile", "Download Arlequin-compatible input file")
+   })
    
 }

@@ -895,9 +895,9 @@ build_arp_per_population <- function(df,
                                      output.prefix = "arp_file",
                                      data_type = "STANDARD") {
    
-   #workdir <- tempfile("arlequin_")
-   #dir.create(workdir)
-   out_path <- file.path(".", paste0(output.prefix, ".arp"))
+   workdir <- tempfile("arlequin_")
+   dir.create(workdir)
+   out_path <- file.path(workdir, paste0(output.prefix, ".arp"))
    
    if (file.exists(out_path)) {
       file.remove(out_path)

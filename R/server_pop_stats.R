@@ -282,4 +282,243 @@ pop_stats_server <- function(input, output, session, rv) {
       downloadButton("downloadStatsXLSX", "Download Results (excel)")
    })
    
+   # ==================== To Arlequin-compatible file =======================#
+   exampleForArlecore <- data.frame(
+      Sample = c("Sample1", "Sample2", "Sample3", "Sample4", "..."),
+      Population = c("POP1", "POP2", "POP3", "POP4", "..."),
+      rs101 = c("A/A", "A/T", "A/A", "T/T", "..."),
+      rs102 = c("G/G", "C/C", "G/C", "G/G", "..."),
+      rs_n = c("...", "...", "...", "...", "...")
+   )
+   
+   output$exampleForArlecore <- DT::renderDataTable(
+      {
+         req(exampleForArlecore)
+         exampleForArlecore
+      },
+      options = list(
+         scrollX = TRUE,
+         pageLength = 10
+      )
+   )
+   
+   #======== REVISE
+   
+   arlequinResults <- reactiveVal(NULL)
+   
+   observe({
+      shinyjs::toggleState("runArlecore", !is.null(input$fileForArlecore))
+   })
+   
+   observeEvent(input$runArlecore, {
+      disable("runArlecore")
+      
+      withProgress(message = "Analysis ongoing...", {
+         incProgress(0.2, detail = "Loading input file...")
+         for_arp <- load_csv_xlsx_files(input$fileForArlecore$datapath)
+         for_arp <- clean_input_data(for_arp)
+         
+         # All null values are "N", set to ""
+         for_arp <- for_arp %>%
+            mutate(across(everything(), ~ case_when(
+               . == "N" ~ "",
+               TRUE ~ .x
+            )))
+         for_arp <- as.data.frame(for_arp)
+         
+         incProgress(0.4, detail = "Creating input file...")
+         # create the arp file
+         arp_file <- build_arp_per_population(for_arp,
+                                              genotypic_data = as.numeric(input$genotypicData),
+                                              gametic_phase = as.numeric(input$gameticPhase),
+                                              recessive_data = as.numeric(input$recessiveData),
+                                              locus_sep = input$locusSep,
+                                              output.prefix = "arp_file",
+                                              data_type = "STANDARD"
+         )
+         
+         incProgress(0.6, detail = "Running arlecore...")
+         #run arlecore, returns path of res folder
+         if (isTRUE(input$calcLD)) {
+            results <- run_arlequin(arp_file, ld = TRUE)
+         } else {
+            results <- run_arlequin(arp_file, ld = FALSE)
+         }
+         
+         incProgress(0.8, detail = "Loading report...")
+         # get report file
+         file_dir <- dirname(results)
+         xml_file <- file.path(results, "arp_file.xml")
+         
+         if (!file.exists(xml_file)) {
+            stop("Resulting 'arp_file.xml' report not found.")
+         }
+         
+         doc <- XML::xmlParse(xml_file)
+         arlequinResults(parse_arlequin_report(doc))
+         
+         print(str(arlequinResults()))
+      })
+      
+      enable("runArlecore")
+   }) # end of observe event
+   
+   output$arlequinTables <- renderUI({
+      req(arlequinResults())
+      
+      lapply(seq_along(arlequinResults()$sections), function(i) {
+         section <- arlequinResults()$sections[[i]]
+         
+         tagList(
+            h3(section$title),
+            DT::DTOutput(paste0("arlequin_table_", i)),
+            br()
+         )
+      })
+   })
+   
+   observe({
+      req(arlequinResults())
+      lapply(seq_along(arlequinResults()$sections), function(i) {
+         local({
+            ii <- i
+            output[[paste0("arlequin_table_", ii)]] <- DT::renderDT({
+               arlequinResults()$sections[[ii]]$data
+            },
+            options = list(
+               scrollX = TRUE,
+               pageLength = 10
+            )
+            )
+         })
+      })
+   })
+   
+   
+   observe({
+      req(arlequinResults())
+      
+      lapply(seq_along(arlequinResults()$sections), function(i) {
+         local({
+            ii <- i
+            
+            output[[paste0("arlequin_plot_", i)]] <- renderPlot({
+               section <- arlequinResults()$sections[[ii]]
+               df <- section$data
+               df_long <- tidyr::pivot_longer(
+                  df,
+                  cols = -Locus,
+                  names_to = "Population",
+                  values_to = "Value"
+               )
+               
+               ggplot2::ggplot(
+                  df_long,
+                  ggplot2::aes(x = Locus, y = Value, color = Population)) +
+                  ggplot2::geom_line() +
+                  ggplot2::theme_minimal() +
+                  ggplot2::labs(
+                     title = section$title,
+                     x = "Locus",
+                     y = NULL
+                  )
+            })
+         })
+      })
+   })
+   
+   observe({
+      req(arlequinResults())
+      lapply(seq_along(arlequinResults()$sections), function(i){
+         local ({
+            ii <- i
+            output[[paste0("download_plot_", ii)]] <- downloadHandler(
+               filename = function() {
+                  paste0(
+                     arlequinResults()$sections[[ii]]$type,
+                     "_plot.png"
+                  )
+               }, content = function(file) {
+                  section <- arlequinResults()$sections[[ii]]
+                  df <- section$data
+                  df_long <- tidyr::pivot_longer(
+                     df,
+                     cols = -Locus,
+                     names_to = "Population",
+                     values_to = "Value"
+                  )
+                  
+                  p <- ggplot2::ggplot(
+                     df_long,
+                     ggplot2::aes(x = Locus, y = Value, color = Population)) +
+                     ggplot2::geom_line() +
+                     ggplot2::theme_minimal() +
+                     ggplot2::labs(
+                        title = section$title,
+                        x = "Locus",
+                        y = NULL
+                     )
+                  
+                  ggplot2::ggsave(
+                     filename = file,
+                     plot = p,
+                     width = 10,
+                     height = 6,
+                     dpi = 300
+                  )
+                  
+               }
+            )
+         })
+      })
+   })
+   
+   output$arlequinPlots <- renderUI({
+      req(arlequinResults())
+      
+      lapply(seq_along(arlequinResults()$sections), function(i) {
+         section <- arlequinResults()$sections[[i]]
+         
+         tagList(
+            h3(section$title),
+            plotOutput(paste0("arlequin_plot_", i), height = "500px"),
+            
+            downloadButton(paste0("download_plot_", i),
+                           paste0("Download ", section$title)
+            ),
+            br()
+         )
+      })
+   })
+   
+   output$downloadArleResults <- downloadHandler(
+      filename = function() {
+         paste0(
+            "arlequin_results_",
+            Sys.Date(),
+            ".xlsx"
+         )
+      }, content = function(file) {
+         wb <- openxlsx::createWorkbook()
+         sections <- arlequinResults()$sections
+         
+         for (i in seq_along(sections)){
+            section <- sections[[i]]
+            sheet_name <- substr(
+               section$type, 1, 31
+            )
+            
+            openxlsx::addWorksheet(wb, sheet_name)
+            
+            openxlsx::writeData(wb, sheet_name, section$data)
+         }
+         openxlsx::saveWorkbook(wb, file, overwrite = TRUE)
+      }
+   )
+   
+   output$downloadArleResults_UI <- renderUI({
+      req(arlequinResults())
+      downloadButton("downloadArleResults", "Download Arlequin Results (excel)")
+   })
+   
 }

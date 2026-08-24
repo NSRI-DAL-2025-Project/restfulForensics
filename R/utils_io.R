@@ -17,7 +17,9 @@ get_plink_path <- function() {
 }
 
 get_arlecore_path <- function() {
-   return("./arlequin/arlecore64.exe")
+   normalizePath("./arlequin/arlecore64.exe",
+                 winslash = "\\",
+                 mustWork = TRUE)
 }
 
 
