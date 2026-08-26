@@ -303,7 +303,9 @@ pop_stats_server <- function(input, output, session, rv) {
    )
    
    #======== REVISE
-
+   
+   arlequinFile <- reactiveVal(NULL)
+   arlequinResult <- reactiveVal(NULL)
    arlequinPopLabels <- reactiveVal(NULL)
    arlequinHeterozygosity <- reactiveVal(NULL)
    arlequinFstMatrix <- reactiveVal(NULL)
@@ -346,6 +348,7 @@ pop_stats_server <- function(input, output, session, rv) {
                                               output.prefix = "arp_file",
                                               data_type = "STANDARD"
          )
+         arlequinFile(arp_file)
          
          incProgress(0.6, detail = "Running arlecore...")
          #run arlecore, returns path of res folder
@@ -363,6 +366,8 @@ pop_stats_server <- function(input, output, session, rv) {
          if (!file.exists(xml_file)) {
             stop("Resulting 'arp_file.xml' report not found.")
          }
+         
+         arlequinResult(xml_file)
          
          doc <- XML::xmlParse(xml_file)
          
@@ -797,14 +802,39 @@ pop_stats_server <- function(input, output, session, rv) {
       }
    )
    
+   output$download_arp_file <- downloadHandler(
+      filename = function() {
+         timestamp <- format(Sys.time(), "%Y%m%d_%H%M")
+         paste0("arp_file", timestamp, ".arp")
+      },
+      content = function(file) {
+         req(arlequinFile())
+         file.copy(arlequinFile(), file)
+      }
+   )
+   
+   output$download_arp_result <- downloadHandler(
+      filename = function() {
+         timestamp <- format(Sys.time(), "%Y%m%d_%H%M")
+         paste0("arp_file", timestamp, ".arp")
+      },
+      content = function(file) {
+         req(arlequinResult())
+         file.copy(arlequinResult(), file)
+      }
+   )
+   
    output$download_arlecore_results_UI <- renderUI({
       req(arlequinPopLabels(),
           arlequinHeterozygosity(),
           arlequinFstMatrix(),
           arlequinCoancestry(),
           arlequinPairwise(),
-          arlequinPopDiversity())
-      downloadButton("download_arlecore_results", "Download Results (.xlsx)")
+          arlequinPopDiversity(),
+          arlequinResult())
+      tagList(downloadButton("download_arlecore_results", "Download Results (.xlsx)"),
+      downloadButton("download_arp_file", "Download .arp file"),
+      downloadButton("download_arp_result", "Download resulting .xml file"))
    })
    
 }

@@ -115,7 +115,7 @@ popstats_tab <- function() {
                         br(),
                         p(strong("Input file/s:"), "CSV file containing marker and population data.
                                               Each row should represent multi-locus data for an individual sample."),
-                        p(strong("Expected output file/s: .ars file"))
+                        p(strong("Expected output file/s: .xlsx and .ars file"))
                      ),
                      tabPanel(
                         title = "Sample Input Format",
