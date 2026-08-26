@@ -266,7 +266,7 @@ parse_ld <- function(doc) {
    
    for (i in seq_along(group_nodes)) {
       current_node <- group_nodes[[i]]
-      group_name <- XML::xmlGetAttr(current_node, "NAME")
+      group_name <- XML::xmlGetAttr(current_node, "NAME", default = "")
       
       group_num <- as.integer(sub(".*_group([0-9]+)$", "\\1", group_name))
       pop_index <- group_num + 1
@@ -274,7 +274,7 @@ parse_ld <- function(doc) {
       
       node <- XML::getSibling(current_node, after = TRUE)
       ld_node <- NULL
-      found_ld <- FALSE
+      #found_ld <- FALSE
       
       while (!is.null(node)) {
          if (XML::xmlName(node) == "A") {
@@ -315,18 +315,17 @@ parse_ld <- function(doc) {
          }
          
          locus1 <- as.integer(trimws(section[1]))
-         values <- trimws(section[2])
-         values <- strsplit(values, "[[:space:]]+")[[1]]
+         value_string <- paste(section[-1], collapse = "")
+         values <- strsplit(trimws(value_string), "[[:space:]]+")[[1]]
          values <- values[nzchar(values)]
          
          locus2 <- seq_along(values) - 1
-         n <- min(length(locus2), length(values))
          
          ld_results[[length(ld_results) + 1]] <- data.frame(
             Population = population,
             Locus1 = locus1,
             Locus2 = locus2,
-            LD = values[seq_len(n)],
+            LD = values,
             stringsAsFactors = FALSE
          )
       }
@@ -334,7 +333,10 @@ parse_ld <- function(doc) {
       if (length(ld_results) > 0) {
          population_ld <- do.call(rbind, ld_results)
          population_ld <- population_ld[
-            population_ld$Locus1 <- population_ld$Locus2 & population_ld$LD == "+"
+            population_ld$Locus1 != population_ld$Locus2 & 
+               population_ld$LD == "+",
+            ,
+            drop = FALSE
          ]
          
          results[[length(results) +1]] <- population_ld
@@ -352,75 +354,124 @@ plot_heatmap_arlecore <- function(long_data, pop_labels, legend_name = "Value") 
    colnames(heatmap_data) <- c("Pop1", "Pop2", "Value")
    
    heatmap_data$Pop1 <- pop_names[
-      match(heatmap_data$Pop1, LETTERS[1:length(pop_names)])
+      match(heatmap_data$Pop1, LETTERS[seq_along(pop_names)])
    ]
    
    heatmap_data$Pop2 <- pop_names[
-      match(heatmap_data$Pop2, LETTERS[1:length(pop_names)])
+      match(heatmap_data$Pop2, LETTERS[seq_along(pop_names)])
    ]
+   
+   heatmap_data$Value <- as.numeric(heatmap_data$Value)
    
    heatmap_data$Pop1 <- factor(heatmap_data$Pop1, levels = pop_names)
    heatmap_data$Pop2 <- factor(heatmap_data$Pop2, levels = pop_names)
    
-   ggplot(heatmap_data, aes(x = Pop1, y = Pop2, fill = Value)) +
-      geom_tile(color = "white", linewidth = 0.8) +
-      geom_text(aes(label = sprintf("%.3f", Value)), size = 4) +
-      scale_fill_viridis_c(name = legend_name, na.value = "white") +
-      scale_x_discrete(limits = pop_names) +
-      scale_y_discrete(limits = rev(pop_names)) +
-      coord_fixed() +
-      labs(x = NULL, y = NULL) +
-      theme_minimal(base_size = 12) +
-      theme(panel.grid = element_blank(),
-            axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1), 
-            axis.text.y = element_text(),
-            legend.position = "right")
+   heatmap_data$hover <- paste0("<b>", 
+                                heatmap_data$Pop1, 
+                                " x ", 
+                                heatmap_data$Pop2, 
+                                "</b>", "<br>", 
+                                legend_name, ": ", 
+                                sprintf("%.3f", heatmap_data$Value))
+   p <- plotly::plot_ly(data = heatmap_data,
+                   x = ~Pop1,
+                   y = ~Pop2,
+                   z = ~Value,
+                   text = ~hover,
+                   hoverinfo = "text",
+                   type = "heatmap",
+                   colorscale = "Viridis",
+                   colorbar = list(title = legend_name))
+   
+   p <- p %>% plotly::add_trace(
+      data = heatmap_data,
+      x = ~Pop1,
+      y = ~Pop2,
+      text = ~sprintf("%.3f", Value),
+      type = "scatter",
+      mode = "text",
+      textposition = "middle center",
+      hoverinfo = "skip",
+      showlegend = FALSE
+   )
+   p %>% plotly::layout(xaxis = list(title = NULL, side = "bottom"),
+                     yaxis = list(title = NULL))
+      
 }
 
-plot_pairwise_heatmap <- function(pairwise_matrix, pop_labels) {
+plot_pairwise_data_prep <- function(pairwise_matrix, pop_labels) {
    pop_names <- pop_labels$Population
    nei <- pairwise_matrix[[1]]$data
    between <- pairwise_matrix[[2]]$data
    within <- pairwise_matrix[[3]]$data
    
-   nei_long <- as.data.frame(as.table(as.matrix(nei)))
-   between_long <- as.data.frame(as.table(as.matrix(between)))
-   within_long <- as.data.frame(as.table(as.matrix(within)))
+   make_long <- function(mat, type) {
+      df <- as.data.frame(as.table(as.matrix(mat)))
+      colnames(df) <- c("row", "col", "value")
+      df$row <- as.numeric(df$row)
+      df$col <- as.numeric(df$col)
+      
+      df <- df[!is.na(df$value), ]
+      df$x <- pop_names[df$col]
+      df$y <- pop_names[df$row]
+      
+      df$type <- type
+      df
+   }
    
-   colnames(nei_long) <- c("row", "col", "value")
-   colnames(between_long) <- c("row", "col", "value")
-   colnames(within_long) <- c("row", "col", "value")
+   nei_long <- make_long(nei, "Nei's distance")
+   between_long <- make_long(between, "Between populations")
+   within_long <- make_long(within, "Within populations")
    
-   nei_long$row <- as.numeric(nei_long$row)
-   nei_long$col <- as.numeric(nei_long$col)
+   return(list(nei = nei_long,
+               between = between_long,
+               within = within_long))
+}
+
+plot_pairwise_heatmap <- function(data, pop_labels) {
+   pop_names <- pop_labels$Population
+   heatmap_data <- dplyr::bind_rows(data)
+   heatmap_data$x <- factor(heatmap_data$x, levels = pop_names)
+   heatmap_data$y <- factor(heatmap_data$y, levels = pop_names)
    
-   between_long$row <- as.numeric(between_long$row)
-   between_long$col <- as.numeric(between_long$col)
+   p <- ggplot(heatmap_data,
+          aes(x = x, y = y, fill = value, text = paste0("Population 1: ", x, "<br>Population 2: ", y, "<br>Value: ", sprintf("%.3f", value))
+              ))+
+      geom_tile(color = "white",
+                linewidth = 0.5) +
+      geom_text(aes(label = sprintf("%.1f", value)), size = 3) +
+      facet_wrap(~type, nrow = 1) +
+      scale_fill_viridis_c(name = "Value", na.value = "white") +
+      coord_fixed() +
+      labs(x = NULL, y = NULL, title = "Ave. Number of Pairwise Differences") +
+      theme_minimal(base_size = 11) +
+      theme(
+         panel.grid = element_blank(),
+         axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
+         axis.text.y = element_text(),
+         legend.position = "right",
+         strip.text = element_text(face = "bold")
+      )
    
-   within_long$row <- as.numeric(within_long$row)
-   within_long$col <- as.numeric(within_long$col)
-   
-   nei_long <- nei_long[!is.na(nei_long$value), ]
-   between_long <- between_long[!is.na(between_long$value), ]
-   within_long <- within_long[!is.na(within_long$value), ]
-   
-   nei_long$x <- pop_names[nei_long$col]
-   nei_long$y <- pop_names[nei_long$row]
-   
-   between_long$x <- pop_names[between_long$col]
-   between_long$y <- pop_names[between_long$row]
-   
-   within_long$x <- pop_names[within_long$col]
-   within_long$y <- pop_names[within_long$row]
+   plotly::ggplotly(p,
+                    tooltip = "text") %>%
+      plotly::layout(hoverlabel = list(align = ""))
+}
+
+plot_pairwise_heatmap_overlap <- function(data, pop_labels) {
+   pop_names <- pop_labels$Population
+   nei_long <- data[[1]]
+   between_long <- data[[2]]
+   within_long <- data[[3]]
    
    nei_long$x <- factor(nei_long$x, levels = pop_names)
-   nei_long$y <- factor(nei_long$y, levels = rev(pop_names))
+   nei_long$y <- factor(nei_long$y, levels = pop_names)
    
    between_long$x <- factor(between_long$x, levels = pop_names)
-   between_long$y <- factor(between_long$y, levels = rev(pop_names))
+   between_long$y <- factor(between_long$y, levels = pop_names)
    
    within_long$x <- factor(within_long$x, levels = pop_names)
-   within_long$y <- factor(within_long$y, levels = rev(pop_names))
+   within_long$y <- factor(within_long$y, levels = pop_names)
    
    ggplot()+
       geom_tile(data = nei_long,
@@ -465,7 +516,7 @@ plot_pairwise_heatmap <- function(pairwise_matrix, pop_labels) {
                 aes(x = x, y = y, label = sprintf("%.1f", value)),
                 size = 3) +
       coord_fixed() +
-      labs(x = NULL, y = NULL, title = pairwise_matrix[[1]]$title) +
+      labs(x = NULL, y = NULL, title = "Ave. Number of Pairwise Differences (Breakdown)") +
       theme_minimal(base_size = 11) +
       theme(
          panel.grid = element_blank(),

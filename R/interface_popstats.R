@@ -102,7 +102,8 @@ popstats_tab <- function() {
                   box(
                      fileInput("fileForArlecore", "Input file (CSV/XLSX)", accept = c("xlsx", "csv")),
                      checkboxInput("calcLD", "Perform linkage disequilibrium test?", value = FALSE),
-                     actionButton("runArlecore", "Run Arlecore", icon = icon("arrow-up-right-from-square"))
+                     actionButton("runArlecore", "Run Arlecore", icon = icon("arrow-up-right-from-square")),
+                     uiOutput("download_arlecore_results_UI")
                   ),
                   tabBox(
                      tabPanel(
@@ -130,7 +131,6 @@ popstats_tab <- function() {
                   ),
                   fluidRow(
                      tabBox(
-                        title = "Results",
                         width = 12,
                         tabPanel(
                            title = "Diversity and HWE calculations",
@@ -145,17 +145,22 @@ popstats_tab <- function() {
                         tabPanel(
                            title = "FST Matrix",
                            DT::DTOutput("fst_arlecore"),
-                           plotOutput("fst_heatmap_plot"),
-                           plotOutput("fst_pairwise_heatmap_plot")
+                           br(),
+                           plotly::plotlyOutput("fst_heatmap_plot_arlequin"),
+                           br(),
+                           plotOutput("fst_pairwise_heatmap_plot_overlap"),
+                           br(),
+                           plotly::plotlyOutput("fst_pairwise_heatmap_plot", height = "600px")
                            ),
                         tabPanel(
                            title = "Coancestry Coefficient",
                            DT::DTOutput("coancestry_arlecore"),
-                           plotOutput("coancestry_heatmap_plot")
+                           plotly::plotlyOutput("coancestry_heatmap_plot")
                         ),
                         tabPanel(
-                           title = "Loci in LD"
-                        ),
+                           title = "Loci in LD",
+                           DT::DTOutput("ld_tables")
+                        )
                         
                         
                         )
