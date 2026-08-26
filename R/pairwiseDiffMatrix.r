@@ -113,13 +113,25 @@ pairwiseDiffMatrix <- function(xmlText, Labels=NULL, timeAttr){
   }
   
   return(list(
-    type = "pairwise_differences",
-    title = "Average number of pairwise differences",
-    time = timeAttr,
-    nei_distance = underMatrix,
-    between_populations = upperMatrix, 
-    within_populations = diagonalMatrix
-  ))
+    list(
+      type = "pairwise_differences_nei",
+      title = "Average number of pairwise differences - Nei distance",
+      time = timeAttr,
+      data = as.data.frame(underMatrix)
+    ),
+    list(
+      type = "pairwise_differences_between",
+      title = "Average number of pairwise differences - Between populations",
+      time = timeAttr,
+      data = as.data.frame(upperMatrix)
+    ),
+    list(
+      type = "pairwise_differences_within",
+      title = "Average number of pairwise differences - Within populations",
+      time = timeAttr,
+      data = as.data.frame(diagonalMatrix)
+    )
+    ))
 
 #  # graphic --------------------------------------------------------------------
 #  a <- ncol(numericMatrix)

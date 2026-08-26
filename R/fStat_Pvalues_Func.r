@@ -5,7 +5,7 @@
 # Date: 8.2009
 ################################################################################
 
-fStat_Pvalues_Func <- function(xmlText){
+fStat_Pvalues_Func <- function(xmlText, timeAttr){
   # convert string data (table with names) to a numeric matrix -----------------
   # split string ------
   tagData2 <- as.character(xmlText)

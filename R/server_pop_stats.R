@@ -305,6 +305,12 @@ pop_stats_server <- function(input, output, session, rv) {
    #======== REVISE
    
    arlequinResults <- reactiveVal(NULL)
+   arlequinPopLabels <- reactiveVal(NULL)
+   arlequinHeterozygosity <- reactiveVal(NULL)
+   arlequinFstMatrix <- reactiveVal(NULL)
+   arlequinCoancestry <- reactiveVal(NULL)
+   arlequinPairwise <- reactiveVal(NULL)
+   arlequinPopDiversity <- reactiveVal(NULL)
    
    observe({
       shinyjs::toggleState("runArlecore", !is.null(input$fileForArlecore))
@@ -355,170 +361,206 @@ pop_stats_server <- function(input, output, session, rv) {
          }
          
          doc <- XML::xmlParse(xml_file)
-         arlequinResults(parse_arlequin_report(doc))
          
-         print(str(arlequinResults()))
+         # run it separately
+         pop_labels <- parse_pop_labels(doc)
+         heterozygosity <- parse_sections_arlequin(doc, "sumExpHeterozygosity", sumExpectedHeterozygosity) # bar plot
+         fst_matrix <- parse_sections_arlequin(doc, "PairFstMat", pairFstMatrix)  # matrix of pairwise fst 
+         coancestry_coeff <- parse_sections_arlequin(doc, "coancestryCoefficients", coancestryCoeff) # pairwise of fst and reynolds
+         pairwise_matrix <- parse_sections_arlequin(doc, "pairwiseDifferenceMatrix", pairwiseDiffMatrix)
+         population_diversity <- parse_pop_diversity(doc)
+         
+         arlequinPopLabels(pop_labels)
+         arlequinHeterozygosity(heterozygosity)
+         arlequinFstMatrix(fst_matrix)
+         arlequinCoancestry(coancestry_coeff)
+         arlequinPairwise(pairwise_matrix)
+         arlequinPopDiversity(population_diversity)
+         #print(str(arlequinResults()))
       })
       
       enable("runArlecore")
    }) # end of observe event
    
-   output$arlequinTables <- renderUI({
-      req(arlequinResults())
+   # separate the tables
+   output$population_tables <- renderUI({
+      req(arlequinPopDiversity())
+      populations <- unique(arlequinPopDiversity()$Population)
       
-      lapply(seq_along(arlequinResults()$sections), function(i) {
-         section <- arlequinResults()$sections[[i]]
-         
-         tagList(
-            h3(section$title),
-            DT::DTOutput(paste0("arlequin_table_", i)),
-            br()
-         )
-      })
+      tagList(
+         lapply(seq_along(populations),
+                function(i) {
+                   population <- populations[i]
+                   
+                   tagList(
+                      h3(population),
+                      DT::DTOutput(paste0("diversity_table_", i)),
+                      br()
+                   )
+                })
+      )
    })
    
    observe({
-      req(arlequinResults())
-      lapply(seq_along(arlequinResults()$sections), function(i) {
+      req(arlequinPopDiversity())
+      data <- arlequinPopDiversity()
+      populations <- unique(data$Population)
+      
+      lapply(seq_along(populations), function(i) {
+         population <- populations[i]
+         output_id <- paste0("diversity_table_", i)
+         
          local({
-            ii <- i
-            output[[paste0("arlequin_table_", ii)]] <- DT::renderDT({
-               arlequinResults()$sections[[ii]]$data
-            },
-            options = list(
-               scrollX = TRUE,
-               pageLength = 10
-            )
+            pop <- population
+            output[[output_id]] <- DT::renderDT({
+               pop_data <- arlequinPopDiversity() %>%
+                  dplyr::filter(Population == pop) %>%
+                  dplyr::select(-Population)
+               
+               DT::datatable(pop_data,
+                             rownames = FALSE,
+                             options = list(
+                                pageLength = 10,
+                                scrollX = TRUE
+                             ))
+               })
+            })
+         })
+   })
+   
+   output$hwe_arlecore <- DT::renderDataTable(
+      {
+         req(arlequinHeterozygosity())
+         arlequinHeterozygosity()[["data"]]
+      },
+      options = list(scrollX = TRUE)
+   )
+   
+   output$hwe_arlecore_plots <- renderUI({
+      hwe <- arlequinHeterozygosity()[["data"]]
+      req(hwe)
+      populations <- setdiff(names(hwe), "Locus")
+      
+      tagList(
+         lapply(seq_along(populations), function(i){
+            tagList(
+               h3(populations[i]),
+               plotly::plotlyOutput(
+                  paste0("het_plot_", i),
+                  height = "400px"
+               ),
+               br()
             )
          })
-      })
+      )
    })
    
-   
    observe({
-      req(arlequinResults())
+      hwe <- arlequinHeterozygosity()[["data"]]
+      req(hwe)
+      populations <- setdiff(names(hwe), "Locus")
       
-      lapply(seq_along(arlequinResults()$sections), function(i) {
+      lapply(seq_along(populations), function(i){
          local({
-            ii <- i
+            pop <- populations[i]
+            output_id <- paste0("het_plot_", i)
             
-            output[[paste0("arlequin_plot_", i)]] <- renderPlot({
-               section <- arlequinResults()$sections[[ii]]
-               df <- section$data
-               df_long <- tidyr::pivot_longer(
-                  df,
-                  cols = -Locus,
-                  names_to = "Population",
-                  values_to = "Value"
-               )
+            output[[output_id]] <- plotly::renderPlotly({
+               pop_data <- hwe %>%
+                  dplyr::select(Locus, Heterozygosity = dplyr::all_of(pop))
                
-               ggplot2::ggplot(
-                  df_long,
-                  ggplot2::aes(x = Locus, y = Value, color = Population)) +
-                  ggplot2::geom_line() +
-                  ggplot2::theme_minimal() +
-                  ggplot2::labs(
-                     title = section$title,
-                     x = "Locus",
-                     y = NULL
+               plotly::plot_ly(data = pop_data,
+                               x = ~Locus,
+                               y = ~Heterozygosity,
+                               type = "bar") %>%
+                  plotly::layout(
+                     title = list(text = pop),
+                     xaxis = list(title = "Locus"),
+                     yaxis = list(title = "Expected Heterozygosity"),
+                     showlegend = FALSE
                   )
             })
          })
       })
    })
    
-   observe({
-      req(arlequinResults())
-      lapply(seq_along(arlequinResults()$sections), function(i){
-         local ({
-            ii <- i
-            output[[paste0("download_plot_", ii)]] <- downloadHandler(
-               filename = function() {
-                  paste0(
-                     arlequinResults()$sections[[ii]]$type,
-                     "_plot.png"
-                  )
-               }, content = function(file) {
-                  section <- arlequinResults()$sections[[ii]]
-                  df <- section$data
-                  df_long <- tidyr::pivot_longer(
-                     df,
-                     cols = -Locus,
-                     names_to = "Population",
-                     values_to = "Value"
-                  )
-                  
-                  p <- ggplot2::ggplot(
-                     df_long,
-                     ggplot2::aes(x = Locus, y = Value, color = Population)) +
-                     ggplot2::geom_line() +
-                     ggplot2::theme_minimal() +
-                     ggplot2::labs(
-                        title = section$title,
-                        x = "Locus",
-                        y = NULL
-                     )
-                  
-                  ggplot2::ggsave(
-                     filename = file,
-                     plot = p,
-                     width = 10,
-                     height = 6,
-                     dpi = 300
-                  )
-                  
-               }
-            )
-         })
-      })
-   })
-   
-   output$arlequinPlots <- renderUI({
-      req(arlequinResults())
-      
-      lapply(seq_along(arlequinResults()$sections), function(i) {
-         section <- arlequinResults()$sections[[i]]
-         
-         tagList(
-            h3(section$title),
-            plotOutput(paste0("arlequin_plot_", i), height = "500px"),
-            
-            downloadButton(paste0("download_plot_", i),
-                           paste0("Download ", section$title)
-            ),
-            br()
+   output$hwe_arlecore_plot <- plotly::renderPlotly(
+      {
+         data <- arlequinHeterozygosity()[["data"]]
+         req(data)
+         data_long <- data %>% tidyr::pivot_longer(
+            cols = -1,
+            names_to = "Population",
+            values_to = "Heterozygosity"
          )
-      })
-   })
-   
-   output$downloadArleResults <- downloadHandler(
-      filename = function() {
-         paste0(
-            "arlequin_results_",
-            Sys.Date(),
-            ".xlsx"
-         )
-      }, content = function(file) {
-         wb <- openxlsx::createWorkbook()
-         sections <- arlequinResults()$sections
-         
-         for (i in seq_along(sections)){
-            section <- sections[[i]]
-            sheet_name <- substr(
-               section$type, 1, 31
+         fig <- plotly::plot_ly(data = data_long,
+                                x = ~Locus,
+                                y = ~Heterozygosity,
+                                type = "bar",
+                                color = ~Population,
+                                colors = "Set2",
+                                text = ~Population) %>%
+            plotly::layout(
+               yaxis = list(title = "Heterozygosity"),
+               xaxis = list(title = "Locus"),
+               barmode = "group"
             )
-            
-            openxlsx::addWorksheet(wb, sheet_name)
-            
-            openxlsx::writeData(wb, sheet_name, section$data)
-         }
-         openxlsx::saveWorkbook(wb, file, overwrite = TRUE)
+      })
+   
+   output$fst_arlecore <- DT::renderDataTable(
+      {
+         req(arlequinFstMatrix())
+         fst_data <- arlequinFstMatrix()[["data"]]
+         fst_data[lower.tri(fst_data)] <- t(fst_data)[lower.tri(fst_data)]
+         pop_names <- arlequinPopLabels()$Population
+         rownames(fst_data) <- pop_names
+         colnames(fst_data) <- pop_names
+         fst_data
+      },
+      options = list(scrollX = TRUE)
+   )
+   
+   output$fst_heatmap_plot <- renderPlot(
+      {
+         req(arlequinFstMatrix())
+         plot_heatmap_arlecore(
+            arlequinFstMatrix()[["long"]],
+            arlequinPopLabels()
+         )
       }
    )
    
-   output$downloadArleResults_UI <- renderUI({
-      req(arlequinResults())
-      downloadButton("downloadArleResults", "Download Arlequin Results (excel)")
-   })
+   output$fst_pairwise_heatmap_plot <- renderPlot(
+      {
+         req(arlequinPairwise())
+         plot_pairwise_heatmap(
+            arlequinPairwise(),
+            arlequinPopLabels()
+         )
+      }
+   )
+   
+   output$coancestry_arlecore <- DT::renderDataTable(
+      {
+         req(arlequinCoancestry())
+         coancestry_data <- arlequinCoancestry()[["data"]]
+         coancestry_data[lower.tri(coancestry_data)] <- t(coancestry_data)[lower.tri(coancestry_data)]
+         pop_names <- arlequinPopLabels()$Population
+         rownames(coancestry_data) <- pop_names
+         colnames(coancestry_data) <- pop_names
+         coancestry_data
+      },
+      options = list(scrollX = TRUE)
+   )
+   
+   output$coancestry_heatmap_plot <- renderPlot(
+      {
+         req(arlequinCoancestry())
+         plot_heatmap_arlecore(
+            arlequinCoancestry()[["long"]],
+            arlequinPopLabels()
+         )
+      }
+   )
    
 }

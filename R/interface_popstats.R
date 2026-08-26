@@ -133,14 +133,31 @@ popstats_tab <- function() {
                         title = "Results",
                         width = 12,
                         tabPanel(
-                           title = "Summary Table",
-                           uiOutput("downloadArleResults_UI"),
-                           uiOutput("arlequinTables")
+                           title = "Diversity and HWE calculations",
+                           uiOutput("population_tables")
                         ),
                         tabPanel(
-                           title = "Plots",
-                              uiOutput("arlequinPlots")
-                           )
+                           title = "Expected Heterozygosity",
+                           DT::DTOutput("hwe_arlecore"),
+                           plotly::plotlyOutput("hwe_arlecore_plot"),
+                           uiOutput("hwe_arlecore_plots")
+                        ),
+                        tabPanel(
+                           title = "FST Matrix",
+                           DT::DTOutput("fst_arlecore"),
+                           plotOutput("fst_heatmap_plot"),
+                           plotOutput("fst_pairwise_heatmap_plot")
+                           ),
+                        tabPanel(
+                           title = "Coancestry Coefficient",
+                           DT::DTOutput("coancestry_arlecore"),
+                           plotOutput("coancestry_heatmap_plot")
+                        ),
+                        tabPanel(
+                           title = "Loci in LD"
+                        ),
+                        
+                        
                         )
                      )
                   )

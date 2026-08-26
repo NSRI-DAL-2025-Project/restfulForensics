@@ -74,9 +74,10 @@ sumNumAllelesFunction <- function(xmlText,timeAttr){
   
   return(list(
               type = "num_alleles",
-              data = numAlleles,
               title = "Number of alleles at different loci",
-              time = timeAttr))
+              time = timeAttr,
+              data = numAlleles
+              ))
   #==============================
   
 #  #save graphic
