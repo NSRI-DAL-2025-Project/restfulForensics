@@ -28,13 +28,13 @@ run_arlequin <- function(file, ld = FALSE) {
 
 
 parse_pop_labels <- function(doc) {
-   nodes <- XML::getNodeSet(doc, "//pairDistPopLabels")
+   nodes <- xml2::xml_find_all(doc, "//pairDistPopLabels")
    
    if (length(nodes) == 0) {
       return(NULL)
    }
    
-   xmlText <- XML::xmlValue(nodes[[1]])
+   xmlText <- xml2::xml_text(nodes[[1]])
    lines <- strsplit(xmlText, "\n")[[1]]
    lines <- trimws(lines)
    lines <- lines[grepl("^[0-9]+\\s*:", lines)]
@@ -56,13 +56,13 @@ parse_pop_diversity <- function(doc){
       stop("Could not find <pairDistPopLabels> in XML file.")
    }
    
-   group_nodes <- XML::getNodeSet(doc, "//A[contains(@NAME, '_group')]")
+   group_nodes <- xml2::xml_find_all(doc, "//A[contains(@NAME, '_group')]")
    
    results <- list()
    
    for (i in seq_along(group_nodes)) {
       current_node <- group_nodes[[i]]
-      group_name <- XML::xmlGetAttr(current_node, "NAME")
+      group_name <- xml2::xml_attr(current_node, "NAME")
       
       group_num <- as.integer(
          sub(".*_group([0-9]+)$", "\\1", group_name)
@@ -70,21 +70,22 @@ parse_pop_diversity <- function(doc){
       
       pop_index <- group_num + 1
       population <- pop_label$Population[pop_index]
-      node <- XML::getSibling(current_node, after = TRUE)
+      #node <- XML::getSibling(current_node, after = TRUE)
+      node <- xml2::xml_find_first(current_node, "./following-sibling::*[1]")
       standard_txt <- NULL
       hw_txt <- NULL
       
-      while (!is.null(node)) {
-         if (XML::xmlName(node) == "A") {
-            next_name <- XML::xmlGetAttr(node, "NAME", default = "")
+      while (!inherits(node, "xml_missing")) {
+         if (xml2::xml_name(node) == "A") {
+            next_name <- xml2::xml_attr(node, "NAME")
             
             if (grepl("_group[0-9]+$", next_name)) {
                break
             }
          }
          
-         if (XML::xmlName(node) == "data") {
-            txt <- XML::xmlValue(node)
+         if (xml2::xml_name(node) == "data") {
+            txt <- xml2::xml_text(node)
             
             if (grepl("Standard diversity indices", txt, fixed = TRUE)) {
                standard_txt <- txt
@@ -95,24 +96,26 @@ parse_pop_diversity <- function(doc){
             }
          }
          
-         node <- XML::getSibling(node, after = TRUE)
+         #node <- XML::getSibling(node, after = TRUE)
+         node <- xml2::xml_find_first(node, "./following-sibling::*[1]")
       }
       
       standard_node <- NULL
-      node <- XML::getSibling(current_node, after = TRUE)
+      #node <- XML::getSibling(current_node, after = TRUE)
+      node <- xml2::xml_find_first(current_node, "./following-sibling::*[1]")
       found_standard <- FALSE
       
-      while (!is.null(node)) {
-         if (XML::xmlName(node) == "A") {
-            next_name <- XML::xmlGetAttr(node, "NAME", default = "")
+      while (!inherits(node, "xml_missing")) {
+         if (xml2::xml_name(node) == "A") {
+            next_name <- xml2::xml_attr(node, "NAME")
             
             if (grepl("_group[0-9]+$", next_name)){
                break
             }
          }
          
-         if (XML::xmlName(node) == "data") {
-            txt <- XML::xmlValue(node)
+         if (xml2::xml_name(node) == "data") {
+            txt <- xml2::xml_text(node)
             
             if (grepl("Standard diversity indices", txt, fixed = TRUE)) {
                found_standard = TRUE
@@ -124,24 +127,26 @@ parse_pop_diversity <- function(doc){
             }
          }
          
-         node <- XML::getSibling(node, after = TRUE)
+         #node <- XML::getSibling(node, after = TRUE)
+         node <- xml2::xml_find_first(node, "./following-sibling::*[1]")
       }
       
       hw_node <- NULL
-      node <- XML::getSibling(current_node, after = TRUE)
+      #node <- XML::getSibling(current_node, after = TRUE)
+      node <- xml2::xml_find_first(current_node, "./following-sibling::*[1]")
       found_hw <- FALSE
       
-      while (!is.null(node)) {
-         if (XML::xmlName(node) == "A") {
-            next_name <- XML::xmlGetAttr(node, "NAME", default = "")
+      while (!inherits(node, "xml_missing")) {
+         if (xml2::xml_name(node) == "A") {
+            next_name <- xml2::xml_attr(node, "NAME")
             
             if (grepl("_group[0-9]+$", next_name)) {
                break
             }
          }
          
-         if (XML::xmlName(node) == "data") {
-            txt <- XML::xmlValue(node)
+         if (xml2::xml_name(node) == "data") {
+            txt <- xml2::xml_text(node)
             
             if (grepl("Hardy-Weinberg equilibrium", txt, fixed = TRUE)) {
                found_hw <- TRUE
@@ -153,13 +158,14 @@ parse_pop_diversity <- function(doc){
             }
          }
          
-         node <- XML::getSibling(node, after = TRUE)
+         #node <- XML::getSibling(node, after = TRUE)
+         node <- xml2::xml_find_first(node, "./following-sibling::*[1]")
       }
       
       standard <- NULL
       
       if (!is.null(standard_node)) {
-         txt <- XML::xmlValue(standard_node)
+         txt <- xml2::xml_text(standard_node)
          lines <- strsplit(txt, "\n", fixed = TRUE)[[1]]
          
          locus_lines <- grep(
@@ -191,7 +197,7 @@ parse_pop_diversity <- function(doc){
       hw <- NULL
       
       if (!is.null(hw_node)) {
-         txt <- XML::xmlValue(hw_node)
+         txt <- xml2::xml_text(hw_node)
          lines <- strsplit(txt, "\n", fixed = TRUE)[[1]]
          
          hw_lines <- grep(
@@ -260,47 +266,48 @@ parse_ld <- function(doc) {
       stop("Could not find <pairDistPopLabels> in XML file.")
    }
    
-   group_nodes <- XML::getNodeSet(doc, "//A[contains(@NAME, '_group')]")
+   group_nodes <- xml2::xml_find_all(doc, "//A[contains(@NAME, '_group')]")
    
    results <- list()
    
    for (i in seq_along(group_nodes)) {
       current_node <- group_nodes[[i]]
-      group_name <- XML::xmlGetAttr(current_node, "NAME", default = "")
+      group_name <- xml2::xml_attr(current_node, "NAME")
       
       group_num <- as.integer(sub(".*_group([0-9]+)$", "\\1", group_name))
       pop_index <- group_num + 1
       population <- pop_label$Population[pop_index]
       
-      node <- XML::getSibling(current_node, after = TRUE)
+      #node <- XML::getSibling(current_node, after = TRUE)
+      node <- xml2::xml_find_first(current_node, "./following-sibling::*[1]")
       ld_node <- NULL
-      #found_ld <- FALSE
       
-      while (!is.null(node)) {
-         if (XML::xmlName(node) == "A") {
-            next_name <- XML::xmlGetAttr(node, "NAME", default = "")
+      while (!inherits(node, "xml_missing")) {
+         if (xml2::xml_name(node) == "A") {
+            next_name <- xml2::xml_attr(node, "NAME")
             
             if (grepl("_group[0-9]+$", next_name)) {
                break
             }
          }
          
-         if (XML::xmlName(node) == "data") {
-            txt <- XML::xmlValue(node)
+         if (xml2::xml_name(node) == "data") {
+            txt <- xml2::xml_text(node)
             if (grepl("Table of significant linkage disequilibrium", txt, fixed = TRUE)) {
                ld_node <- node
                break
             }
          }
          
-         node <- XML::getSibling(node, after = TRUE)
+         #node <- XML::getSibling(node, after = TRUE)
+         node <- xml2::xml_find_first(node, "./following-sibling::*[1]")
       }
       
       if (is.null(ld_node)) {
          next
       }
       
-      txt <- XML::xmlValue(ld_node)
+      txt <- xml2::xml_text(ld_node)
       lines <- strsplit(txt, "\n", fixed = TRUE)[[1]]
       ld_lines <- grep(
          "^[[:space:]]*[0-9]+[[:space:]]*\\|", lines, value = TRUE
@@ -527,59 +534,20 @@ plot_pairwise_heatmap_overlap <- function(data, pop_labels) {
 }
 
 parse_sections_arlequin <- function(doc, tag, fun) {
-   nodes <- XML::getNodeSet(doc, paste0("//", tag))
+   #nodes <- xml2::xml_find_all(doc, paste0("//", tag))
+   nodes <- xml2::xml_find_all(doc, paste0("//", tag))
    if (length(nodes) == 0) {
       return(NULL)
    }
    
    results <- lapply(nodes, function(node) {
-      xmlText <- XML::xmlValue(node)
-      timeAttr <- XML::xmlGetAttr(node, "time")
+      #xmlText <- xml2::xml_text(node)
+      xmlText <- xml2::xml_text(node)
+      timeAttr <- xml2::xml_attr(node, "time")
+      #timeAttr <- xml2::xml_attr(node, "time")
       fun(xmlText = xmlText, timeAttr =  timeAttr)
    })
    
    unlist(results, recursive = FALSE)
 }
 
-parse_arlequin_report <- function(doc) {
-   sections <- list()
-
-   #sections <- c(sections,
-   #              parse_sections_arlequin(doc, "sumNumAlleles", sumNumAllelesFunction))
-   
-   sections <- c(sections,
-                 parse_sections_arlequin(doc, "sumExpHeterozygosity", sumExpectedHeterozygosity))
-   
-   #sections <- c(sections,
-   #              parse_sections_arlequin(doc, "sumThetaH", sumThetaHFunction))
-   
-   sections <- c(sections,
-                 parse_sections_arlequin(doc, "PairFstMat", pairFstMatrix))
-   
-   sections <- c(sections,
-                 parse_sections_arlequin(doc, "coancestryCoefficients", coancestryCoeff))
-   
-   sections <- c(sections,
-                 parse_sections_arlequin(doc, "pairwiseDifferenceMatrix", pairwiseDiffMatrix))
-   
-   #sections <- c(sections,
-   #              parse_sections_arlequin(doc, "PairFstPvalMat", fStat_Pvalues_Func))
-   
-   population_diversity <- parse_pop_diversity(doc)
-   
-   if (!is.null(population_diversity)){
-      sections <- c(sections,
-                    list(
-                       list(
-                          type = "population_diversity",
-                          title = "Population Diversity and HWE",
-                          time = Sys.time(),
-                          data = population_diversity
-                       )
-                    ))
-   }
-   
-   sections <- Filter(Negate(is.null), sections)
-   list(sections = sections)
-   
-}

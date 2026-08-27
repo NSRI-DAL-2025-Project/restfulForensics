@@ -301,9 +301,7 @@ pop_stats_server <- function(input, output, session, rv) {
          pageLength = 10
       )
    )
-   
-   #======== REVISE
-   
+
    arlequinFile <- reactiveVal(NULL)
    arlequinResult <- reactiveVal(NULL)
    arlequinPopLabels <- reactiveVal(NULL)
@@ -313,6 +311,7 @@ pop_stats_server <- function(input, output, session, rv) {
    arlequinPairwise <- reactiveVal(NULL)
    arlequinPopDiversity <- reactiveVal(NULL)
    arlequinLD <- reactiveVal(NULL)
+   locusData <- reactiveVal(NULL)
    
    observe({
       shinyjs::toggleState("runArlecore", !is.null(input$fileForArlecore))
@@ -328,7 +327,7 @@ pop_stats_server <- function(input, output, session, rv) {
          
          rsids <- as.data.frame(colnames(for_arp)[-c(1,2)])
          rsids <- data.frame(rownames(rsids), rsids)
-         
+         locusData(rsids)
          
          # All null values are "N", set to ""
          for_arp <- for_arp %>%
@@ -339,7 +338,6 @@ pop_stats_server <- function(input, output, session, rv) {
          for_arp <- as.data.frame(for_arp)
          
          incProgress(0.4, detail = "Creating input file...")
-         # create the arp file
          arp_file <- build_arp_per_population(for_arp,
                                               genotypic_data = as.numeric(input$genotypicData),
                                               gametic_phase = as.numeric(input$gameticPhase),
@@ -351,7 +349,7 @@ pop_stats_server <- function(input, output, session, rv) {
          arlequinFile(arp_file)
          
          incProgress(0.6, detail = "Running arlecore...")
-         #run arlecore, returns path of res folder
+         #returns path of res folder
          if (isTRUE(input$calcLD)) {
             results <- run_arlequin(arp_file, ld = TRUE)
          } else {
@@ -369,7 +367,7 @@ pop_stats_server <- function(input, output, session, rv) {
          
          arlequinResult(xml_file)
          
-         doc <- XML::xmlParse(xml_file)
+         doc <- xml2::read_xml(xml_file)
          
          # run it separately
          pop_labels <- parse_pop_labels(doc)
@@ -384,6 +382,9 @@ pop_stats_server <- function(input, output, session, rv) {
          coancestry_coeff <- parse_sections_arlequin(doc, "coancestryCoefficients", coancestryCoeff) # pairwise of fst and reynolds
          pairwise_matrix <- parse_sections_arlequin(doc, "pairwiseDifferenceMatrix", pairwiseDiffMatrix)
          population_diversity <- parse_pop_diversity(doc)
+         population_diversity$Locus <- rsids[[2]][
+            match(as.numeric(population_diversity$Locus), as.numeric(rsids[[1]]))
+         ]
          
          if (isTRUE(input$calcLD)) {
             rsids_zero <- rsids
@@ -676,7 +677,7 @@ pop_stats_server <- function(input, output, session, rv) {
             fst <- arlequinFstMatrix()[["data"]]
             
             if (!is.null(fst)){
-               fst <- as.matrix(fst)
+               #fst <- as.matrix(fst)
                fst[lower.tri(fst)] <- t(fst)[lower.tri(fst)]
                pop_names <- arlequinPopLabels()$Population
                
@@ -696,7 +697,7 @@ pop_stats_server <- function(input, output, session, rv) {
             coanc <- arlequinCoancestry()[["data"]]
             
             if (!is.null(coanc)){
-               coanc <- as.matrix(coanc)
+               #coanc <- as.matrix(coanc)
                coanc[lower.tri(coanc)] <- t(coanc)[lower.tri(coanc)]
                pop_names <- arlequinPopLabels()$Population
                
@@ -721,6 +722,15 @@ pop_stats_server <- function(input, output, session, rv) {
                
                if (!is.null(obj[["data"]])) {
                   pair_data <- obj[["data"]]
+                  pair_data[lower.tri(pair_data)] <- t(pair_data)[lower.tri(pair_data)]
+                  pop_names <- arlequinPopLabels()$Population
+                  
+                  rownames(pair_data) <- pop_names
+                  colnames(pair_data) <- pop_names
+                  
+                  pair_data_export <- cbind(Population = rownames(pair_data),
+                                        as.data.frame(pair_data))
+                  
                   sheet_name <- obj[["title"]]
                   
                   if (is.null(sheet_name) || sheet_name == "") {
@@ -745,7 +755,7 @@ pop_stats_server <- function(input, output, session, rv) {
                   used_sheet_names <- c(used_sheet_names, sheet_name)
                   openxlsx::addWorksheet(wb, sheet_name)
                   
-                  openxlsx::writeData(wb, sheet_name, pair_data)
+                  openxlsx::writeData(wb, sheet_name, pair_data_export)
                   
                }
             }
@@ -764,7 +774,7 @@ pop_stats_server <- function(input, output, session, rv) {
                      Population == pop
                   ) %>%
                   dplyr::select(-Population)
-               
+
                sheet_name <- paste0("Diversity - ", pop)
                sheet_name <- substr(sheet_name, 1, 31)
                
