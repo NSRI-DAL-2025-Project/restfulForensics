@@ -31,15 +31,6 @@
 # Convert Windows text file to Unix text file in Linux
 # awk '{ sub("\r$", ""); print }' winfile.txt > unixfile.txt
 
-#' Genind to STRUCTURE
-#'
-#' @param input The input as a dataframe.
-#' 
-#' @returns A dataframe containing information from the input file.
-#'
-#' @importFrom tidyselect everything
-#'
-#' @keywords internal
 genind2structure2 <- function(data, file = "", pops = TRUE, markers = TRUE, unix = FALSE) {
    ## Check input file a genind object
    if (!"genind" %in% class(data)) {
@@ -156,8 +147,6 @@ genind2structure2 <- function(data, file = "", pops = TRUE, markers = TRUE, unix
 
 #====================== Adapted from the dartR package
 #' Convert genind object to STRUCTURE-compatible format
-#'
-#' @keywords internal
 to_structure <- function(genind_obj,
                          include_pop = TRUE) {
    # out_path <- file.path(dir, file)
@@ -189,8 +178,6 @@ to_structure <- function(genind_obj,
 
 #' Parse matrix files
 #' Sections commented out were revised.
-#'
-#' @keywords internal
 .structureParseQmat <- function(q.mat.txt,
                                 pops) {
    q.mat.txt <- sub("[*]+", "", q.mat.txt)
@@ -231,8 +218,6 @@ to_structure <- function(genind_obj,
 
 #' Read STRUCTURE file
 #' Sections commented out were revised.
-#'
-#' @keywords internal
 structureRead <- function(file,
                           pops = NULL) {
    if (!file.exists(file)) {
@@ -366,8 +351,6 @@ structureRead <- function(file,
 
 #' Parse matrix files
 #' Sections commented out were revised.
-#'
-#' @keywords internal
 utils.structure.evanno <- function(sr, plot = TRUE) {
    if (!"structure.result" %in% class(sr)) {
       stop(error("'sr' is not a result from 'structure.run'."))
@@ -484,8 +467,6 @@ utils.structure.evanno <- function(sr, plot = TRUE) {
 
 
 #' Run STRUCTURE analysis
-#'
-#' @keywords internal
 running_structure <- function(input_file,
                               k.range,
                               num.k.rep,
@@ -677,16 +658,14 @@ running_structure <- function(input_file,
    ))
 }
 
+# ===================
+
 
 #' Calculate Q matrices from STRUCTURE v2.3.4 results
 #' 
 #' @param dir The directory containing the STRUCTURE results.
 #'
 #' @returns directory containing the q matrices files.
-#' 
-#' @export
-#' @examples
-#' generate_ind_files("./structure_res")
 generate_ind_files <- function(dir) {
    output <- list.files(path = dir, pattern = "\\_f$", full.names = TRUE)
    
@@ -709,8 +688,12 @@ generate_ind_files <- function(dir) {
 }
 
 
-# for using CLUMPP
-# first combine the files with the same K
+#' Combines file with the same K (for CLUMPP)
+#' 
+#' @param dir The directory containing the STRUCTURE results.
+#' @param k.value The target K for plotting.
+#'
+#' @returns List of merged metrics for a particular K.
 combine_ind_files <- function(dir, k.value = 2) {
    ind_result <- tempfile(pattern = paste0("combined_", k.value, "_"), fileext = ".ind")
    
@@ -745,6 +728,14 @@ combine_ind_files <- function(dir, k.value = 2) {
                ids = ids))
 }
 
+
+#' Extract QMatrices from STRUCTURE result
+#' 
+#' @param sr The structure object.
+#' @param output.dir The output directory.
+#' @param prefix File prefix of each run.
+#'
+#' @returns The file path of the extracted QMatrices.
 structureExportQmat <- function(sr, output.dir = ".", prefix = "run") {
    if (!inherits(sr, "structure.result")) {
       stop("'sr' must be a structure.result object.")
@@ -778,7 +769,12 @@ structureExportQmat <- function(sr, output.dir = ".", prefix = "run") {
    invisible(out.files)
 }
 
-
+#' Generate structure R object
+#' 
+#' @param files The directory containing structure results.
+#' @param pops The populations in the input file.
+#'
+#' @returns The structure object generated from actual STRUCTURE resulting files.
 structureImport <- function(files, pops = NULL) {
    if (length(files) == 0) {
       stop("No STRUCTURE files found.")
@@ -807,6 +803,11 @@ structureImport <- function(files, pops = NULL) {
     return(sr)
 }
 
+#' Extract populations from STRUCTURE files
+#' 
+#' @param file The directory containing structure results.
+#'
+#' @returns A list of populations.
 structure_get_populations <- function(file){
    txt <- readLines(file)
    

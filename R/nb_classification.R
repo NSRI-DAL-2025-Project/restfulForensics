@@ -2,15 +2,7 @@
 #' 
 #' @param file The file path to file with sample, population, and genotype information.
 #' 
-#' @returns A list containing the prediction rate and other model metrices.
-#' 
-#' @importFrom e1071 naiveBayes
-#' @importFrom caret confusionMatrix
-#' @importFrom tidyr pivot_wider 
-#' 
-#' @export
-#' @examples
-#' calculate_naive_bayes("./file/my_pop_file.xlsx")
+#' @returns A list containing the prediction rate and other model metrics.
 calculate_naive_bayes <- function(file) {
    
    data_fsnps <- load_csv_xlsx_files(file)
