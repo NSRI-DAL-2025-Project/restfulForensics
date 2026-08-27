@@ -282,4 +282,559 @@ pop_stats_server <- function(input, output, session, rv) {
       downloadButton("downloadStatsXLSX", "Download Results (excel)")
    })
    
+   # ==================== To Arlequin-compatible file =======================#
+   exampleForArlecore <- data.frame(
+      Sample = c("Sample1", "Sample2", "Sample3", "Sample4", "..."),
+      Population = c("POP1", "POP2", "POP3", "POP4", "..."),
+      rs101 = c("A/A", "A/T", "A/A", "T/T", "..."),
+      rs102 = c("G/G", "C/C", "G/C", "G/G", "..."),
+      rs_n = c("...", "...", "...", "...", "...")
+   )
+   
+   output$exampleForArlecore <- DT::renderDataTable(
+      {
+         req(exampleForArlecore)
+         exampleForArlecore
+      },
+      options = list(
+         scrollX = TRUE,
+         pageLength = 10
+      )
+   )
+   
+   #======== REVISE
+   
+   arlequinFile <- reactiveVal(NULL)
+   arlequinResult <- reactiveVal(NULL)
+   arlequinPopLabels <- reactiveVal(NULL)
+   arlequinHeterozygosity <- reactiveVal(NULL)
+   arlequinFstMatrix <- reactiveVal(NULL)
+   arlequinCoancestry <- reactiveVal(NULL)
+   arlequinPairwise <- reactiveVal(NULL)
+   arlequinPopDiversity <- reactiveVal(NULL)
+   arlequinLD <- reactiveVal(NULL)
+   
+   observe({
+      shinyjs::toggleState("runArlecore", !is.null(input$fileForArlecore))
+   })
+   
+   observeEvent(input$runArlecore, {
+      disable("runArlecore")
+      
+      withProgress(message = "Analysis ongoing...", {
+         incProgress(0.2, detail = "Loading input file...")
+         for_arp <- load_csv_xlsx_files(input$fileForArlecore$datapath)
+         for_arp <- clean_input_data(for_arp)
+         
+         rsids <- as.data.frame(colnames(for_arp)[-c(1,2)])
+         rsids <- data.frame(rownames(rsids), rsids)
+         
+         
+         # All null values are "N", set to ""
+         for_arp <- for_arp %>%
+            mutate(across(everything(), ~ case_when(
+               . == "N" ~ "",
+               TRUE ~ .x
+            )))
+         for_arp <- as.data.frame(for_arp)
+         
+         incProgress(0.4, detail = "Creating input file...")
+         # create the arp file
+         arp_file <- build_arp_per_population(for_arp,
+                                              genotypic_data = as.numeric(input$genotypicData),
+                                              gametic_phase = as.numeric(input$gameticPhase),
+                                              recessive_data = as.numeric(input$recessiveData),
+                                              locus_sep = input$locusSep,
+                                              output.prefix = "arp_file",
+                                              data_type = "STANDARD"
+         )
+         arlequinFile(arp_file)
+         
+         incProgress(0.6, detail = "Running arlecore...")
+         #run arlecore, returns path of res folder
+         if (isTRUE(input$calcLD)) {
+            results <- run_arlequin(arp_file, ld = TRUE)
+         } else {
+            results <- run_arlequin(arp_file, ld = FALSE)
+         }
+         
+         incProgress(0.8, detail = "Loading report...")
+         # get report file
+         file_dir <- dirname(results)
+         xml_file <- file.path(results, "arp_file.xml")
+         
+         if (!file.exists(xml_file)) {
+            stop("Resulting 'arp_file.xml' report not found.")
+         }
+         
+         arlequinResult(xml_file)
+         
+         doc <- XML::xmlParse(xml_file)
+         
+         # run it separately
+         pop_labels <- parse_pop_labels(doc)
+         heterozygosity <- parse_sections_arlequin(doc, "sumExpHeterozygosity", sumExpectedHeterozygosity) # bar plot
+         hwe <- heterozygosity[["data"]]
+         hwe$Locus <- rsids[[2]][
+            match(as.numeric(hwe$Locus), as.numeric(rsids[[1]]))
+         ]
+         heterozygosity[["data"]] <- hwe
+         
+         fst_matrix <- parse_sections_arlequin(doc, "PairFstMat", pairFstMatrix)  # matrix of pairwise fst 
+         coancestry_coeff <- parse_sections_arlequin(doc, "coancestryCoefficients", coancestryCoeff) # pairwise of fst and reynolds
+         pairwise_matrix <- parse_sections_arlequin(doc, "pairwiseDifferenceMatrix", pairwiseDiffMatrix)
+         population_diversity <- parse_pop_diversity(doc)
+         
+         if (isTRUE(input$calcLD)) {
+            rsids_zero <- rsids
+            rsids_zero[[1]] <- seq(0, nrow(rsids_zero) - 1)
+            ld_vals <- parse_ld(doc)
+            ld_vals$Locus1 <- rsids_zero[[2]][
+               match(ld_vals$Locus1, rsids_zero[[1]])
+            ]
+            
+            ld_vals$Locus2 <- rsids_zero[[2]][
+               match(ld_vals$Locus2, rsids_zero[[1]])
+            ]
+         } else {
+            ld_vals <- NULL
+         }
+         
+         arlequinPopLabels(pop_labels)
+         arlequinHeterozygosity(heterozygosity)
+         arlequinFstMatrix(fst_matrix)
+         arlequinCoancestry(coancestry_coeff)
+         arlequinPairwise(pairwise_matrix)
+         arlequinPopDiversity(population_diversity)
+         arlequinLD(ld_vals)
+      })
+      
+      enable("runArlecore")
+   }) # end of observe event
+   
+   # separate the tables
+   output$population_tables <- renderUI({
+      req(arlequinPopDiversity())
+      populations <- unique(arlequinPopDiversity()$Population)
+      
+      tagList(
+         lapply(seq_along(populations),
+                function(i) {
+                   population <- populations[i]
+                   
+                   tagList(
+                      h3(population),
+                      DT::DTOutput(paste0("diversity_table_", i)),
+                      br()
+                   )
+                })
+      )
+   })
+   
+   observe({
+      req(arlequinPopDiversity())
+      data <- arlequinPopDiversity()
+      populations <- unique(data$Population)
+      
+      lapply(seq_along(populations), function(i) {
+         population <- populations[i]
+         output_id <- paste0("diversity_table_", i)
+         
+         local({
+            pop <- population
+            output[[output_id]] <- DT::renderDT({
+               pop_data <- arlequinPopDiversity() %>%
+                  dplyr::filter(Population == pop) %>%
+                  dplyr::select(-Population)
+               
+               DT::datatable(pop_data,
+                             rownames = FALSE,
+                             options = list(
+                                pageLength = 10,
+                                scrollX = TRUE
+                             ))
+               })
+            })
+         })
+   })
+   
+   output$hwe_arlecore <- DT::renderDataTable(
+      {
+         req(arlequinHeterozygosity())
+         arlequinHeterozygosity()[["data"]]
+      },
+      options = list(scrollX = TRUE)
+   )
+   
+   output$hwe_arlecore_plots <- renderUI({
+      hwe <- arlequinHeterozygosity()[["data"]]
+      req(hwe)
+      populations <- setdiff(names(hwe), "Locus")
+      
+      tagList(
+         lapply(seq_along(populations), function(i){
+            tagList(
+               h3(populations[i]),
+               plotly::plotlyOutput(
+                  paste0("het_plot_", i),
+                  height = "400px"
+               ),
+               br()
+            )
+         })
+      )
+   })
+   
+   observe({
+      hwe <- arlequinHeterozygosity()[["data"]]
+      req(hwe)
+      populations <- setdiff(names(hwe), "Locus")
+      
+      lapply(seq_along(populations), function(i){
+         local({
+            pop <- populations[i]
+            output_id <- paste0("het_plot_", i)
+            
+            output[[output_id]] <- plotly::renderPlotly({
+               pop_data <- hwe %>%
+                  dplyr::select(Locus, Heterozygosity = dplyr::all_of(pop))
+               
+               plotly::plot_ly(data = pop_data,
+                               x = ~Locus,
+                               y = ~Heterozygosity,
+                               type = "bar") %>%
+                  plotly::layout(
+                     title = list(text = pop),
+                     xaxis = list(title = "Locus"),
+                     yaxis = list(title = "Expected Heterozygosity"),
+                     showlegend = FALSE
+                  )
+            })
+         })
+      })
+   })
+   
+   output$hwe_arlecore_plot <- plotly::renderPlotly(
+      {
+         data <- arlequinHeterozygosity()[["data"]]
+         req(data)
+         data_long <- data %>% tidyr::pivot_longer(
+            cols = -1,
+            names_to = "Population",
+            values_to = "Heterozygosity"
+         )
+         fig <- plotly::plot_ly(data = data_long,
+                                x = ~Locus,
+                                y = ~Heterozygosity,
+                                type = "bar",
+                                color = ~Population,
+                                colors = "Set2",
+                                text = ~Population) %>%
+            plotly::layout(
+               yaxis = list(title = "Heterozygosity"),
+               xaxis = list(title = "Locus"),
+               barmode = "group"
+            )
+      })
+   
+   output$fst_arlecore <- DT::renderDataTable(
+      {
+         req(arlequinFstMatrix())
+         fst_data <- arlequinFstMatrix()[["data"]]
+         fst_data[lower.tri(fst_data)] <- t(fst_data)[lower.tri(fst_data)]
+         pop_names <- arlequinPopLabels()$Population
+         rownames(fst_data) <- pop_names
+         colnames(fst_data) <- pop_names
+         fst_data
+      },
+      options = list(scrollX = TRUE)
+   )
+   
+   output$fst_heatmap_plot_arlequin <- plotly::renderPlotly(
+      {
+         req(arlequinFstMatrix())
+         plot_heatmap_arlecore(
+            arlequinFstMatrix()[["long"]],
+            arlequinPopLabels(),
+            legend_name = "FST"
+         )
+      }
+   )
+   
+   output$fst_pairwise_heatmap_plot <- plotly::renderPlotly(
+      {
+         req(arlequinPairwise())
+         data <- plot_pairwise_data_prep(arlequinPairwise(),
+                                         arlequinPopLabels())
+         plot_pairwise_heatmap(
+            data,
+            arlequinPopLabels()
+         )
+      }
+   )
+   
+   output$fst_pairwise_heatmap_plot_overlap <- renderPlot(
+      {
+         req(arlequinPairwise())
+         data <- plot_pairwise_data_prep(arlequinPairwise(),
+                                         arlequinPopLabels())
+         plot_pairwise_heatmap_overlap(
+            data,
+            arlequinPopLabels()
+         )
+      }
+   )
+   
+   output$coancestry_arlecore <- DT::renderDataTable(
+      {
+         req(arlequinCoancestry())
+         coancestry_data <- arlequinCoancestry()[["data"]]
+         coancestry_data[lower.tri(coancestry_data)] <- t(coancestry_data)[lower.tri(coancestry_data)]
+         pop_names <- arlequinPopLabels()$Population
+         rownames(coancestry_data) <- pop_names
+         colnames(coancestry_data) <- pop_names
+         coancestry_data
+      },
+      options = list(scrollX = TRUE)
+   )
+   
+   output$coancestry_heatmap_plot <- plotly::renderPlotly(
+      {
+         req(arlequinCoancestry())
+         plot_heatmap_arlecore(
+            arlequinCoancestry()[["long"]],
+            arlequinPopLabels(),
+            legend_name = "Coancestry Coefficient"
+         )
+      }
+   )
+   
+   
+   output$ld_tables <- renderUI({
+      req(arlequinLD())
+      populations <- unique(arlequinLD()$Population)
+      
+      tagList(
+         lapply(seq_along(populations),
+                function(i) {
+                   population <- populations[i]
+                   
+                   tagList(
+                      h3(population),
+                      DT::DTOutput(paste0("ld_table_", i)),
+                      br()
+                   )
+                })
+      )
+   })
+   
+   observe({
+      req(arlequinLD())
+      data <- arlequinLD()
+      populations <- unique(data$Population)
+      
+      lapply(seq_along(populations), function(i) {
+         population <- populations[i]
+         output_id <- paste0("ld_table_", i)
+         
+         local({
+            pop <- population
+            output[[output_id]] <- DT::renderDT({
+               pop_data <- arlequinLD() %>%
+                  dplyr::filter(Population == pop) %>%
+                  dplyr::select(-Population)
+               
+               DT::datatable(pop_data,
+                             rownames = FALSE,
+                             options = list(
+                                pageLength = 10,
+                                scrollX = TRUE
+                             ))
+            })
+         })
+      })
+   })
+   
+   output$download_arlecore_results <- downloadHandler(
+      filename = function() {
+         paste0("Arlecore_results_", Sys.Date(), ".xlsx")
+      },
+      content = function(file){
+         wb <- openxlsx::createWorkbook()
+         
+         if (!is.null(arlequinHeterozygosity())) {
+            hwe <- arlequinHeterozygosity()[["data"]]
+            
+            if (!is.null(hwe)) {
+               openxlsx::addWorksheet(wb, "Heterozygosity")
+               
+               openxlsx::writeData(wb, "Heterozygosity", hwe)
+            }
+         }
+         
+         if (!is.null(arlequinFstMatrix())){
+            fst <- arlequinFstMatrix()[["data"]]
+            
+            if (!is.null(fst)){
+               fst <- as.matrix(fst)
+               fst[lower.tri(fst)] <- t(fst)[lower.tri(fst)]
+               pop_names <- arlequinPopLabels()$Population
+               
+               rownames(fst) <- pop_names
+               colnames(fst) <- pop_names
+               
+               fst_export <- cbind(Population = rownames(fst),
+                                   as.data.frame(fst))
+               
+               openxlsx::addWorksheet(wb, "FST Matrix")
+               
+               openxlsx::writeData(wb, "FST Matrix", fst_export)
+            }
+         }
+         
+         if (!is.null(arlequinCoancestry())) {
+            coanc <- arlequinCoancestry()[["data"]]
+            
+            if (!is.null(coanc)){
+               coanc <- as.matrix(coanc)
+               coanc[lower.tri(coanc)] <- t(coanc)[lower.tri(coanc)]
+               pop_names <- arlequinPopLabels()$Population
+               
+               rownames(coanc) <- pop_names
+               colnames(coanc) <- pop_names
+               
+               coanc_export <- cbind(Population = rownames(coanc),
+                                   as.data.frame(coanc))
+               
+               openxlsx::addWorksheet(wb, "Coancestry Coefficient")
+               
+               openxlsx::writeData(wb, "Coancestry Coefficient", coanc_export)
+            }
+         }
+         
+         if (!is.null(arlequinPairwise())) {
+            pairwise <- arlequinPairwise()
+            used_sheet_names <- character(0)
+            
+            for (i in seq_along(pairwise)) {
+               obj <- pairwise[[i]]
+               
+               if (!is.null(obj[["data"]])) {
+                  pair_data <- obj[["data"]]
+                  sheet_name <- obj[["title"]]
+                  
+                  if (is.null(sheet_name) || sheet_name == "") {
+                     sheet_name <- paste0(
+                        "Pairwise ", i
+                     )
+                  }
+                  
+                  sheet_name <- gsub("[\\/:*?\\[\\]]", "-", sheet_name)
+                  sheet_name <- substr(sheet_name, 1, 31)
+                  original_name <- sheet_name
+                  count <- 2
+                  
+                  while (tolower(sheet_name) %in% tolower(used_sheet_names)){
+                     suffix <- paste0(" (", count, ")")
+                     sheet_name <- paste0(substr(original_name, 1, 31 - nchar(suffix)),
+                                          suffix
+                                          )
+                     count <- count + 1
+                  }
+                  
+                  used_sheet_names <- c(used_sheet_names, sheet_name)
+                  openxlsx::addWorksheet(wb, sheet_name)
+                  
+                  openxlsx::writeData(wb, sheet_name, pair_data)
+                  
+               }
+            }
+         }
+         
+         if (!is.null(arlequinPopDiversity())) {
+            diversity_stats <- arlequinPopDiversity()
+            
+            populations <- unique(diversity_stats$Population)
+            
+            for (i in seq_along(populations)) {
+               pop <- populations[i]
+               
+               pop_data <- diversity_stats %>%
+                  dplyr::filter(
+                     Population == pop
+                  ) %>%
+                  dplyr::select(-Population)
+               
+               sheet_name <- paste0("Diversity - ", pop)
+               sheet_name <- substr(sheet_name, 1, 31)
+               
+               openxlsx::addWorksheet(wb, sheet_name)
+               
+               openxlsx::writeData(wb, sheet_name, pop_data)
+            }
+         }
+         
+         
+         if (!is.null(arlequinLD())) {
+            ld <- arlequinLD()
+            
+            populations <- unique(ld$Population)
+            for (i in seq_along(populations)) {
+               pop <- populations[i]
+               
+               pop_data <- ld %>%
+                  dplyr::filter(
+                     Population == pop
+                  ) %>%
+                  dplyr::select(-Population)
+               
+               sheet_name <- paste0("LD - ", pop)
+               sheet_name <- substr(sheet_name, 1, 31)
+               
+               openxlsx::addWorksheet(wb, sheet_name)
+               
+               openxlsx::writeData(wb, sheet_name, pop_data)
+            }
+         }
+         
+         openxlsx::saveWorkbook(wb, file, overwrite = TRUE)
+         
+      }
+   )
+   
+   output$download_arp_file <- downloadHandler(
+      filename = function() {
+         timestamp <- format(Sys.time(), "%Y%m%d_%H%M")
+         paste0("arp_file", timestamp, ".arp")
+      },
+      content = function(file) {
+         req(arlequinFile())
+         file.copy(arlequinFile(), file)
+      }
+   )
+   
+   output$download_arp_result <- downloadHandler(
+      filename = function() {
+         timestamp <- format(Sys.time(), "%Y%m%d_%H%M")
+         paste0("arp_file", timestamp, ".arp")
+      },
+      content = function(file) {
+         req(arlequinResult())
+         file.copy(arlequinResult(), file)
+      }
+   )
+   
+   output$download_arlecore_results_UI <- renderUI({
+      req(arlequinPopLabels(),
+          arlequinHeterozygosity(),
+          arlequinFstMatrix(),
+          arlequinCoancestry(),
+          arlequinPairwise(),
+          arlequinPopDiversity(),
+          arlequinResult())
+      tagList(downloadButton("download_arlecore_results", "Download Results (.xlsx)"),
+      downloadButton("download_arp_file", "Download .arp file"),
+      downloadButton("download_arp_result", "Download resulting .xml file"))
+   })
+   
 }

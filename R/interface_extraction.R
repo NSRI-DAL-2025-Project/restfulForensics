@@ -6,7 +6,7 @@ snp_extraction_tab <- function() {
       tabsetPanel(
          # SNP extraction submodule =============================================================
          tabPanel(
-            "SNP Data Extraction",
+            title = "SNP Data Extraction",
             fluidRow(
                box(
                   width = 5,
@@ -30,7 +30,7 @@ snp_extraction_tab <- function() {
                ),
                tabBox(
                   tabPanel(
-                     "Instructions",
+                     title = "Instructions",
                      h4("This extracts SNPs based on reference SNP cluster ID (rsID) or GRCh37/GRCh38 position."),
                      p(strong("Input file/s:")),
                      p("(1) VCF, BCF, or PLINK (.bed, .bim, .fam) files."),
@@ -46,7 +46,7 @@ snp_extraction_tab <- function() {
                      p("Maximum accepted file size: 5GB. It is recommended to split files with sizes larger than 5GB into multiple smaller files.")
                   ),
                   tabPanel(
-                     "Sample Input Format",
+                     title = "Sample Input Format",
                      h4("rsID Format"),
                      tableOutput("examplersID"),
                      h4("Position Format"),
@@ -54,7 +54,7 @@ snp_extraction_tab <- function() {
                      helpText("rsID column is required if rsID will be added to output.")
                   ),
                   tabPanel(
-                     "Download Sample Files",
+                     title = "Download Sample Files",
                      h4("Sample Files"),
                      tags$ul(
                         tags$a("A. Sample VCF file", href = "sample_hgdp.vcf", download = "sample_hgdp.vcf"),
@@ -84,7 +84,7 @@ snp_extraction_tab <- function() {
          
          # Concordance analysis submodule =======================================================
          tabPanel(
-            "Concordance Analysis",
+            title = "Concordance Analysis",
             fluidRow(
                box(
                   fileInput("concordanceFile1", "Upload File A", accept = c(".xlsx", ".csv")),
@@ -94,7 +94,7 @@ snp_extraction_tab <- function() {
                ),
                tabBox(
                   tabPanel(
-                     "Instructions",
+                     title = "Instructions",
                      h4("This performs concordance analysis between files/datasets with overlapping samples."),
                      p(strong("Input file/s:"), "CSV or Excel (.xlsx) files with the same data format (i.e. same columns)."),
                      p(strong("Parameter/s:"), "Indicate if using phased genotypes"),
@@ -106,12 +106,12 @@ snp_extraction_tab <- function() {
                      )
                   ),
                   tabPanel(
-                     "Sample Input Format/s",
+                     title = "Sample Input Format/s",
                      h4("File Format (for concordance)"),
                      tableOutput("exampleTable")
                   ),
                   tabPanel(
-                     "Download Sample Files",
+                     title = "Download Sample Files",
                      h4("Sample Files"),
                      tags$ul(
                         tags$a("Sample CSV file (1)", href = "sample1_for_concordance.csv", download = "sample1_for_concordance.csv"),
@@ -126,7 +126,7 @@ snp_extraction_tab <- function() {
                   title = "Concordance Results",
                   width = 12,
                   tabPanel(
-                     "Summary Table",
+                     title = "Summary Table",
                      div(
                         style = "overflow-x: auto;",
                         DT::dataTableOutput("concordanceResults")
@@ -135,7 +135,7 @@ snp_extraction_tab <- function() {
                      uiOutput("downloadConcordance_UI")
                   ),
                   tabPanel(
-                     "Concordance Plot",
+                     title = "Concordance Plot",
                      div(
                         style = "overflow-x: auto;",
                         plotOutput("concordancePlot", height = "600px"),

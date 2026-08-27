@@ -595,7 +595,6 @@ file_conversion_server <- function(input, output, session, rv) {
    )
    
    # ==================== CSV to STR =======================#
-   
    examplePop_STR <- data.frame(
       Sample = c("Sample1", "Sample2", "Sample3", "Sample4", "..."),
       Population = c("POP1", "POP2", "POP3", "POP4", "..."),
@@ -691,6 +690,84 @@ file_conversion_server <- function(input, output, session, rv) {
    output$downloadSTRfile_UI <- renderUI({
       req(str_file())
       downloadButton("downloadSTRfile", "Download .str File")
+   })
+   
+   # ==================== To Arlequin-compatible file =======================#
+   exampleForArlecore <- data.frame(
+      Sample = c("Sample1", "Sample2", "Sample3", "Sample4", "..."),
+      Population = c("POP1", "POP2", "POP3", "POP4", "..."),
+      rs101 = c("A/A", "A/T", "A/A", "T/T", "..."),
+      rs102 = c("G/G", "C/C", "G/C", "G/G", "..."),
+      rs_n = c("...", "...", "...", "...", "...")
+   )
+   
+   output$exampleForArlecore <- DT::renderDataTable(
+      {
+         req(exampleForArlecore)
+         exampleForArlecore
+      },
+      options = list(
+         scrollX = TRUE,
+         pageLength = 10
+      )
+   )
+   
+   #======== REVISE
+   
+   arleFile <- reactiveVal(NULL)
+   
+   observe({
+      shinyjs::toggleState("convert2Arle", !is.null(input$toArleFile))
+   })
+   
+   observeEvent(input$convert2Arle, {
+      disable("convert2Arle")
+      
+         for_arp <- load_csv_xlsx_files(input$toArleFile$datapath)
+         for_arp <- clean_input_data(for_arp)
+         
+         # All null values are "N", set to ""
+         for_arp <- for_arp %>%
+            mutate(across(everything(), ~ case_when(
+               . == "N" ~ "",
+               TRUE ~ .x
+            )))
+         for_arp <- as.data.frame(for_arp)
+
+         # create the arp file
+         arp_file <- build_arp_per_population(for_arp,
+                                              genotypic_data = as.numeric(input$genotypicData),
+                                              gametic_phase = as.numeric(input$gameticPhase),
+                                              recessive_data = as.numeric(input$recessiveData),
+                                              locus_sep = input$locusSep,
+                                              output.prefix = "arp_file",
+                                              data_type = "STANDARD"
+                                              )
+         
+         
+         arleFile(arp_file)
+
+      enable("convert2Arle")
+   }) 
+   
+   output$fstTableArlecore <- renderTable({
+      req(arlequinResults())
+      get_fst_results(arlequinResults()$raw)
+   })
+   
+   output$downloadArpFile <- downloadHandler(
+      filename = function() {
+         "arl_run.ars"
+      },
+      content = function(file) {
+         req(arleFile())
+         file.copy(arleFile(), file)
+      }
+   )
+   
+   output$downloadArpFile_UI <- renderUI({
+      req(arleFile())
+      downloadButton("downloadArpFile", "Download Arlequin-compatible input file")
    })
    
 }

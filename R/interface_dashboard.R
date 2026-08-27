@@ -36,7 +36,7 @@ dashboard_tab <- function() {
                )
             ),
             tabPanel(
-               "File Conversion Options",
+               title = "File Conversion Options",
                div(style = "display:flex; justify-content: space-evenly; margin-bottom:10px;"),
                actionButton("smaller_fc", "-"),
                actionButton("bigger_fc", "+"),

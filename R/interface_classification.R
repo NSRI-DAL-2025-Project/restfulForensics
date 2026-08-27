@@ -11,7 +11,7 @@ classification_tab <- function() {
          ),
          tabBox(
             tabPanel(
-               "Instructions",
+               title = "Instructions",
                p(
                   "This performs a NaÏve Bayes classification and leave-one-out cross-validation
                                   of individuals with SNP data (ancestry- or phenotype- informative) using the ",
@@ -43,11 +43,11 @@ classification_tab <- function() {
                p(strong("Expected output file:"), "XLSX file")
             ),
             tabPanel(
-               "Sample Input File",
+               title = "Sample Input File",
                DT::dataTableOutput("classificationRef_UI")
             ),
             tabPanel(
-               "Download Sample File",
+               title = "Download Sample File",
                h4("Download Sample File"),
                tags$ul(
                   tags$a("Sample CSV file", href = "sample.csv", download = "sample.csv")
@@ -59,15 +59,15 @@ classification_tab <- function() {
          tabBox(
             width = 12,
             tabPanel(
-               "Prediction Table",
+               title = "Prediction Table",
                verbatimTextOutput("predictionTableResult")
             ),
             tabPanel(
-               "Statistics by Population",
+               title = "Statistics by Population",
                verbatimTextOutput("statbyClassResult")
             ),
             tabPanel(
-               "Overall Statistics",
+               title = "Overall Statistics",
                verbatimTextOutput("overallStatResult")
             )
          )

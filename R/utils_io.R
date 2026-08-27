@@ -16,6 +16,12 @@ get_plink_path <- function() {
    return("./plink/plink.exe")
 }
 
+get_arlecore_path <- function() {
+   normalizePath("./arlequin/arlecore64.exe",
+                 winslash = "\\",
+                 mustWork = TRUE)
+}
+
 
 #' Unpack compressed files
 #'

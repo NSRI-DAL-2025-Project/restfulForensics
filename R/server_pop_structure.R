@@ -143,7 +143,7 @@ structure_analysis_server <- function(input, output, session, rv) {
       },
       content = function(file) {
          f_files <- list.files(output_dir, full.names = TRUE)
-         f_files <- f_files[grepl("_f", basename(f_files))]
+         f_files <- f_files[grepl("_f", basename(f_files))] # specify actual file name, check directory
          if (length(f_files) == 0) {
             return(NULL)
          }

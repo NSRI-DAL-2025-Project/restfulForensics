@@ -5,7 +5,7 @@ msa_tab <- function() {
       tabName = "MSAtab",
       # Alignment submodule =====================================================================
       tabPanel(
-         "Multiple Sequence Alignment",
+         title = "Multiple Sequence Alignment",
          fluidRow(
             box(
                fileInput("fastaFile", "Upload zipped FASTA files", accept = c(".zip", ".tar")),
@@ -25,7 +25,7 @@ msa_tab <- function() {
             ),
             tabBox(
                tabPanel(
-                  "Instructions",
+                  title = "Instructions",
                   h4("This performs multiple sequence alignment using the msa R package (Bodenhofer et al., 2015)
                                                and post-processing using DECIPHER (Wright, 2015)."),
                   p(strong("Input file/s:"), "Zipped folder (.zip) containing FASTA files."),
@@ -45,7 +45,7 @@ msa_tab <- function() {
                   )
                ),
                tabPanel(
-                  "Download Sample File",
+                  title = "Download Sample File",
                   h4("Sample Files"),
                   tags$ul(
                      tags$a("Sample zipped FASTA file", href = "lacto2.zip", download = "lacto2.zip")
@@ -55,9 +55,7 @@ msa_tab <- function() {
             tabBox(
                width = 12,
                tabPanel(
-                  "Preview of Alignments",
-                  # msaR::msaROutput("msaView", width = "100%"),
-                  # br(),
+                  title = "Preview of Alignments",
                   verbatimTextOutput("initialAlignmentText"),
                   br(),
                   verbatimTextOutput("adjustedAlignmentText"),
@@ -67,7 +65,7 @@ msa_tab <- function() {
                   verbatimTextOutput("alignmentScoresPreview")
                ),
                tabPanel(
-                  "Download Results",
+                  title = "Download Results",
                   uiOutput("downloadAlignedFASTA_UI"),
                   uiOutput("downloadAlignmentScores_UI"),
                   downloadButton("downloadAlignmentPDF", "Download Alignment in PDF"),
@@ -85,7 +83,7 @@ phylogeny_tab <- function(){
    tabItem(
       tabName = "PhylogenAnalysis",
       tabPanel(
-         "Phylogenetic Tree Analysis",
+         title = "Phylogenetic Tree Analysis",
          fluidRow(
             box(
                checkboxInput("uploadMSA", "Use results from the MSA tab?", value = FALSE),
@@ -145,7 +143,7 @@ phylogeny_tab <- function(){
             tabBox(
                width = 12,
                tabPanel(
-                  "View Results",
+                  title = "View Results",
                   h4("Phylogenetic Tree"),
                   uiOutput("downloadTree_UI"),
                   uiOutput("treeImage")
@@ -161,11 +159,11 @@ barcoding_tab <- function() {
    tabItem(
       tabName = "BarcodingTab",
       tabPanel(
-         "Barcoding",
+         title = "Barcoding",
          tabsetPanel(
             # Species Identification submodule =========================================
             tabPanel(
-               "Species Identification",
+               title = "Species Identification",
                fluidRow(
                   box(
                      fileInput("refBarcoding", "Upload Aligned Reference Sequences"),
@@ -222,7 +220,7 @@ barcoding_tab <- function() {
             ),
             # Optimization of kmer values submodule ====================================
             tabPanel(
-               "Optimize kmer values",
+               title = "Optimize kmer values",
                fluidRow(
                   box(
                      title = "Optimization Options",
@@ -235,7 +233,7 @@ barcoding_tab <- function() {
                      title = "Instructions",
                      width = 6,
                      tabPanel(
-                        "Overview",
+                        title = "Overview",
                         h4("This calculates the optimal kmer values using BarcodingR (Zhang et al., 2016)"),
                         p(strong("Input file/s:"), "Aligned sequences of the reference dataset (FASTA file)"),
                         p(strong("Parameter/s:"), "Length of maximum kmer value"),
@@ -248,7 +246,7 @@ barcoding_tab <- function() {
                      title = "Results",
                      width = 12,
                      tabPanel(
-                        "Outputs",
+                        title = "Outputs",
                         verbatimTextOutput("kmerResult"),
                         imageOutput("kmerPlot"),
                         uiOutput("downloadKmerPlot_UI")
@@ -259,7 +257,7 @@ barcoding_tab <- function() {
             
             # Barcoding gap submodule ==================================================
             tabPanel(
-               "Barcoding Gap",
+               title = "Barcoding Gap",
                fluidRow(
                   box(
                      title = "Gap Calculation Options",
@@ -275,7 +273,7 @@ barcoding_tab <- function() {
                      title = "Instructions",
                      width = 6,
                      tabPanel(
-                        "Overview",
+                        title = "Overview",
                         h4("This calculate the barcoding gap using BarcodingR (Zhang et al., 2016)"),
                         p(strong("Input file:"), "VCF file"),
                         p(strong("Parameter/s:"), "Distance (raw, K80, euclidean)"),
@@ -288,7 +286,7 @@ barcoding_tab <- function() {
                      title = "Results",
                      width = 12,
                      tabPanel(
-                        "Outputs",
+                        title = "Outputs",
                         verbatimTextOutput("barcodingResult"),
                         imageOutput("BarcodingGapPlot"),
                         uiOutput("downloadGapPlot_UI")
@@ -299,7 +297,7 @@ barcoding_tab <- function() {
             
             # Evaluation of barcodes submodule =========================================
             tabPanel(
-               "Evaluate Barcodes",
+               title = "Evaluate Barcodes",
                fluidRow(
                   box(
                      fileInput("barcode1", "Upload Barcode 1"),
@@ -322,7 +320,7 @@ barcoding_tab <- function() {
             
             # Calculation of species membership value using TDR submodule ==============
             tabPanel(
-               "Species Membership Value (TDR)",
+               title = "Species Membership Value (TDR)",
                fluidRow(
                   box(
                      p("Calculate the TDR2 value"),

@@ -3,9 +3,9 @@ forensic_params_tab <- function() {
    # CALCULATION OF FORENSIC PARAMETERS MODULE =======================================================
    tabItem(
       tabName = "ForensicParams",
-      tabsetPanel(
+      #tabsetPanel(
          tabPanel(
-            "individual identity SNPs",
+            title = "individual identity SNPs",
             fluidRow(
                box(
                   fileInput("iisnpsFile", "Upload Reference File", accept = c(".csv", ".xlsx")),
@@ -27,7 +27,7 @@ forensic_params_tab <- function() {
                ),
                tabBox(
                   tabPanel(
-                     "Instructions",
+                     title = "Instructions",
                      h4("Calculate forensic parameters specific for individual identity SNPs"),
                      tags$ul(
                         tags$li("Random match probability (PM)"),
@@ -55,7 +55,7 @@ forensic_params_tab <- function() {
                      ),
                   ),
                   tabPanel(
-                     "Sample Input File",
+                     title = "Sample Input File",
                      h4("Acceptable file inputs: genotype files or an allele frequency table:"),
                      p("Genotype file"),
                      DT::dataTableOutput("referenceData_UI"),
@@ -65,7 +65,7 @@ forensic_params_tab <- function() {
                      DT::dataTableOutput("profileSample_UI")
                   ),
                   tabPanel(
-                     "Download Sample Files",
+                     title = "Download Sample Files",
                      h4("Download Sample File"),
                      tags$ul(
                         tags$a("Sample CSV file", href = "sample.csv", download = "sample.csv")
@@ -80,7 +80,7 @@ forensic_params_tab <- function() {
                tabBox(
                   width = 12,
                   tabPanel(
-                     "Overall Forensic Params",
+                     title = "Overall Forensic Params",
                      selectInput("selected_pop", "Select Population", choices = NULL),
                      div(
                         style = "overflow-x: auto;",
@@ -88,7 +88,7 @@ forensic_params_tab <- function() {
                      )
                   ),
                   tabPanel(
-                     "Genotype Frequencies",
+                     title = "Genotype Frequencies",
                      selectInput("selected_pop_gt", "Select Population", choices = NULL),
                      div(
                         style = "overflow-x: auto;",
@@ -98,7 +98,7 @@ forensic_params_tab <- function() {
                )
             )
          )
-      )
+    #  )
    )
    
 }

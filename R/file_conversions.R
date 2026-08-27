@@ -887,6 +887,113 @@ alignment_to_dnabin <- function(path) {
 }
 
 
+build_arp_per_population <- function(df,
+                                     genotypic_data = 1,
+                                     gametic_phase = 0,
+                                     recessive_data = 0,
+                                     locus_sep = "WHITESPACE",
+                                     output.prefix = "arp_file",
+                                     data_type = "STANDARD") {
+   
+   workdir <- tempfile("arlequin_")
+   dir.create(workdir)
+   #workdir <- "."
+   out_path <- file.path(workdir, paste0(output.prefix, ".arp"))
+   
+   if (file.exists(out_path)) {
+      file.remove(out_path)
+   }
+   
+   # get snps
+   names(df) <- tolower(trimws(names(df)))
+   names(df)[2] <- "population"
+   
+   # need to ensure no XML reserved characters sa population (<, >, or &)
+   df$population <- gsub("&", "and", df$population) 
+   #df <- as.data.frame(df)
+   
+   subgroups <- unique(df$population)
+   loci <- colnames(df)[-c(1,2)]
+
+   # Base Arlequin header
+   arp <- c("[Profile]", 
+            paste0('Title="Structure Analysis per Population"'), 
+            paste0("NbSamples=", length(subgroups)), 
+            paste0("NbLoci=", length(loci)), 
+            paste0("GenotypicData=", genotypic_data), 
+            paste0("GameticPhase=", gametic_phase), 
+            paste0("RecessiveData=", recessive_data), 
+            paste0("DataType=", data_type), # Dynamic: MICROSAT for LB, STANDARD for SB
+            paste0("LocusSeparator=", locus_sep),
+            'MissingData="?"', 
+            "",
+            "[Data]", 
+            "[[Samples]]")
+   
+   # Append each individual population as its own Sample section
+   for (sub in subgroups) {
+      sub_df <- df[df$population == sub, ]
+      arp <- c(arp, 
+               paste0('SampleName="', sub, '"'), 
+               paste0("SampleSize=", nrow(sub_df)), 
+               "SampleData={")
+      
+      for (i in 1:nrow(sub_df)) {
+         allele1_row <- c(); allele2_row <- c()
+         
+         for (loc in loci) {
+            val <- sub_df[[loc]][i]
+            
+            if (is.na(val) || val %in% c("", "?")) {
+               allele1_row <- c(allele1_row, "?")
+               allele2_row <- c(allele2_row, "?")
+               next
+            }
+            
+            # Split alleles by slash
+            alleles <- unlist(strsplit(as.character(val), "/"))
+            alleles <- trimws(alleles)
+            
+            if (length(alleles) == 1) {
+               # If only 1 allele is detected, female is homozygous. Duplicate the allele.
+               allele1_row <- c(allele1_row, alleles[1])
+               allele2_row <- c(allele2_row, alleles[1])
+            } else {
+               # Heterozygous
+               allele1_row <- c(allele1_row, alleles[1])
+               allele2_row <- c(allele2_row, alleles[2])
+            }
+         }
+         
+         # Build the two lines per sample (Arlequin format for GenotypicData=1)
+         arp <- c(arp, paste(sub_df$sample[i], "1", paste(allele1_row, collapse = " ")))
+         arp <- c(arp, paste("    ", paste(allele2_row, collapse = " ")))
+      }
+      arp <- c(arp, "}", "")
+   }
+   
+#   arp <- c(arp,
+#            "",
+#            "[[Structure]]",
+#            "",
+#            'StructureName="Population Structure"',
+#            paste0("NbGroups=", length(subgroups)))
+   
+#   for (sub in subgroups) {
+#      arp <- c(
+#         arp,
+#         "Group={",
+#         paste0('"', sub, '"'),
+#         "}"
+#      )
+#   }
+   
+   writeLines(arp, out_path)
+   message("SUCCESS: Generated Arlequin project file:", out_path)
+   return(out_path)
+   }
+
+
 csv_to_gtype_format <- function(file) {
    df <- load_csv_xlsx_files(file)
    df <- clean_input_data(df)
@@ -910,5 +1017,4 @@ csv_to_gtype_format <- function(file) {
    data_file <- dplyr::bind_cols(Sample, Pop, data_clean)
    
    return(data_file)
-   
 }
