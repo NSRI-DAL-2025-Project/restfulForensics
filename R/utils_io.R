@@ -1,8 +1,6 @@
 #' Get PLINK2 executable path
 #' 
 #' @returns The file path for PLINK 2.0.
-#' 
-#' @keywords internal
 get_plink2_path <- function() {
    return("./plink/plink2.exe")
 }
@@ -10,8 +8,6 @@ get_plink2_path <- function() {
 #' Get PLINK1.9 executable path
 #' 
 #' @returns The file path for PLINK 1.9.
-#' 
-#' @keywords internal
 get_plink_path <- function() {
    return("./plink/plink.exe")
 }
@@ -29,11 +25,6 @@ get_arlecore_path <- function() {
 #' @param output.dir The directory to save the unpacked files. Default is the working directory.
 #' 
 #' @returns File path of the directory where files are unpacked and the list of actual files.
-#' 
-#' @keywords internal
-#'
-#' @importFrom utils unzip
-#' @importFrom tools file_ext
 unpack_input_file <- function(files, output.dir = ".") {
    
   if (!file.exists(files)) {
@@ -77,11 +68,6 @@ unpack_input_file <- function(files, output.dir = ".") {
 #' @param input The file path of input.
 #' 
 #' @returns A dataframe containing information from the input file.
-#'
-#' @keywords internal
-#'
-#' @importFrom tools file_ext
-#' @importFrom readxl read_excel
 load_csv_xlsx_files <- function(input) {
    
    if (!file.exists(input)) {
@@ -111,16 +97,6 @@ load_csv_xlsx_files <- function(input) {
 #' @param output.dir The directory to save the unpacked and merged files if files are zipped. Default is the working directory.
 #' 
 #' @returns The genotype dataframe with sample ID.
-#'
-#' @importFrom tools file_ext
-#' @importFrom utils untar
-#' @importFrom janitor row_to_names
-#' @importFrom tibble rownames_to_column
-#' @importFrom vcfR read.vcfR extract.gt getFIX
-#' 
-#' @export
-#' @examples
-#' load_vcf_files('my_file.vcf')
 load_vcf_files <- function(vcf, output.dir = ".") {
    
    if (tools::file_ext(vcf) == "vcf") {
@@ -166,11 +142,6 @@ load_vcf_files <- function(vcf, output.dir = ".") {
 #' @param directory The directory to save the unpacked files. Default is the working directory.
 #' 
 #' @returns A DNA bin.
-#'
-#' @keywords internal
-#' 
-#' @importFrom utils unzip
-#' @importFrom Biostrings readDNAStringSet
 read_fasta <- function(zipped, directory) {
    
    utils::unzip(zipped,
@@ -194,11 +165,6 @@ read_fasta <- function(zipped, directory) {
 #' @param filename The file name of input.
 #' 
 #' @returns The alignment.
-#' 
-#' @keywords internal
-#'
-#' @importFrom utils unzip
-#' @importFrom Biostrings readDNAStringSet
 read_msa_file <- function(path, filename) {
    
    ext <- tolower(tools::file_ext(filename))

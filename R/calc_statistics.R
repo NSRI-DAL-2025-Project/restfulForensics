@@ -9,14 +9,6 @@
 #' @param dpi The quality of the png output.
 #' 
 #' @returns Depth plot.
-#' 
-#' @import ggplot2
-#' @importFrom vcfR read.vcfR extract.gt
-#' @importFrom tidyr pivot_longer
-#' 
-#' @export
-#' @examples
-#' depth_from_vcf("my_file.vcf", reference = "pop_data.xlsx", palette = "Set1")
 depth_from_vcf <- function(vcf,
                            output.dir = ".",
                            reference,
@@ -72,19 +64,11 @@ depth_from_vcf <- function(vcf,
    ))
 }
 
-
 #' Compute heterozygosities, MAR, and inbreeding
 #' 
 #' @param fsnps_gen The genind data containing genotype and population information.
 #' 
 #' @returns A list containing the metrices.
-#' 
-#' @importFrom hierfstat allelic.richness genind2hierfstat basic.stats
-#' @importFrom tidyr pivot_longer
-#' 
-#' @export
-#' @examples
-#' compute_pop_stats(fsnps_gen = my_genind)
 compute_pop_stats <- function(fsnps_gen) {
    mar_matrix <- hierfstat::allelic.richness(hierfstat::genind2hierfstat(fsnps_gen))$Ar %>%
       apply(MARGIN = 2, FUN = mean) %>%
@@ -123,12 +107,6 @@ compute_pop_stats <- function(fsnps_gen) {
 #' @inheritParams compute_pop_stats
 #' 
 #' @returns An allele frequency dataframe.
-#' 
-#' @importFrom adegenet genind2genpop makefreq
-#' 
-#' @export
-#' @examples
-#' compute_pop_stats(fsnps_gen = my_genind)
 compute_af <- function(fsnps_gen) {
    fsnps_gpop <- adegenet::genind2genpop(fsnps_gen)
    allele_freqs <- t(adegenet::makefreq(fsnps_gpop, quiet = FALSE, missing = NA)) %>%
@@ -148,14 +126,6 @@ compute_af <- function(fsnps_gen) {
 #' @param alpha The alpha value for the threshold. Default is 0.05.
 #' 
 #' @returns A list of HWE stats results.
-#' 
-#' @importFrom pegas hw.test
-#' @importFrom adegenet seppop
-#' @importFrom tibble rownames_to_column
-#' 
-#' @export
-#' @examples
-#' compute_hwe(fsnps_gen = my_genind)
 compute_hwe <- function(fsnps_gen, correction = "Bonferroni", alpha = 0.05) {
    # Hardy-Weinberg Equilibrium (List for export)
    fsnps_hwe <- as.data.frame(round(pegas::hw.test(fsnps_gen, B = 1000), 6))
@@ -249,14 +219,6 @@ compute_hwe <- function(fsnps_gen, correction = "Bonferroni", alpha = 0.05) {
 #' @inheritParams compute_pop_stats
 #' 
 #' @returns A list of FST stats results.
-#' 
-#' @importFrom hierfstat genet.dist
-#' @importFrom tibble rownames_to_column
-#' @importFrom tidyr pivot_longer
-#' 
-#' @export
-#' @examples
-#' compute_fst(fsnps_gen = my_genind)
 compute_fst <- function(fsnps_gen) {
    # Pairwise Fst matrix using Weir & Cockerham 1984 method
    fst_matrix_raw <- hierfstat::genet.dist(fsnps_gen, method = "WC84") %>%
@@ -284,10 +246,6 @@ compute_fst <- function(fsnps_gen) {
 #' @param out_dir The directory to save the plot.
 #' 
 #' @returns Plot of observed vs expected heterozygosity per population.
-#'
-#' @keywords internal
-#' 
-#' @import ggplot2
 plot_heterozygosity <- function(Het_fsnps_df, out_dir) {
    out_path <- file.path(out_dir, "heterozygosity_plot.png")
    
@@ -316,10 +274,6 @@ plot_heterozygosity <- function(Het_fsnps_df, out_dir) {
 #' @param out_dir The directory to save the plot.
 #' 
 #' @returns PNG file of the heatmap.
-#'
-#' @keywords internal
-#' 
-#' @import ggplot2
 plot_fst <- function(fst_df, out_dir) {
    out_path <- file.path(out_dir, "fst_heatmap.png")
    
@@ -351,13 +305,6 @@ plot_fst <- function(fst_df, out_dir) {
 #' @param dir The directory to save the result.
 #' 
 #' @returns An excel (.xlsx) file containing the results in individual sheets.
-#' 
-#' @importFrom tidyr pivot_wider
-#' @importFrom openxlsx write.xlsx
-#' 
-#' @export
-#' @examples
-#' export_pop_results(allele_freq, priv_alleles, stats_matrix, hw_matrix, fst_matrix, dir = ".")
 export_pop_results <- function(allele_freq, priv_alleles, stats_matrix, hw_matrix, fst_matrix, dir = tempdir()) {
    timestamp <- format(Sys.time(), "%Y%m%d_%H%M")
    out_file <- file.path(dir, paste0("population-statistics-results_", timestamp, ".xlsx"))
@@ -406,12 +353,7 @@ export_pop_results <- function(allele_freq, priv_alleles, stats_matrix, hw_matri
 #' @param sample_size The total number of samples in the file.
 #' @param genotype The format of genotype data.
 #' 
-#' @returns A string indicating the data format
-#' 
-#' @keywords internal
-#' 
-#' @importFrom tidyr pivot_wider
-#' @importFrom openxlsx write.xlsx
+#' @returns A string indicating the data format.
 evaluate_file <- function(df, sample_size = 50, genotype = "^[A-Z]/[A-Z]$") {
    all_vals <- unlist(df, use.names = FALSE)
    all_vals <- all_vals[!is.na(all_vals) & all_vals != "N"]
@@ -441,13 +383,6 @@ evaluate_file <- function(df, sample_size = 50, genotype = "^[A-Z]/[A-Z]$") {
 #' @param pop The total number of samples in the data. Required if employing five-event minimum allele frequency.
 #' 
 #' @returns A list containing genotype frequency (overall and by population).
-#' 
-#' @importFrom stringr str_remove str_replace_all
-#' @importFrom tidyr pivot_longer
-#' 
-#' @export
-#' @examples
-#' calc_genotype_freq(allele_freq)
 calc_genotype_freq <- function(df, pop = NULL) {
    df <- dplyr::rename(df, markers = 1)
    
@@ -521,12 +456,6 @@ calc_genotype_freq <- function(df, pop = NULL) {
 #' @param theta The coefficient of ancestry or inbreeding to adjust calculation of match probabilities. Required if profile is not NULL.
 #'
 #' @returns A list of dataframes containing results.
-#' 
-#' @importFrom stringr str_split str_replace_all
-#' 
-#' @export
-#' @examples
-#' calc_iisnps_params(geno_freq)
 calc_iisnps_params <- function(geno_freqs, profile = NULL, theta = 0) {
    marker_metrics <- geno_freqs %>%
       dplyr::rowwise() %>%
@@ -596,10 +525,6 @@ calc_iisnps_params <- function(geno_freqs, profile = NULL, theta = 0) {
 #' @param column (string) The basis for grouping samples, it should exist as a column in the dataframe.
 #' 
 #' @returns The dataframe of tally count.
-#' 
-#' @export
-#' @examples
-#' pop_breakdown(info_with_meta, column = "Population")
 pop_breakdown <- function(file, column) {
    col_name <- as.character(column)
    print(col_name)

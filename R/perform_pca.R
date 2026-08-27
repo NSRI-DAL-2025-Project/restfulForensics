@@ -4,14 +4,6 @@
 #' @param popinfo To indicate if population metadata is present. Default is TRUE.
 #' 
 #' @returns A list of dataframes containing eigenvalues.
-#' 
-#' @importFrom ade4 dudi.pca
-#' @importFrom adegenet indNames
-#' @importFrom stats aggregate
-#' 
-#' @export
-#' @examples
-#' compute_pca(genind_obj)
 compute_pca <- function(fsnps_gen, popinfo = TRUE) {
    
    x <- adegenet::tab(fsnps_gen, NA.method = "mean")
@@ -55,7 +47,6 @@ compute_pca <- function(fsnps_gen, popinfo = TRUE) {
    
 }
 
-
 #' Set up labels for PCA plotting
 #' 
 #' @param fsnps_gen The genind data containing genotype and population information.
@@ -63,13 +54,6 @@ compute_pca <- function(fsnps_gen, popinfo = TRUE) {
 #' @param label_file The file path to custom shapes and colors.
 #' 
 #' @returns A list of custom labels, shapes, and colors.
-#' 
-#' @importFrom RColorBrewer brewer.pal
-#' @importFrom BiocGenerics setdiff
-#' 
-#' @export
-#' @examples
-#' get_labels(genind_obj, use_default = FALSE, label_file = "custom.xlsx")
 get_labels <- function(fsnps_gen, use_default = TRUE, label_file = NULL, popinfo = TRUE) {
    
    if (use_default) {
@@ -131,13 +115,6 @@ get_labels <- function(fsnps_gen, use_default = TRUE, label_file = NULL, popinfo
 #' @param pc_y Eigenvector to be plotted on the y-axis.
 #' 
 #' @returns A PCA plot.
-#' 
-#' @import ggplot2
-#' @importFrom ggrepel geom_label_repel
-#' 
-#' @export
-#' @examples
-#' plot_pca(ind_coords, centroid, percent, labels_colors, width = 8, height = 8, pc_x = 1, pc_y = 2)
 plot_pca <- function(ind_coords,
                      centroid,
                      percent,
