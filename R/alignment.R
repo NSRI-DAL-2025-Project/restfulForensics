@@ -4,16 +4,6 @@
 #' @param algorithm The method for alignment (ClustalW, ClustalOmega, MUSCLE).
 #' 
 #' @returns A list of aligned sequences.
-#' 
-#' @import seqinr
-#' @importFrom pwalign nucleotideSubstitutionMatrix
-#' @importFrom msa msa msaConservationScore msaConvert
-#' @importFrom Biostrings DNAStringSet
-#' @importFrom DECIPHER AdjustAlignment StaggerAlignment
-#' 
-#' @export
-#' @examples
-#' calc_msa(fasta_files, algorithm = "ClustalW")
 calc_msa <- function(files, algorithm) {
    # Creating Substitution Matrix
    personal_matrix <- pwalign::nucleotideSubstitutionMatrix(
@@ -69,9 +59,6 @@ calc_msa <- function(files, algorithm) {
 #' @param model The substitution model.
 #' 
 #' @returns A phylogenetic tree plot.
-#' 
-#' @import ggtree
-#' @importFrom ape as.DNAbin dist.dna nj root ladderize boot.phylo
 build_nj_tree <- function(alignment, outgroup = NULL, seed = 123, model = model) {
    bins <- ape::as.DNAbin(alignment)
    distance <- ape::dist.dna(bins, model = model)
@@ -124,14 +111,6 @@ build_nj_tree <- function(alignment, outgroup = NULL, seed = 123, model = model)
 #' @inheritParams build_nj_tree
 #' 
 #' @returns A phylogenetic tree plot.
-#' 
-#' @importFrom ape as.DNAbin dist.dna ladderize boot.phylo root
-#' @importFrom phangorn upgma
-#' @import ggtree
-#' 
-#' @export
-#' @examples
-#' build_upgma_tree(my_alignment, seed = 1000, model = "K80")
 build_upgma_tree <- function(alignment, outgroup = NULL, seed = 123, model = model) {
    bins <- ape::as.DNAbin(alignment)
    distance <- ape::dist.dna(bins, model = model)
@@ -187,15 +166,6 @@ build_upgma_tree <- function(alignment, outgroup = NULL, seed = 123, model = mod
 #' @param directory The directory to save the png plot.
 #' 
 #' @returns A phylogenetic tree plot.
-#' 
-#' @importFrom ape as.DNAbin root
-#' @importFrom phangorn phyDat dist.ml optim.parsimony bootstrap.phyDat
-#' @import ggtree
-#' 
-#' @export
-#' @examples
-#' build_max_parsimony(my_alignment, seed = 1000)
-
 build_max_parsimony <- function(alignment, outgroup = NULL, seed = 123, directory = ".") {
    bins <- ape::as.DNAbin(alignment)
    phy <- phangorn::phyDat(bins, type = "DNA")
@@ -231,14 +201,6 @@ build_max_parsimony <- function(alignment, outgroup = NULL, seed = 123, director
 #' @param directory The directory to save the png plot.
 #' 
 #' @returns A list specifying the (1) model and (2) phylogenetic tree plot.
-#' 
-#' @importFrom ape as.DNAbin 
-#' @importFrom phangorn phyDat pml optim.pml modelTest bootstrap.pml
-#' @import ggtree
-#' 
-#' @export
-#' @examples
-#' build_ml_tree(my_alignment, seed = 1000, bs_reps = 1000)
 build_ml_tree <- function(alignment,
                           outgroup = NULL,
                           seed = 123,

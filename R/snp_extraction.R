@@ -11,8 +11,6 @@
 #' @param output_dir The directory to save the range files.
 #' 
 #' @returns A list of file paths of range files.
-#' 
-#' @keywords internal
 create_range_file <- function(pos_input, addID = FALSE) {
    
    if (is.character(pos_input)) {
@@ -100,10 +98,6 @@ create_range_file <- function(pos_input, addID = FALSE) {
 #' @param merged_file The name of the output file.
 #' 
 #' @returns The file path of result.
-#' 
-#' @export
-#' @examples
-#' extract_by_ID_pgen(pgen_prefix = 'my_file', snps_list = 'list_of_snps')
 extract_by_ID_pgen <- function(pgen_prefix,
                                snps_list,
                                output_dir = ".",
@@ -140,10 +134,6 @@ extract_by_ID_pgen <- function(pgen_prefix,
 #' @param merged_file The name of the output file.
 #' 
 #' @returns The file path of extracted file.
-#' 
-#' @export
-#' @examples
-#' extract_by_pos_pgen(pos_list = "my_snps.xlsx", pgen_prefix = 'my_file', merged_file = "extracted_file")
 extract_by_pos_pgen <- function(pos_list,
                                 pgen_prefix,
                                 output_dir = ".",
@@ -182,10 +172,6 @@ extract_by_pos_pgen <- function(pos_list,
 #' @param output_dir The directory to save output file. Default is working directory.
 #' 
 #' @returns The file path of result.
-#' 
-#' @export
-#' @examples
-#' extract_POStoID_pgen(pos_list = "my_snps.xlsx", pgen_prefix = 'my_file')
 extract_POStoID_pgen <- function(pos_list,
                                  pgen_prefix,
                                  output_dir = ".") {
@@ -240,17 +226,6 @@ extract_POStoID_pgen <- function(pos_list,
 #' @param phased Indicates if genotypes are phased. Default is FALSE.
 #' 
 #' @returns The data frame containing the genotype of samples present in both file1 and file2.
-#' 
-#' @importFrom dplyr rename select ends_with
-#' @importFrom janitor row_to_names
-#' @importFrom tibble rownames_to_column
-#' @importFrom purrr reduce
-#' @importFrom tidyselect everything
-#' @importFrom QurvE zipFastener
-#' 
-#' @export
-#' @examples
-#' calc_concordance(file1 = "ngs.csv", file2 = 'wgs.xlsx')
 calc_concordance <- function(file1, file2, phased = FALSE) {
    if (!file.exists(file1)) {
       stop("First file does not exist in the working directory")
@@ -353,14 +328,6 @@ calc_concordance <- function(file1, file2, phased = FALSE) {
 #' @param dataframe The dataframe containing genotype information of samples sequenced using two different techniques.
 #' 
 #' @returns A list containing the dataframe of the tally of concordant and discordant calls and the concordance plot.
-#' 
-#' @importFrom dplyr rename select ends_with mutate relocate
-#' @importFrom tidyr pivot_longer
-#' @importFrom forcats fct_inorder
-#' 
-#' @export
-#' @examples
-#' plot_concordance(dataframe = "merged_samples")
 plot_concordance <- function(dataframe) {
    
    dataframe <- dplyr::rename(dataframe, ID = 1)

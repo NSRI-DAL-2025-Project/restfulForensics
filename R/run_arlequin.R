@@ -1,3 +1,9 @@
+#' Run arlecore
+#' 
+#' @param file The dataframe containing the population and marker information.
+#' @param ld To indicate if linkage disequilibrium will be calculated. Default is FALSE.
+#' 
+#' @returns The path of the resulting folder.
 run_arlequin <- function(file, ld = FALSE) {
    
    arlecore_path <- get_arlecore_path()
@@ -26,7 +32,11 @@ run_arlequin <- function(file, ld = FALSE) {
    return(paste0(workdir, "/", tools::file_path_sans_ext(basename(file)), ".res"))
 }
 
-
+#' Extract population information
+#' 
+#' @param doc The .xml result file from arlecore.
+#' 
+#' @returns A dataframe containing population information and numeric labels.
 parse_pop_labels <- function(doc) {
    nodes <- xml2::xml_find_all(doc, "//pairDistPopLabels")
    
@@ -48,7 +58,11 @@ parse_pop_labels <- function(doc) {
    
 }
 
-
+#' Extract population diversity and HWE from arlecore .xml result
+#' 
+#' @param doc The .xml result file from arlecore.
+#' 
+#' @returns A dataframe containing merged population diversity and HWE metrics.
 parse_pop_diversity <- function(doc){
    pop_label <- parse_pop_labels(doc)
    
@@ -259,6 +273,11 @@ parse_pop_diversity <- function(doc){
    
 }
 
+#' Extract LD table from arlecore .xml result
+#' 
+#' @param doc The .xml result file from arlecore.
+#' 
+#' @returns A dataframe containing markers that are in LD.
 parse_ld <- function(doc) {
    pop_label <- parse_pop_labels(doc)
    
@@ -353,7 +372,13 @@ parse_ld <- function(doc) {
    do.call(rbind, results)
 }
 
-
+#' Plot the difference between population in a heatmap
+#' 
+#' @param long_data A dataframe containing pairs of population and associated values.
+#' @param pop_labels A list of population names and the numeric counterparts.
+#' @param legend_name The legend for the plot.
+#' 
+#' @returns An interactive heatmap plot.
 plot_heatmap_arlecore <- function(long_data, pop_labels, legend_name = "Value") {
    pop_names <- pop_labels$Population
    
@@ -406,6 +431,12 @@ plot_heatmap_arlecore <- function(long_data, pop_labels, legend_name = "Value") 
       
 }
 
+#' Pre-process data for pairwise plotting
+#' 
+#' @param pairwise_matrix A matrix containing three dataframes of population comparison.
+#' @param pop_labels A list of population names and the numeric counterparts.
+#' 
+#' @returns A list of dataframes.
 plot_pairwise_data_prep <- function(pairwise_matrix, pop_labels) {
    pop_names <- pop_labels$Population
    nei <- pairwise_matrix[[1]]$data
@@ -435,6 +466,12 @@ plot_pairwise_data_prep <- function(pairwise_matrix, pop_labels) {
                within = within_long))
 }
 
+#' Plot pairwise difference of populations
+#' 
+#' @param data A dataframe containing pairs of population and associated values.
+#' @param pop_labels A list of population names and the numeric counterparts.
+#' 
+#' @returns A heatmap plot of Nei's average number of pairwise difference within and between populations.
 plot_pairwise_heatmap <- function(data, pop_labels) {
    pop_names <- pop_labels$Population
    heatmap_data <- dplyr::bind_rows(data)
@@ -465,6 +502,12 @@ plot_pairwise_heatmap <- function(data, pop_labels) {
       plotly::layout(hoverlabel = list(align = ""))
 }
 
+#' Plot Nei's average number of pairwise difference
+#' 
+#' @param data A dataframe containing pairs of population and associated values.
+#' @param pop_labels A list of population names and the numeric counterparts.
+#' 
+#' @returns Multiple heatmaps plotting Nei's average number of pairwise difference within and between populations.
 plot_pairwise_heatmap_overlap <- function(data, pop_labels) {
    pop_names <- pop_labels$Population
    nei_long <- data[[1]]
@@ -533,6 +576,13 @@ plot_pairwise_heatmap_overlap <- function(data, pop_labels) {
       )
 }
 
+#' Parse relevant sections from the arlecore result
+#' 
+#' @param doc The resulting .xml file read using xml2.
+#' @param tag The tag within the xml file.
+#' @param fun The dedicated function for parsing the information.
+#' 
+#' @returns The parsed .xml section and information as a list.
 parse_sections_arlequin <- function(doc, tag, fun) {
    #nodes <- xml2::xml_find_all(doc, paste0("//", tag))
    nodes <- xml2::xml_find_all(doc, paste0("//", tag))

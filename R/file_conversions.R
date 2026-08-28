@@ -3,12 +3,6 @@
 #' @param input The input as a dataframe.
 #' 
 #' @returns A dataframe containing information from the input file.
-#'
-#' @importFrom tidyselect everything
-#'
-#' @export
-#' @examples
-#' clean_input_data(my_dataframe)
 clean_input_data <- function(file) {
    
    # Get first value of the third column, assumption is genotype
@@ -53,13 +47,7 @@ clean_input_data <- function(file) {
 #' @param to_str To indicate whether input file will be used to generate .str files. Default is FALSE.
 #' @param popinfo To indicate if population metadata is present. Default is TRUE.
 #' 
-#' @returns A genind object
-#'
-#' @importFrom adegenet df2genind
-#'
-#' @export
-#' @examples
-#' convert_to_genind(file = my_table, to_str = FALSE)
+#' @returns A genind object.
 convert_to_genind <- function(file, to_str = FALSE, popinfo = TRUE) {
    
    if (isFALSE(popinfo) && isTRUE(to_str)) {
@@ -145,8 +133,8 @@ convert_to_genind <- function(file, to_str = FALSE, popinfo = TRUE) {
 #' 
 #' @param fsnps_gen The genind object containing sample, population, and genotype data.
 #' @param pops The populations to be used for PCA recalculation.
-#' @return Genind object
-#' @keywords internal
+#' 
+#' @return Genind object.
 subset_genind_pop <- function(fsnps_gen, pops) {
    keep <- adegenet::pop(fsnps_gen) %in% pops
    fsnps_gen[keep,]
@@ -161,11 +149,6 @@ subset_genind_pop <- function(fsnps_gen, pops) {
 #' @param output_chr The chromosome formatting for output files based on PLINK2.0. Default is '26' indicating numeric codes.
 #' 
 #' @returns The prefix of PLINK2.0 files.
-#' 
-#' @export
-#' @examples
-#' convert_to_plink2('my_vcf.vcf', original_name = "my_vcf", isplink = FALSE, plink_path = "./plink2/plink2.exe, name = "converted_file", output_chr = "26")
-#' convert_to_plink2('my_vcf.vcf', original_name = "my_vcf", isplink = FALSE, plink_path = "./plink2/plink2.exe, name = "converted_file", output_chr = "MT")
 convert_to_plink2 <- function(input.file,
                               original_name = NULL,
                               isplink = FALSE,
@@ -216,8 +199,6 @@ convert_to_plink2 <- function(input.file,
 #' @param output_chr The chromosome formatting for output files based on PLINK2.0. Default is '26' indicating numeric codes.
 #' 
 #' @returns The prefix of PLINK2.0 files.
-#' 
-#' @export
 convert_to_plink <- function(input.file, name = "converted_to_plink") {
    plink_path <- get_plink_path()
    
@@ -249,10 +230,6 @@ convert_to_plink <- function(input.file, name = "converted_to_plink") {
 #' @param output.dir The directory to save the unpacked files. Default is the working directory.
 #' 
 #' @returns The prefix of the merged dataset.
-#' 
-#' @export
-#' @examples
-#' prepare_input_dataset_archive('my_zipped_file.zip', output.dir = "./unpacked")
 prepare_input_dataset_archive <- function(input_file, output.dir = ".") {
    
    unpacked <- unpack_input_file(input_file, output.dir)
@@ -311,12 +288,6 @@ prepare_input_dataset_archive <- function(input_file, output.dir = ".") {
 #' @inheritParams prepare_input_dataset_archive
 #' 
 #' @returns The prefix of the converted dataset.
-#'
-#' @importFrom tools file_ext
-#' 
-#' @export
-#' @examples
-#' prepare_input_dataset('my_zipped_file.zip', output.dir = "./unpacked")
 prepare_input_dataset <- function(input_file, output.dir = ".") {
    
    ext <- tools::file_ext(input_file)
@@ -354,12 +325,6 @@ prepare_input_dataset <- function(input_file, output.dir = ".") {
 #' @param ref The population metadata of samples. Required only if output_type is CSV.
 #' 
 #' @returns The file path of the output.
-#'
-#' @importFrom zip zipr
-#' 
-#' @export
-#' @examples
-#' convert_from_plink2(prefix = "my_plink_files", output_type = "vcf2", output.dir = "./unpacked")
 convert_from_plink2 <- function(prefix,
                                 output_type,
                                 output.dir = ".",
@@ -424,10 +389,6 @@ convert_from_plink2 <- function(prefix,
 #' @param output_prefix The prefix of the output (expected to be PLINK2.0).
 #' 
 #' @returns The file path of the output.
-#' 
-#' @export
-#' @examples
-#' merge_plink2_files(merge_list = "plink_files.txt", output_prefix = "mergedFile")
 merge_plink2_files <- function(base_prefix, merge_list, output_prefix) {
    
    plink_path <- get_plink_path()
@@ -460,13 +421,6 @@ merge_plink2_files <- function(base_prefix, merge_list, output_prefix) {
 #' @param output.dir (optional) The output directory to save input files if zipped. Default is working directory.
 #' 
 #' @returns The dataframe of merged metadata with genotype information.
-#' 
-#' @importFrom tools file_ext
-#' @importFrom tibble add_column
-#' 
-#' @export
-#' @examples
-#' vcf_to_csv('extracted_markers.vcf', ref = reference_file)
 vcf_to_csv <- function(files, ref = NULL, output.dir = ".") {
    print("running conversion to csv")
    extension <- tools::file_ext(files)
@@ -516,12 +470,6 @@ vcf_to_csv <- function(files, ref = NULL, output.dir = ".") {
 #' @param markers The reference file containing metadata of samples with information on 1. rsID 2. REF 3. ALT.
 #' 
 #' @returns The dataframe of dosages per marker and samples.
-#'
-#' @importFrom tidyselect everything
-#' 
-#' @export
-#' @examples
-#' to_binary(snp_calls, markers = marker_list)
 to_binary <- function(df, markers = marker.file) {
    df <- as.data.frame(df)
    rownames(df) <- paste(df[, 1], "id", sep = "_")
@@ -568,12 +516,6 @@ to_binary <- function(df, markers = marker.file) {
 #' @param loci.meta The file path to the reference file containing metadata of markers with rsID, chr, pos, genetic distance, ref allele, and alt allele information.
 #' 
 #' @returns A gentibble object.
-#'
-#' @importFrom tidypopgen gen_tibble
-#' 
-#' @export
-#' @examples
-#' csv_to_gentibble('snp_calls.csv', loci.meta = "markers_meta.xlsx")
 csv_to_gentibble <- function(file, loci.meta = loci.meta) {
    df <- load_csv_xlsx_files(file)
    meta <- df[, 1:2]
@@ -603,7 +545,6 @@ csv_to_gentibble <- function(file, loci.meta = loci.meta) {
    return(gentibble)
 }
 
-
 #' Widen long genotype file
 #' 
 #' @param files A zipped file containing long genotype files.
@@ -611,15 +552,6 @@ csv_to_gentibble <- function(file, loci.meta = loci.meta) {
 #' @param output.dir The directory to save unpacked files. Default is working directory.
 #' 
 #' @returns The dataframe of widened and merged genotype files.
-#'
-#' @importFrom readxl read_excel
-#' @importFrom stats aggregate
-#' @importFrom purrr map reduce
-#' @importFrom tidyr pivot_wider
-#' 
-#' @export
-#' @examples
-#' widen_genotype_file(files = "zipped_files.zip", output.dir = "./new_dir")
 widen_genotype_file <- function(files = files,
                                 population = NULL,
                                 output.dir = ".") {
@@ -705,12 +637,6 @@ widen_genotype_file <- function(files = files,
 #' @returns The file path to the .str file
 #'
 #' @seealso [convert_to_genind()] to convert sample, population, and genotype file to STRUCTURE v2.3.4-compatible format. Set 'to_str' to TRUE.
-#'
-#' @importFrom poppr popsub
-#' 
-#' @export
-#' @examples
-#' revise_structure_file(file = my_table, output.dir = ".", system = "Linux")
 revise_structure_file <- function(file, output.dir = ".", system = "Windows") {
    fsnps_gen_sub <- poppr::popsub(file)
    path <- file.path(output.dir, "structure_file.str")
@@ -735,12 +661,6 @@ revise_structure_file <- function(file, output.dir = ".", system = "Windows") {
 #' @param markers The number of markers in the dataset.
 #' 
 #' @returns A dataframe formatted for SNIPPER compatibility.
-#'
-#' @importFrom plyr ldply
-#' 
-#' @export
-#' @examples
-#' to_snipper(input = df, references = pop_info, target.pop = FALSE, markers = 56)
 to_snipper <- function(input,
                        references,
                        target.pop = TRUE,
@@ -842,14 +762,7 @@ to_snipper <- function(input,
 #' 
 #' @param path The alignment object.
 #' 
-#' @returns DNA bin
-#' 
-#' @importFrom tools file_ext
-#' @importFrom ape read.dna as.DNAbin
-#' 
-#' @export
-#' @examples
-#' alignment_to_dnabin("./alignment.fas")
+#' @returns DNA bin.
 alignment_to_dnabin <- function(path) {
    ext <- tolower(tools::file_ext(path))
    
@@ -886,7 +799,16 @@ alignment_to_dnabin <- function(path) {
    return(alignment)
 }
 
-
+#' Generate Arlequin-compatible file (.arp)
+#' 
+#' @param df The dataframe containing marker and population information.
+#' @param genotypic_data To indicate if the data to be analyzed is haplotypic or genotypic.
+#' @param recessive_data Indicates if genotypic data present are recessive.
+#' @param locus_sep The character used to separate the alleles of different loci (locus separator).
+#' @param data_type The type of data to be analyzed. Standard is DNA.
+#' @param output.prefix The prefix of output (.arp) file.
+#' 
+#' @returns The file path of the output .arp file.
 build_arp_per_population <- function(df,
                                      genotypic_data = 1,
                                      gametic_phase = 0,
@@ -993,7 +915,11 @@ build_arp_per_population <- function(df,
    return(out_path)
    }
 
-
+#' Convert CSV file to gtype class (strataG-specific object)
+#' 
+#' @param file The file path of the .csv/.xlsx file.
+#' 
+#' @returns A dataframe in gtype format.
 csv_to_gtype_format <- function(file) {
    df <- load_csv_xlsx_files(file)
    df <- clean_input_data(df)
