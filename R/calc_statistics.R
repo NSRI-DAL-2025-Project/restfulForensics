@@ -527,23 +527,22 @@ calc_iisnps_params <- function(geno_freqs, profile = NULL, theta = 0) {
 #' @returns The dataframe of tally count.
 pop_breakdown <- function(file, column) {
    col_name <- as.character(column)
-   print(col_name)
-   print(colnames(file))
+
    if (!(col_name %in% colnames(file))) {
       stop("Ensure specified column is present in the dataset.")
    }
    
    file <- file %>%
-      rename(Sample = 1, Pop = col_name)
+      dplyr::rename(Sample = 1, Pop = col_name)
    
    for_breakdown <- data.frame(file$Sample, file$Pop)
    for_breakdown <- for_breakdown %>%
-      rename(Sample = 1, Population = 2)
+      dplyr::rename(Sample = 1, Population = 2)
    
    total <- for_breakdown %>%
       unique() %>%
-      group_by(Population) %>%
-      summarize(Total = n())
+      dplyr::group_by(Population) %>%
+      dplyr::summarize(Total = n())
    
-   return(total)
+   return(as.data.frame(total))
 }
