@@ -183,7 +183,7 @@ file_conversion_tab <- function() {
                      uiOutput("downloadCSV_UI")
                   ),
                   tabPanel(
-                     title = "(to CSV) View Population Breakdown",
+                     title = "View Population Breakdown",
                      div(
                         style = "overflow-x: auto;",
                         DT::dataTableOutput("previewTableBreakdown")

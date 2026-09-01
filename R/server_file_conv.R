@@ -203,7 +203,6 @@ file_conversion_server <- function(input, output, session, rv) {
    convertedBreakdown <- reactiveVal(NULL)
    output.dir <- tempdir()
    timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
-   #outputName <- paste0("converted_", timestamp, ".csv")
    
    observe({
       fileready <- !is.null(input$genotypeFile) || (!is.null(input$firstPLINK) && !is.null(input$secondPLINK) && !is.null(input$thirdPLINK))

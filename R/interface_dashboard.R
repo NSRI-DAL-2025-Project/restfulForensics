@@ -7,7 +7,7 @@ dashboard_tab <- function() {
             title = "Introduction",
             side = "right",
             width = 12,
-            h4("restFUL forensics is a toolkit dedicated for the forensic analysis of
+            h4("restful forensics is a toolkit dedicated for the forensic analysis of
                           single nucleotide polymorphisms (SNPs) and DNA barcodes. It compiles
                           reference population datasets extracted from publicly available databases
                           for direct evaluation of forensic marker panels. It allows the user to

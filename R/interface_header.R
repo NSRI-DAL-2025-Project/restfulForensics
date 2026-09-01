@@ -2,7 +2,7 @@ restful_header <- function() {
    
    dashboardHeader(
       title = div(
-         tags$span("restFUL Forensics",
+         tags$span("restful forensics",
                    style = "font-family: Carme, sans-serif; font-size: 26px; color: #ffffff; vertical-align: middle; padding-left: 0px;"
          )
       ),
