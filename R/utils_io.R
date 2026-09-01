@@ -162,35 +162,4 @@ read_fasta <- function(zipped, directory) {
    return(dna_sequences)
 }
 
-#' Read MSA files
-#'
-#' @param path The file path of the alignment file.
-#' @param filename The file name of input.
-#' 
-#' @returns The alignment.
-read_msa_file <- function(path, filename) {
-   
-   ext <- tolower(tools::file_ext(filename))
-   
-   if (ext == "msa") {
-      return(Biostrings::readDNAStringSet(path))
-   }
-   
-   if (ext %in% c("fa", "fas", "fasta")) {
-      ext <- "fasta"
-   }
-   
-   if (ext == "aln") {
-      ext <- "clustal"
-   }
-   
-   if (!ext %in% c("fasta", "msf", "clustal")) {
-      stop(paste("Unsupported format"))
-   }
-   
-   seqinr::read.alignment(
-      file = path,
-      format = ext
-   )
-}
 

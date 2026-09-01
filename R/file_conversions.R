@@ -767,36 +767,28 @@ alignment_to_dnabin <- function(path) {
    ext <- tolower(tools::file_ext(path))
    
    if (ext %in% c("fasta", "fa", "fas")) {
-      alignment <- ape::read.dna(
-         file = path,
-         format = "fasta",
-         as.character = TRUE,
-         skip = 0,
-         as.matrix = FALSE
-      )
+      fmt = "fasta"
+   } else if (ext == "aln") {
+      fmt = "clustal"
+   } else if (ext == "msf"){
+      fmt = "msf"
+   } else if (ext == "mase") {
+      fmt = "mase"
+   } else if (ext == "phylip") {
+      fmt = "phylip"
    } else {
-      
-      if (ext == "mase") {
-         alignment <- seqinr::read.alignment(path, format = "mase")
-         
-      } else if (ext == "aln") {
-         alignment <- seqinr::read.alignment(path, format = "clustal")
-         
-      } else if (ext == "msf") {
-         alignment <- seqinr::read.alignment(path, format = "msf")
-         
-      } else if (ext == "phylip") {
-         alignment <- seqinr::read.alignment(path, format = "phylip")
-      } else {
-         stop("Unsupported file format: ", ext)
-      }
-      
-      mat <- do.call(rbind, strsplit(alignment$seq, ""))
-      rownames(mat) <- alignment$nam
-      alignment <- ape::as.DNAbin(mat)
+      stop("Unsupported file format: ", ext)
    }
-
-   return(alignment)
+   
+   alignment <- seqinr::read.alignment(
+      path,
+      format = fmt
+   )
+   mat <- do.call(rbind, lapply(alignment$seq, function(x) {
+               strsplit(toupper(x), "")[[1]]
+            }))
+   rownames(mat) <- alignment$nam
+   return(ape::as.DNAbin(mat))
 }
 
 #' Generate Arlequin-compatible file (.arp)
