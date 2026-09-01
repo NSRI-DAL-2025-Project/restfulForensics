@@ -211,7 +211,11 @@ barcoding_tab <- function() {
                   box(
                      title = "Results",
                      width = 12,
-                     verbatimTextOutput("identificationResult")
+                     p("Species Identification Success Rate"),
+                     verbatimTextOutput("identificationResult"),
+                     br(),
+                     p("Species inferred and corresponding confidence levels:"),
+                     DT::DTOutput("identified_samples")
                   )
                )
             ),

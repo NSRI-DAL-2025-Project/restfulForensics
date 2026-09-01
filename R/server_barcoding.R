@@ -18,44 +18,91 @@ barcoding_server <- function(input, output, session, rv) {
       req(input$refBarcoding)
       req(input$queBarcoding)
       
-      barcoding_ref <- read_msa_file(input$refBarcoding$datapath, input$refBarcoding$name)
-      barcoding_que <- read_msa_file(input$queBarcoding$datapath, input$queBarcoding$name)
-      
-      ref_mat <- do.call(rbind, lapply(barcoding_ref$seq, function(x) {
-         strsplit(toupper(x), "")[[1]]
-      }))
-      
-      que_mat <- do.call(rbind, lapply(barcoding_que$seq, function(x) {
-         strsplit(toupper(x), "")[[1]]
-      }))
-      
-      rownames(ref_mat) <- barcoding_ref$nam
-      rownames(que_mat) <- barcoding_que$nam
-      
-      ref_seq <- ape::as.DNAbin(ref_mat)
-      que_seq <- ape::as.DNAbin(que_mat)
+      ref_seq <- alignment_to_dnabin(input$refBarcoding$datapath)
+      que_seq <- alignment_to_dnabin(input$queBarcoding$datapath)
       
       refseq(ref_seq)
       queseq(que_seq)
       
       # If not using kmer method
       if (!isTRUE(input$kmerSelect)) {
-         result_identity <- BarcodingR::barcoding.spe.identify(refseq(), queseq(), method = input$barcodingMethod)
+         result_identity <- BarcodingR::barcoding.spe.identify(
+            refseq(), 
+            queseq(), 
+            method = input$barcodingMethod
+            )
+         
+         if (input$barcodingMethod == "Bayesian") {
+            result <- result_identity[["output_identified"]]
+         } else {
+            result <- list( 
+               success_rate = result_identity[["success.rates.ref"]],
+               output = result_identity[["output_identified"]]
+            )
+         }
+         
       } else {
          if (input$kmerType == "Fuzzy-set Method and kmer") {
-            result_identity <- BarcodingR::barcoding.spe.identify2(refseq(), queseq(), kmer = input$kmerValueFuzzy, optimization = input$optimizationKMER)
+            result_identity <- BarcodingR::barcoding.spe.identify2(
+               refseq(), 
+               queseq(), 
+               kmer = input$kmerValueFuzzy, 
+               optimization = input$optimizationKMER
+               )
+            
+            result <- list(
+               model_success = result_identity[["model.success"]],
+               output = result_identity[["output_identified"]]
+            )
+            
          } else if (input$kmerType == "BP-based Method and kmer") {
-            result_identity <- BarcodingR::bbsik(refseq(), queseq(), kmer = input$kmerValueBP, UseBuiltModel = input$builtModel, lr = input$lrValue, maxit = input$maxitValue)
+            result_identity <- BarcodingR::bbsik(
+               refseq(), 
+               queseq(), 
+               kmer = input$kmerValueBP, 
+               UseBuiltModel = input$builtModel, 
+               lr = input$lrValue, 
+               maxit = input$maxitValue
+               )
+            
+            result <- list(
+               success_rate = result_identity[["success.rates.ref"]],
+               output = result_identity[["output_identified"]]
+            )
          }
       }
       
-      resultIdentity(result_identity)
+      resultIdentity(result)
       enable("identifySpecies")
    })
    
    output$identificationResult <- renderPrint({
       req(resultIdentity())
-      print(resultIdentity())
+      if (!isTRUE(input$kmerSelect)) {
+         if (input$barcodingMethod == "Bayesian") {
+            print("Species identification success rate unavailable when using 'Bayesian' method.")
+         }
+         rate <- resultIdentity()[[1]]
+         print(rate*100)
+      } else {
+         rate <- resultIdentity()[[1]]
+         print(rate*100)
+      }
+   })
+   
+   output$identified_samples <- DT::renderDataTable({
+      req(resultIdentity())
+      if (!isTRUE(input$kmerSelect)) {
+         if (input$barcodingMethod == "Bayesian") {
+            DT::datatable(resultIdentity()[[1]],
+                          options = list(pageLength = 5),
+                          rownames = FALSE)
+         }
+      } 
+      
+      DT::datatable(resultIdentity()[[2]],
+                    options = list(pageLength = 5),
+                    rownames = FALSE)
    })
    
    #----------------- Optimize kmer values
@@ -73,10 +120,11 @@ barcoding_server <- function(input, output, session, rv) {
       
       Sys.sleep(1.5)
       
-      kmer_File <- ape::read.dna(
-         input$optimizeKmerRef$datapath,
-         format = "fasta"
-      )
+      kmer_File <- alignment_to_dnabin(input$optimizeKmerRef$datapath)
+      #kmer_File <- ape::read.dna(
+      #   input$optimizeKmerRef$datapath,
+      #   format = "fasta"
+      #)
       
       tmp_file <- tempfile(fileext = ".png")
       png(tmp_file, width = 1200, height = 800)
