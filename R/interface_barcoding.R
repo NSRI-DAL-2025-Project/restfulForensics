@@ -36,8 +36,6 @@ msa_tab <- function() {
                      tags$li("Alignment scores"),
                      tags$li("Alignment PDF")
                   ),
-                  p("PDF of the alignment is automatically downloaded in the working directory of the repository.
-                                              This is a native feature of the msaPrettyPrint() function."),
                   br(),
                   p(
                      "The aligned sequences can be used in the tab ",
@@ -68,8 +66,7 @@ msa_tab <- function() {
                   title = "Download Results",
                   uiOutput("downloadAlignedFASTA_UI"),
                   uiOutput("downloadAlignmentScores_UI"),
-                  downloadButton("downloadAlignmentPDF", "Download Alignment in PDF"),
-                  p("Note that the PDF is automatically downloaded in the same folder/working directory. This is a built in feature of the msa R package.")
+                  downloadButton("downloadAlignmentPDF", "Download Alignment in PDF")
                )
             )
          )
