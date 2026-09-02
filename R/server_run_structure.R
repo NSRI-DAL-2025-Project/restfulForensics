@@ -104,33 +104,33 @@ run_structure_analysis <- function(input, output, session, rv) {
       analysis_done(TRUE)
    })
    
-   output$structure_log <- renderText({
-      structureLog()
-   })
-   
-   output$downloadLogs <- downloadHandler(
-      filename = function() {
-         paste0("structure_logs_", Sys.Date(), ".zip")
-      },
-      content = function(file) {
-         log_files <- list.files(out_path, pattern = "_log.*$", full.names = TRUE)
-         if (length(log_files) == 0) {
-            return(NULL)
-         }
-         
-         log_files_renamed <- sapply(log_files, function(f) {
-            ext <- tools::file_ext(f)
-            if (ext == "") {
-               new_f <- paste0(f, ".txt")
-               file.rename(f, new_f)
-               return(new_f)
-            }
-            return(f)
-         })
-         zip::zipr(zipfile = file, files = log_files_renamed, recurse = FALSE)
-      },
-      contentType = "application/zip"
-   )
+#   output$structure_log <- renderText({
+#      structureLog()
+#   })
+#   
+#   output$downloadLogs <- downloadHandler(
+#      filename = function() {
+#         paste0("structure_logs_", Sys.Date(), ".zip")
+#      },
+#      content = function(file) {
+#         log_files <- list.files(out_path, pattern = "_log.*$", full.names = TRUE)
+#         if (length(log_files) == 0) {
+#            return(NULL)
+#         }
+#         
+#         log_files_renamed <- sapply(log_files, function(f) {
+#            ext <- tools::file_ext(f)
+#            if (ext == "") {
+#               new_f <- paste0(f, ".txt")
+#               file.rename(f, new_f)
+#               return(new_f)
+#            }
+#            return(f)
+#         })
+#         zip::zipr(zipfile = file, files = log_files_renamed, recurse = FALSE)
+#      },
+#      contentType = "application/zip"
+#   )
    
    output$downloadFOutputs <- downloadHandler(
       filename = function() {
@@ -178,7 +178,7 @@ run_structure_analysis <- function(input, output, session, rv) {
    output$downloadButtons <- renderUI({
       req(analysis_done())
       tagList(
-         downloadButton("downloadLogs", "Download Log Files (.zip)"),
+         #downloadButton("downloadLogs", "Download Log Files (.zip)"),
          downloadButton("downloadFOutputs", "Download STRUCTURE _f Files (.zip)"),
          downloadButton("downloadQMatrixTxtZip", "Download Q Matrices (.zip)")
       )
