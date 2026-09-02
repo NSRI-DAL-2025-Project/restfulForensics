@@ -17,13 +17,6 @@ file_conversion_server <- function(input, output, session, rv) {
       toggleState("ConvertFILES", condition = hasfile && breakdown_ready)
    })
    
-   exampleCSVFile <- data.frame(
-      Sample.Name = c("sample1", "sample2", "sample3", "sample4", "..."),
-      Population = c("Malaysia", "Mexico", "Greece", "South Korea", "..."),
-      rs01 = c("G/T", "G/A", "C/A", "A/A", "..."),
-      rs02 = c("C/C", "C/C", "G/C", "G/G", "..."),
-      "..." = c("...", "...", "...", "...", "...")
-   )
    marker_info_format <- data.frame(
       SNP = c("rs01", "rs02", "rs03", "rs04", "..."),
       chromosome = c("chr1", "chr4", "chr5", "chr5", "..."),
@@ -31,34 +24,6 @@ file_conversion_server <- function(input, output, session, rv) {
       genetic_distance = c("0", "0", "0", "0", "..."),
       ref_allele = c("A", "T", "G", "G", "C"),
       alt_allele = c("T", "A", "C", "C", "G")
-   )
-   
-   exampleRefCSV <- data.frame(
-      Sample.Name = c("sample1", "sample2", "sample3", "sample4", "..."),
-      Population = c("Malaysia", "Mexico", "Greece", "South Korea", "..."),
-      Superpopulation = c("Southeast Asia", "North and South America", "Europe", "East Asia", "...")
-   )
-   
-   output$ExampleRefFile <- DT::renderDataTable(
-      {
-         req(exampleRefCSV)
-         exampleRefCSV
-      },
-      options = list(
-         scrollX = TRUE,
-         pageLength = 5
-      )
-   )
-   
-   output$ExampleCSVFormat <- DT::renderDataTable(
-      {
-         req(exampleCSVFile)
-         marker_info_format
-      },
-      options = list(
-         scrollX = TRUE,
-         pageLength = 5
-      )
    )
    
    output$markerInfoFormat <- DT::renderDataTable(

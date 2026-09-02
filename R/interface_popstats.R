@@ -6,7 +6,6 @@ popstats_tab <- function() {
       tabPanel(
          title = "Population Statistics",
          tabsetPanel(
-            # R-based module
             tabPanel(
                title = "R-based Calculations",
                fluidRow(
@@ -26,13 +25,12 @@ popstats_tab <- function() {
                         )
                      ),
                      tabPanel(
-                        title = "Sample Input Format/s",
+                        title = "Sample Input Format",
                         h4("Example: Population File Format"),
                         DT::dataTableOutput("examplePop_UI")
                      ),
                      tabPanel(
                         title = "Download Sample Files",
-                        h4("Sample File"),
                         tags$ul(
                            tags$a("Sample CSV file", href = "sample.csv", download = "sample.csv")
                         )
@@ -95,7 +93,7 @@ popstats_tab <- function() {
                      )
                   )
                )
-            ), # end of first tabpanel
+            ),
             tabPanel(
                title = "Arlecore",
                fluidRow(
@@ -108,14 +106,15 @@ popstats_tab <- function() {
                   tabBox(
                      tabPanel(
                         title = "Instructions",
+                        h4("Calculate common population statistics using Arlecore (terminal-based version of Arlequin)"),
+                        p(strong("Input file/s:"), "CSV file containing marker and population data.
+                                              Each row should represent multi-locus data for an individual sample."),
+                        p(strong("Expected output file/s: .xlsx and .ars file")),
+                        hr(),
                         p(tags$a("Arlequin",
                                  href = "https://cmpg.unibe.ch/software/arlequin35/",
                                  target = "_blank"
-                        ), " is a free software package for population genetic analysis, calculating intra-population and inter-population metrices (Excoffier & Lischer, 2010)."),
-                        br(),
-                        p(strong("Input file/s:"), "CSV file containing marker and population data.
-                                              Each row should represent multi-locus data for an individual sample."),
-                        p(strong("Expected output file/s: .xlsx and .ars file"))
+                        ), " is a free software package for population genetic analysis, calculating intra-population and inter-population metrices (Excoffier & Lischer, 2010).")
                      ),
                      tabPanel(
                         title = "Sample Input Format",
@@ -161,16 +160,13 @@ popstats_tab <- function() {
                            title = "Loci in LD",
                            DT::DTOutput("ld_tables")
                         )
-                        
-                        
                         )
                      )
                   )
             )
-            
-         ) # end of tabset panel
+         ) 
       )
-   ) # end of tabitem
+   )
    
    
 }

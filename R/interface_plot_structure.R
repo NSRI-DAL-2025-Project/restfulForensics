@@ -27,30 +27,35 @@ plot_structure_runs <- function() {
             ),
             numericInput("orderRun", "Permute clusters according to cluster order?", value = 0),
             actionButton("plotStructureResults", "Run CLUMPP", icon = icon("play"))
-            
-         ), # end of box
+         ),
          tabBox(
             tabPanel(
                "Instructions",
+               h4("Run CLUMPP and plot STRUCTURE results"),
+               p(strong("Input file:"), "Zipped structure files or structure result from Run STRUCTURE v2.3.4 tab."),
+               p(strong("Expected output file:"), "PNG plot"),
+               hr(),
                p(
-                  "This runs CLUMPP (Jakobsson & Rosenberg, 2007) and plots STRUCTURE results using the ",
+                  "Runs ",
+                  tags$a("CLUMPP",
+                         href = "https://rosenberglab.stanford.edu/clumpp.html",
+                         target = "_blank"
+                         ),
+                  "(Jakobsson & Rosenberg, 2007) to visualize STRUCTURE results using the ",
                   tags$a("strataG",
                          href = "https://github.com/EricArcher/strataG/tree/master",
                          target = "_blank"
                   ), "R package."
-               ),
-               p(strong("Input file:"), "Zipped structure files or structure result from Run STRUCTURE v2.3.4 tab."),
-               p(strong("Expected output file:"), "PNG plot")
+               )
             ),
             tabPanel(
                "Download Sample File",
-               h4("Download Sample File"),
                tags$ul(
                   tags$a("Sample STRUCTURE results", href = "structure_results.csv", download = "structure_results.csv")
                )
             )
          )
-      ), # end of fluid row
+      ), 
       fluidRow(
          tabBox(
             width = 12,
@@ -61,6 +66,5 @@ plot_structure_runs <- function() {
             )
          )
       )
-   ) # end of tab item
-   
+   ) 
 }

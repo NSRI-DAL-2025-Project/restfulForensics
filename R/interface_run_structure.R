@@ -26,23 +26,22 @@ structure_runs <- function() {
          tabBox(
             tabPanel(
                title = "Instructions",
+               h4("Run population structure analysis using STRUCTURE v2.3.4"),
+               p(strong("Input file:"), "CSV or XLSX file"),
+               p(strong("Expected output file:"), "Zipped qmatrices and individual files"),
+               hr(),
                p(
-                  "This runs the basic Windows implementation of STRUCTURE v2.3.4 without a front-end and allows immediate
-                                   visualization of results using the ",
+                  "This runs the basic Windows implementation of ",
+                  tags$a("STRUCTURE v2.3.4",
+                         href = "https://web.stanford.edu/group/pritchardlab/structure_software/release_versions/v2.3.4/structure_doc.pdf",
+                         target = "_blank"
+                         ),
+                  "without a front-end using the",
                   tags$a("strataG",
                          href = "https://github.com/EricArcher/strataG/tree/master",
                          target = "_blank"
                   ), "R package. This generates STRUCTURE input files and qmatrices files compatible for
-                                   other visualization programs such as pong (Behr et al., 2016)."
-               ),
-               p(strong("Input file:"), "CSV or XLSX file"),
-               p(strong("Expected output file:"), "Zipped qmatrices and individual files"),
-               p(
-                  "See ",
-                  tags$a("STRUCTURE v2.3.4 Documentation",
-                         href = "https://web.stanford.edu/group/pritchardlab/structure_software/release_versions/v2.3.4/structure_doc.pdf",
-                         target = "_blank"
-                  )
+                                   other programs such as pong (Behr et al., 2016) or CLUMPP (Jakobsson & Rosenberg, 2007)."
                )
             ),
             tabPanel(
@@ -51,22 +50,12 @@ structure_runs <- function() {
             ),
             tabPanel(
                title = "Download Sample File",
-               h4("Download Sample File"),
                tags$ul(
                   tags$a("Sample CSV file", href = "sample.csv", download = "sample.csv")
                )
             )
          )
-      )#,
-      #fluidRow(
-      #   tabBox(
-      #      width = 12,
-      #      tabPanel(
-      #         "Status",
-      #         verbatimTextOutput("structure_log")
-      #      )
-      #   )
-      #)
+      )
    )
    
 }

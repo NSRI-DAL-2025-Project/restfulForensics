@@ -282,7 +282,15 @@ dashboard_server <- function(input, output, session, rv){
    
    output$popstatRef <- renderUI({
       p_lists <- list(
-         p("Calculation of common population statistics:"),
+         h4("Calculate common population statistics using R-based packages"),
+         p(strong("Input file:"), "CSV or .xlsx file"),
+         p(strong("Expected output files:")),
+         tags$ul(
+            tags$li(".xlsx file with all results"),
+            tags$li("Heterozygosity Plot (.png)"),
+            tags$li("Fst Plots (.png)")
+         ),
+         p("Population statistics included:"),
          tags$ul(
             tags$li(strong("Private alleles"), "[1] calculated using the poppr R package (Kamvar et al., 2014)"),
             tags$li(strong("Mean Allelic Richness"), "[2] using the hierfstat R package (Goudet, 2004)"),
@@ -291,14 +299,6 @@ dashboard_server <- function(input, output, session, rv){
             tags$li(strong("Allele frequency"), "[5] using the adegenet R package (Jombart, 2008)"),
             tags$li(strong("Hardy-Weinberg equilibrium"), "[6] using the pegas R package (Paradis, 2010)"),
             tags$li(strong("FST values"), "[7] using the hierfstat R package (Goudet, 2004)")
-         ),
-         br(),
-         p(strong("Input file:"), "CSV or .xlsx file"),
-         p(strong("Expected output files:")),
-         tags$ul(
-            tags$li(".xlsx file with all results"),
-            tags$li("Heterozygosity Plot (.png)"),
-            tags$li("Fst Plots (.png)")
          ),
          br(),
          h5("To learn more about the statistics:"),

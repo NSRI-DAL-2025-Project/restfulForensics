@@ -55,7 +55,7 @@ file_conversion_tab <- function() {
                   conditionalPanel(
                      condition = "input.inputType1 == 'csv1'",
                      p("This feature automatically converts a CSV file to VCF"),
-                     fileInput("CSVFile", "Upload File (.csv or .xlsx)", accept = c(".csv")),
+                     fileInput("CSVFile", "Upload File (.csv or .xlsx)", accept = c(".csv", ".xlsx")),
                      fileInput("lociMetaFile", "Upload loci/marker information (.csv or .xlsx)", accept = c(".xlsx", ".csv"))
                   ),
                   actionButton("ConvertFILES", "Convert files", icon = icon("file-csv"))
@@ -63,22 +63,21 @@ file_conversion_tab <- function() {
                tabBox(
                   tabPanel(
                      title = "Instructions",
-                     h4("This interconverts common genetic files and formats with or without population information."),
+                     h4("Interconvert common genetic files"),
                      p(strong("Input file/s:")),
                      p("Required: VCF, BCF, or PLINK (.bed, .bim, .fam) files. It also accepts zipped files as long as it contains the same file type, except if using PLINK files."),
                      p("Optional input file:"),
                      tags$ul(
-                        tags$li("(.csv to .vcf) Marker information with the following columns: [1] SNP, [2] CHR, [3] POS, [4] Genetic distance, [5] REF Allele [6] ALT Allele.")
+                        tags$li("(.csv/.xlsx to .vcf) Marker information with the following columns: [1] SNP, [2] CHR, [3] POS, [4] Genetic distance, [5] REF Allele [6] ALT Allele.")
                      ),
-                     p(strong("Expected output file/s:"), "VCF, PLINK (.psam/.pvar/.pgen), or CSV file."),
+                     p(strong("Expected output file/s:"), "VCF or PLINK-associated files."),
                      br(),
                      p("Maximum accepted file size: 5GB. It is recommended to split files with sizes larger than 5GB into multiple smaller files.")
                   ),
                   tabPanel(
                      title = "Sample Input Format/s",
-                     h4("For File to VCF conversion, a separate file on marker information is needed."),
+                     h4("For CSV/XLSX File to VCF conversion, a separate file on marker information is needed."),
                      h4("Required marker info format:"),
-                     DT::dataTableOutput("ExampleCSVFormat"),
                      DT::dataTableOutput("markerInfoFormat")
                   ),
                   tabPanel(
@@ -112,7 +111,7 @@ file_conversion_tab <- function() {
                   checkboxInput("isPLINKmeta", "Use PLINK files", value = FALSE),
                   conditionalPanel(
                      condition = "input.isPLINKmeta == false",
-                     fileInput("genotypeFile", "Genotype File (.vcf/.vcf.gz/.bcf) or zipped files", accept = c(".vcf", ".bcf", ".vcf.gz", ".zip", ".tar"))
+                     fileInput("genotypeFile", "Genotype File (.vcf/.vcf.gz/.bcf) or zipped files", accept = c(".vcf", ".bcf", ".gz", ".zip", ".tar"))
                   ),
                   conditionalPanel(
                      condition = "input.isPLINKmeta == true",
@@ -149,7 +148,7 @@ file_conversion_tab <- function() {
                tabBox(
                   tabPanel(
                      title = "Instructions",
-                     h4("This merges select metadata to genotype data."),
+                     h4("Merge select metadata to genotype/sample data"),
                      p(strong("Input file/s:")),
                      tags$ul(
                         tags$li("Genotype data (.vcf, .vcf.gz, .bcf, or PLINK files"),
@@ -169,7 +168,7 @@ file_conversion_tab <- function() {
                      tags$a("B. Sample zipped file (VCF files)", href = "vcf_sample_files.zip", download = "vcf_sample_files.zip"),
                   )
                )
-            ), # end of fluid row
+            ),
             fluidRow(
                tabBox(
                   width = 12,
@@ -211,7 +210,7 @@ file_conversion_tab <- function() {
                   fileInput("uas_zip", "Upload ZIP or TAR file",
                             accept = c(".zip", ".tar")
                   ),
-                  helpText("*Accepts compressed files containing XLSX files."),
+                  helpText("*Accepts compressed files containing CSV/XLSX files."),
                   fileInput("ref_file", "Optional Reference File (CSV or XLSX)",
                             accept = c(".csv", ".xlsx", ".zip", ".tar")
                   ),
@@ -220,7 +219,7 @@ file_conversion_tab <- function() {
                tabBox(
                   tabPanel(
                      title = "Instructions",
-                     h4("This converts zipped excel (.xlsx) files containing SNP calls in long format into a single excel file in a wide format."),
+                     h4("Convert zipped files (.xlsx/.csv) containing SNP calls in long format into a single .xslx file in a wide format"),
                      p(strong("Input file/s:"), "Compressed folder (.zip or .tar) containing .xlsx files."),
                      p(strong("Expected output file/s:"), "Single CSV file (merged .xlsx files).")
                   ),
@@ -250,7 +249,7 @@ file_conversion_tab <- function() {
          
          # Convert file to SNIPPER compatible file submodule ====================================
          tabPanel(
-            title = "Convert to SNIPPER analysis-ready file",
+            title = "To SNIPPER file",
             fluidRow(
                box(
                   width = 6,
@@ -272,6 +271,11 @@ file_conversion_tab <- function() {
                tabBox(
                   tabPanel(
                      title = "Instructions",
+                     h4("Convert file into a SNIPPER-compatible input file for individual classification using ancestry-informative markers"),
+                     p(strong("Input file/s:"), "CSV or Excel (.xlsx) file"),
+                     p(strong("Parameter/s:"), "(optional) Target population name for classification."),
+                     p(strong("Expected output file/s:"), ".xlsx"),
+                     hr(),
                      p(
                         "The ",
                         tags$a("SNIPPER app suite",
@@ -283,11 +287,6 @@ file_conversion_tab <- function() {
                                target = "_blank"
                         )
                      ),
-                     br(),
-                     h4("This converts CSV or Excel (.xlsx) files into a SNIPPER-compatible input file."),
-                     p(strong("Input file/s:"), "CSV or Excel (.xlsx) file"),
-                     p(strong("Parameter/s:"), "(optional) Target population name for classification."),
-                     p(strong("Expected output file/s:"), ".xlsx")
                   ),
                   tabPanel(
                      title = "Sample Input Format/s",
@@ -303,9 +302,10 @@ file_conversion_tab <- function() {
                   ),
                   tabPanel(
                      title = "Download Sample File",
-                     h4("Downloadable Sample"),
                      tags$ul(
-                        tags$a("Sample zipped file", href = "sample_snipper.csv", download = "sample_snipper.csv")
+                        tags$a("A. Sample CSV file", href = "sample.csv", download = "sample.csv"),
+                        br(),
+                        tags$a("B. Sample zipped file", href = "sample_snipper.csv", download = "sample_snipper.csv")
                      )
                   )
                )
@@ -338,19 +338,12 @@ file_conversion_tab <- function() {
                   radioButtons("systemFile", "Choose the operating system where STRUCTURE v2.3.4 is installed",
                                choices = c("Linux" = "Linux", "Windows" = "Windows")
                   ),
-                  actionButton("csv2str", "Generate STRUCTURE File", icon = icon("arrow-up-right-from-square"))
+                  actionButton("csv2str", "Generate File", icon = icon("arrow-up-right-from-square"))
                ),
                tabBox(
                   tabPanel(
                      title = "Instructions",
-                     p(tags$a("STRUCTURE",
-                              href = "https://web.stanford.edu/group/pritchardlab/structure.html",
-                              target = "_blank"
-                     ), " is a free software package for investigating population structure using
-                                              multi-locus genotype data (Stephen and Donnelly, 2000; Falush et al., 2003;
-                                              Falush et al., 2007; Hubisz et al., 2009)."),
-                     br(),
-                     p("This converts CSV files into standard STRUCTURE-compatible files. This module was tested on STRUCTURE version 2.3.4."),
+                     h4("Convert file into a standard STRUCTURE v2.3.4-compatible file"),
                      p(strong("Input file/s:"), "CSV file containing marker and population data.
                                               Each row should represent multi-locus data for an individual sample."),
                      p(strong("Parameter/s:"), "User's operating system (for STRUCTURE input compatibility)"),
@@ -359,7 +352,13 @@ file_conversion_tab <- function() {
                         tags$li("structure (.str) file"),
                         tags$li("revised input file")
                      ),
-                     br(),
+                     hr(),
+                     p(tags$a("STRUCTURE",
+                              href = "https://web.stanford.edu/group/pritchardlab/structure.html",
+                              target = "_blank"
+                     ), " is a free software package for investigating population structure using
+                                              multi-locus genotype data (Stephen and Donnelly, 2000; Falush et al., 2003;
+                                              Falush et al., 2007; Hubisz et al., 2009)."),
                      p("STRUCTURE generally can't handle sample labels with alphabets, the function converts sample labels to their associated row number."),
                      p(
                         "For users who opt to use STRUCTURE via the terminal or GUI, instructions can be found here: ",
@@ -372,6 +371,10 @@ file_conversion_tab <- function() {
                   tabPanel(
                      title = "Sample Input Format",
                      DT::dataTableOutput("examplePop_STRUI")
+                  ),
+                  tabPanel(
+                     title = "Download Sample File",
+                     tags$a("Sample CSV file", href = "sample.csv", download = "sample.csv")
                   )
                )
             ),
@@ -412,19 +415,21 @@ file_conversion_tab <- function() {
                   #               "RFLP" = "RFLP"
                   #            ),
                   #            selected = "STANDARD"),
-                  actionButton("convert2Arle", "Generate Arlequin-compatible File", icon = icon("arrow-up-right-from-square"))
+                  actionButton("convert2Arle", "Generate File", icon = icon("arrow-up-right-from-square"))
                ),
-               tabBox( #=========== FOR REVISION
+               tabBox(
                   tabPanel(
                      title = "Instructions",
+                     h4("Convert genotype and population data (.xlsx/.csv) to Arlequin-compatible file"),
+                     p(strong("Input file/s:"), "CSV file containing marker and population data.
+                                              Each row should represent multi-locus data for an individual sample."),
+                     p(strong("Expected output file/s: .ars file")),
+                     hr(),
                      p(tags$a("Arlequin",
                               href = "https://cmpg.unibe.ch/software/arlequin35/",
                               target = "_blank"
-                     ), " is a free software package for population genetic analysis, calculating intra-population and inter-population metrices (Excoffier & Lischer, 2010)."),
-                     br(),
-                     p(strong("Input file/s:"), "CSV file containing marker and population data.
-                                              Each row should represent multi-locus data for an individual sample."),
-                     p(strong("Expected output file/s: .ars file"))
+                     ), " is a free software package for population genetic analysis, calculating intra-population and inter-population metrices (Excoffier & Lischer, 2010)."
+                     )
                   ),
                   tabPanel(
                      title = "Sample Input Format",
@@ -432,7 +437,6 @@ file_conversion_tab <- function() {
                   ),
                   tabPanel(
                      title = "Download Sample Files",
-                     h4("Sample File"),
                      tags$ul(
                         tags$a("Sample CSV file", href = "sample.csv", download = "sample.csv")
                      )

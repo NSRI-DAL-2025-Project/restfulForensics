@@ -31,7 +31,7 @@ snp_extraction_tab <- function() {
                tabBox(
                   tabPanel(
                      title = "Instructions",
-                     h4("This extracts SNPs based on reference SNP cluster ID (rsID) or GRCh37/GRCh38 position."),
+                     h4("Extract SNPs based on reference SNP cluster ID (rsID) or GRCh37/GRCh38 position"),
                      p(strong("Input file/s:")),
                      p("(1) VCF, BCF, or PLINK (.bed, .bim, .fam) files."),
                      p("(2) Markers/position list — type rsIDs manually, upload a list, or use a POS .txt/.csv file."),
@@ -55,7 +55,6 @@ snp_extraction_tab <- function() {
                   ),
                   tabPanel(
                      title = "Download Sample Files",
-                     h4("Sample Files"),
                      tags$ul(
                         tags$a("A. Sample VCF file", href = "sample_hgdp.vcf", download = "sample_hgdp.vcf"),
                         br(),
@@ -95,7 +94,7 @@ snp_extraction_tab <- function() {
                tabBox(
                   tabPanel(
                      title = "Instructions",
-                     h4("This performs concordance analysis between files/datasets with overlapping samples."),
+                     h4("Perform concordance analysis between files/datasets with overlapping samples"),
                      p(strong("Input file/s:"), "CSV or Excel (.xlsx) files with the same data format (i.e. same columns)."),
                      p(strong("Parameter/s:"), "Indicate if using phased genotypes"),
                      helpText("Markers will be directly compared and the order of the alleles is considered when matching for concordance."),
@@ -112,7 +111,6 @@ snp_extraction_tab <- function() {
                   ),
                   tabPanel(
                      title = "Download Sample Files",
-                     h4("Sample Files"),
                      tags$ul(
                         tags$a("Sample CSV file (1)", href = "sample1_for_concordance.csv", download = "sample1_for_concordance.csv"),
                         br(),

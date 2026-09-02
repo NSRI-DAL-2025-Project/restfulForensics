@@ -26,8 +26,7 @@ msa_tab <- function() {
             tabBox(
                tabPanel(
                   title = "Instructions",
-                  h4("This performs multiple sequence alignment using the msa R package (Bodenhofer et al., 2015)
-                                               and post-processing using DECIPHER (Wright, 2015)."),
+                  h4("Perform multiple sequence alignment"),
                   p(strong("Input file/s:"), "Zipped folder (.zip) containing FASTA files."),
                   p(strong("Parameter/s:"), "Substitution matrix for the alignment (ClustalW, ClustalOmega, MUSCLE)"),
                   p(strong("Expected output/s:")),
@@ -36,7 +35,9 @@ msa_tab <- function() {
                      tags$li("Alignment scores"),
                      tags$li("Alignment PDF")
                   ),
-                  br(),
+                  hr(),
+                  p("This performs multiple sequence alignment using the msa R package (Bodenhofer et al., 2015)
+                                               and post-processing using DECIPHER (Wright, 2015)."),
                   p(
                      "The aligned sequences can be used in the tab ",
                      tags$a(actionLink("tophylogentab", "'Phylogenetic Tree Analysis'."))
@@ -44,7 +45,6 @@ msa_tab <- function() {
                ),
                tabPanel(
                   title = "Download Sample File",
-                  h4("Sample Files"),
                   tags$ul(
                      tags$a("Sample zipped FASTA file", href = "lacto2.zip", download = "lacto2.zip")
                   ),
@@ -120,6 +120,12 @@ phylogeny_tab <- function(){
             ),
             tabBox(
                title = "Instructions",
+               h4("Perform phylogenetic tree reconstruction"),
+               p(strong("Input file"), "is a multiple sequence alignment. Results from the 'MSA' tab are also accepted.
+                                     If using outputs from the 'MSA' tab, there is an option to use the raw, adjusted, or staggered alignment for tree construction."),
+               p(strong("Parameters"), "vary based on the method."),
+               p(strong("Expected output"), "is the phylogenetic tree in PNG format."),
+               hr(),
                p(
                   "This performs phylogenetic tree reconstruction using ape (Paradis and Strimmer, 2004) and phangorn (Schliep, 2011) R packages
                                       on multiple sequence alignments. Outputs generated from the ",
@@ -131,11 +137,7 @@ phylogeny_tab <- function(){
                          href = "https://pmc.ncbi.nlm.nih.gov/articles/PMC11117635/",
                          target = "_blank"
                   ), "."
-               ),
-               p(strong("Input file"), "is a multiple sequence alignment. Results from the 'MSA' tab are also accepted.
-                                     If using outputs from the 'MSA' tab, there is an option to use the raw, adjusted, or staggered alignment for tree construction."),
-               p(strong("Parameters"), "vary based on the method."),
-               p(strong("Expected output"), "is the phylogenetic tree in PNG format.")
+               )
             ),
             tabBox(
                width = 12,
@@ -196,7 +198,7 @@ barcoding_tab <- function() {
                   ),
                   tabBox(
                      title = "Instructions",
-                     h4("This performs species identification using the R package 'BarcodingR' (Zhang et al., 2016)."),
+                     h4("Perform species identification using the R package 'BarcodingR' (Zhang et al., 2016)"),
                      p(strong("Input file/s:")),
                      tags$ul(
                         tags$li("Aligned reference sequences (.msa, .fasta, .msf, .aln, .faa, .fas)"),
@@ -235,7 +237,7 @@ barcoding_tab <- function() {
                      width = 6,
                      tabPanel(
                         title = "Overview",
-                        h4("This calculates the optimal kmer values using BarcodingR (Zhang et al., 2016)"),
+                        h4("Calculate the optimal kmer values using BarcodingR (Zhang et al., 2016)"),
                         p(strong("Input file/s:"), "Aligned sequences of the reference dataset (FASTA file)"),
                         p(strong("Parameter/s:"), "Length of maximum kmer value"),
                         p(strong("Expected output file:"), "Kmer plot (.png)")
@@ -275,7 +277,7 @@ barcoding_tab <- function() {
                      width = 6,
                      tabPanel(
                         title = "Overview",
-                        h4("This calculate the barcoding gap using BarcodingR (Zhang et al., 2016)"),
+                        h4("Calculate the barcoding gap using BarcodingR (Zhang et al., 2016)"),
                         p(strong("Input file:"), "VCF file"),
                         p(strong("Parameter/s:"), "Distance (raw, K80, euclidean)"),
                         p(strong("Expected output file:"), "Barcoding gap plot (.png)")
@@ -309,7 +311,7 @@ barcoding_tab <- function() {
                   ),
                   tabBox(
                      title = "Instructions",
-                     h4("This evaluate barcodes using species identification success rate criteria (Zhang et al., 2016)"),
+                     h4("Evaluate barcodes using species identification success rate criteria (Zhang et al., 2016)"),
                      p(strong("Input file/s:"), ".csv or .xlsx."),
                      p(strong("Parameter/s:"), "Length of kmer for barcode 1 and barcode 2 (separate)")
                   ),
@@ -333,7 +335,7 @@ barcoding_tab <- function() {
                   ),
                   tabBox(
                      title = "Instructions",
-                     h4("This calculates the Species Membership Value in terms of
+                     h4("Calculate the Species Membership Value in terms of
                                                   Two-Dimensional non-parametric resampling (TDR) using BarcodingR (Zhang et al., 2016)"),
                      p(strong("Input file/s:"), "CSV file with marker and population data."),
                      p(strong("Parameter/s:"), "Bootstrap value for query and reference samples.")

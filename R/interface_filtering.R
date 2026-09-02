@@ -80,7 +80,7 @@ filtering_tab <- function() {
          tabBox(
             tabPanel(
                title = "Instructions",
-               h4("This filters individuals and variants using standard options in PLINK 2.0 (Chang et al., 2015)."),
+               h4("Filter individuals and variants using standard options in PLINK 2.0 (Chang et al., 2015)"),
                p(strong("Input file/s:"), ".vcf, .vcf.gz, .bcf, or PLINK (bed/bim/fam) files"),
                p(strong("Parameter/s:")),
                tags$ul(

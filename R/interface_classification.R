@@ -12,6 +12,10 @@ classification_tab <- function() {
          tabBox(
             tabPanel(
                title = "Instructions",
+               h4("Perform NaÏve Bayes classification"),
+               p(strong("Input file/s:"), "CSV file containing training data or merged training and test data."),
+               p(strong("Expected output file:"), "XLSX file"),
+               hr(),
                p(
                   "This performs a NaÏve Bayes classification and leave-one-out cross-validation
                                   of individuals with SNP data (ancestry- or phenotype- informative) using the ",
@@ -38,9 +42,7 @@ classification_tab <- function() {
                   ),
                   " Multiple resources are available detailing the limiation of each classification method
                                    (Cheung et al., 2016; Barash et al., 2024)."
-               ),
-               p(strong("Input file/s:"), "CSV file containing training data or merged training and test data."),
-               p(strong("Expected output file:"), "XLSX file")
+               )
             ),
             tabPanel(
                title = "Sample Input File",
@@ -48,7 +50,6 @@ classification_tab <- function() {
             ),
             tabPanel(
                title = "Download Sample File",
-               h4("Download Sample File"),
                tags$ul(
                   tags$a("Sample CSV file", href = "sample.csv", download = "sample.csv")
                )

@@ -14,13 +14,13 @@ calculate_naive_bayes <- function(file) {
    
    # training the naive bayes classifier using a leave-one-out cross validation method
    res <- lapply(1:nrow(data_fsnps), function(i) {
-      fit <- naiveBayes(
+      fit <- e1071::naiveBayes(
          y = factor(data_fsnps[-i, label]),
          x = as.matrix(data_fsnps[-i, predictors])
       )
       data.frame(
          label = data_fsnps[i, label],
-         pred = predict(fit, as.matrix(data_fsnps[i, predictors], nrow = 1))
+         pred = e1071::predict(fit, as.matrix(data_fsnps[i, predictors], nrow = 1))
       )
    })
    
@@ -28,7 +28,7 @@ calculate_naive_bayes <- function(file) {
    res <- do.call(rbind, res)
    
    # prepare the confusion matrix from the results
-   confMatrix <- confusionMatrix(res$pred, data_fsnps$Pop, mode = "everything")
+   confMatrix <- caret::confusionMatrix(res$pred, data_fsnps$Pop, mode = "everything")
    
    # convert to table, get pred and ref values
    pred <- as.data.frame(confMatrix$table)

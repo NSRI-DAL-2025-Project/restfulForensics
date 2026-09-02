@@ -3,7 +3,6 @@ forensic_params_tab <- function() {
    # CALCULATION OF FORENSIC PARAMETERS MODULE =======================================================
    tabItem(
       tabName = "ForensicParams",
-      #tabsetPanel(
          tabPanel(
             title = "individual identity SNPs",
             fluidRow(
@@ -38,7 +37,7 @@ forensic_params_tab <- function() {
                      ),
                      p(strong("Input file:"), "CSV or XLSX file in genotype format or as an allele frequency table"),
                      p(strong("Expected output file:"), "CSV file"),
-                     br(),
+                     hr(),
                      p(
                         "Guidelines on statistical calculations for casework: ",
                         tags$a("Guidelines (for STR):",
@@ -66,7 +65,6 @@ forensic_params_tab <- function() {
                   ),
                   tabPanel(
                      title = "Download Sample Files",
-                     h4("Download Sample File"),
                      tags$ul(
                         tags$a("Sample CSV file", href = "sample.csv", download = "sample.csv")
                      ),
@@ -98,7 +96,5 @@ forensic_params_tab <- function() {
                )
             )
          )
-    #  )
    )
-   
 }

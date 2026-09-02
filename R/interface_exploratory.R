@@ -24,8 +24,7 @@ exploratory_tab <- function() {
          tabBox(
             tabPanel(
                title = "Instructions",
-               h4("This runs principal component analysis using the ade4 (Dray and Dufour, 2007) package in R."),
-               br(),
+               h4("Run principal component analysis using the ade4 (Dray and Dufour, 2007) package in R"),
                p(strong("Input file:"), "CSV or XLSX file and color labels (optional)"),
                p(strong("Optional additional input file/s:")),
                tags$ul(
@@ -43,12 +42,11 @@ exploratory_tab <- function() {
             ),
             tabPanel(
                title = "Sample Input Format/s",
-               h4("Example: PCA Input Format"),
+               h4("Example Input Format"),
                tableOutput("examplePCA")
             ),
             tabPanel(
                title = "Download sample files",
-               h4("Sample File"),
                tags$ul(
                   tags$a("Sample file", href = "sample.csv", download = "sample.csv")
                )
