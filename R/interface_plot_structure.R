@@ -51,13 +51,14 @@ plot_structure_runs <- function() {
             tabPanel(
                "Download Sample File",
                tags$ul(
-                  tags$a("Sample STRUCTURE results", href = "structure_results.csv", download = "structure_results.csv")
+                  tags$a("Sample STRUCTURE results", href = "structure_results.zip", download = "structure_results.zip")
                )
             )
          )
       ), 
       fluidRow(
          tabBox(
+            title = "Results",
             width = 12,
             tabPanel(
                "CLUMPP results",

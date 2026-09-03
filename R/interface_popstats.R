@@ -25,7 +25,7 @@ popstats_tab <- function() {
                         )
                      ),
                      tabPanel(
-                        title = "Sample Input Format",
+                        title = "Sample Input Format/s",
                         h4("Example: Population File Format"),
                         DT::dataTableOutput("examplePop_UI")
                      ),
@@ -39,6 +39,7 @@ popstats_tab <- function() {
                ),
                fluidRow(
                   tabBox(
+                     title = "Results",
                      width = 12,
                      tabPanel(
                         title = "1. Private Alleles",
@@ -117,7 +118,7 @@ popstats_tab <- function() {
                         ), " is a free software package for population genetic analysis, calculating intra-population and inter-population metrices (Excoffier & Lischer, 2010).")
                      ),
                      tabPanel(
-                        title = "Sample Input Format",
+                        title = "Sample Input Format/s",
                         DT::dataTableOutput("exampleForArlecore")
                      ),
                      tabPanel(
@@ -130,6 +131,7 @@ popstats_tab <- function() {
                   ),
                   fluidRow(
                      tabBox(
+                        title = "Results",
                         width = 12,
                         tabPanel(
                            title = "Diversity and HWE calculations",

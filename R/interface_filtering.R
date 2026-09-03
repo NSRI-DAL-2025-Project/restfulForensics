@@ -113,6 +113,7 @@ filtering_tab <- function() {
             )
          ),
          tabBox(
+            title = "Results",
             tabPanel(
                title = "PLINK Commands Preview",
                verbatimTextOutput("plinkCommandPreview"),

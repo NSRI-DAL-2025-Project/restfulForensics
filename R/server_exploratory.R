@@ -157,6 +157,11 @@ exploratory_analysis_server <- function(input, output, session, rv) {
       contentType = "image/png"
    )
    
+   output$downloadbarPlot_UI <- renderUI({
+      req(PCAResults())
+      downloadButton("downloadbarPlot", "Download Bar Plot")
+   })
+   
    output$downloadPCAPlot <- downloadHandler(
       filename = function() {
          paste0("pca_plot_", Sys.Date(), ".png")
@@ -176,5 +181,10 @@ exploratory_analysis_server <- function(input, output, session, rv) {
       },
       contentType = "image/png"
    )
+   
+   output$downloadPCAPlot_UI <- renderUI({
+      req(PCAResults())
+      downloadButton("downloadPCAPlot", "Download PCA Plot")
+   })
    
 }

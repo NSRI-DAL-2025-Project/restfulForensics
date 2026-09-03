@@ -51,6 +51,7 @@ msa_tab <- function() {
                )
             ),
             tabBox(
+               title = "Results",
                width = 12,
                tabPanel(
                   title = "Preview of Alignments",
@@ -140,6 +141,7 @@ phylogeny_tab <- function(){
                )
             ),
             tabBox(
+               title = "Results",
                width = 12,
                tabPanel(
                   title = "View Results",
@@ -316,6 +318,7 @@ barcoding_tab <- function() {
                      p(strong("Parameter/s:"), "Length of kmer for barcode 1 and barcode 2 (separate)")
                   ),
                   tabBox(
+                     title = "Results",
                      tableOutput("evalBarcodesResult")
                   )
                )
@@ -341,6 +344,7 @@ barcoding_tab <- function() {
                      p(strong("Parameter/s:"), "Bootstrap value for query and reference samples.")
                   ),
                   tabBox(
+                     title = "Results",
                      tableOutput("tdrValues")
                   )
                )

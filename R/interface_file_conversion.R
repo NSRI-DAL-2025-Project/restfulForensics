@@ -94,6 +94,7 @@ file_conversion_tab <- function() {
             ),
             fluidRow(
                tabBox(
+                  title = "Results",
                   width = 12,
                   tabPanel(
                      title = "Download Results",
@@ -171,9 +172,10 @@ file_conversion_tab <- function() {
             ),
             fluidRow(
                tabBox(
+                  title = "Results",
                   width = 12,
                   tabPanel(
-                     title = "Preview CSV File and Download Output",
+                     title = "Preview File and Download",
                      div(
                         style = "overflow-x: auto;",
                         DT::dataTableOutput("previewTable")
@@ -182,7 +184,7 @@ file_conversion_tab <- function() {
                      uiOutput("downloadCSV_UI")
                   ),
                   tabPanel(
-                     title = "View Population Breakdown",
+                     title = "Population Breakdown",
                      div(
                         style = "overflow-x: auto;",
                         DT::dataTableOutput("previewTableBreakdown")
@@ -232,7 +234,7 @@ file_conversion_tab <- function() {
             ),
             fluidRow(
                tabBox(
-                  title = "Conversion Results",
+                  title = "Results",
                   width = 12,
                   tabPanel(
                      title = "Preview and Download",
@@ -312,7 +314,7 @@ file_conversion_tab <- function() {
             ),
             fluidRow(
                tabBox(
-                  title = "Conversion Result",
+                  title = "Results",
                   width = 12,
                   tabPanel(
                      title = "Preview and Download",
@@ -369,7 +371,7 @@ file_conversion_tab <- function() {
                      )
                   ),
                   tabPanel(
-                     title = "Sample Input Format",
+                     title = "Sample Input Format/s",
                      DT::dataTableOutput("examplePop_STRUI")
                   ),
                   tabPanel(
@@ -380,7 +382,7 @@ file_conversion_tab <- function() {
             ),
             fluidRow(
                tabBox(
-                  title = "Conversion Result",
+                  title = "Results",
                   width = 12,
                   tabPanel(
                      title = "Preview and Download",
@@ -432,7 +434,7 @@ file_conversion_tab <- function() {
                      )
                   ),
                   tabPanel(
-                     title = "Sample Input Format",
+                     title = "Sample Input Format/s",
                      DT::dataTableOutput("exampleForArlecore")
                   ),
                   tabPanel(
@@ -445,7 +447,7 @@ file_conversion_tab <- function() {
             ),
             fluidRow(
                tabBox(
-                  title = "Conversion Result",
+                  title = "Results",
                   width = 12,
                   tabPanel(
                      uiOutput("downloadArpFile_UI")

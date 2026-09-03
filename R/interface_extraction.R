@@ -46,7 +46,7 @@ snp_extraction_tab <- function() {
                      p("Maximum accepted file size: 5GB. It is recommended to split files with sizes larger than 5GB into multiple smaller files.")
                   ),
                   tabPanel(
-                     title = "Sample Input Format",
+                     title = "Sample Input Format/s",
                      h4("rsID Format"),
                      tableOutput("examplersID"),
                      h4("Position Format"),
@@ -67,6 +67,7 @@ snp_extraction_tab <- function() {
             ),
             fluidRow(
                tabBox(
+                  title = "Results",
                   width = 12,
                   tabPanel(
                      title = "Detected rsIDs",
@@ -121,7 +122,7 @@ snp_extraction_tab <- function() {
             ),
             fluidRow(
                tabBox(
-                  title = "Concordance Results",
+                  title = "Results",
                   width = 12,
                   tabPanel(
                      title = "Summary Table",

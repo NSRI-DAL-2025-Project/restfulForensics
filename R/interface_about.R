@@ -6,7 +6,7 @@ about_tab <- function() {
             title = tagList(icon("book-open-reader"), "Background"),
             width = 12,
             # height = "250px",
-            h4("The restFUL forensics toolkit is an output of the project", strong("Development and validation of an automated web-based tool for efficient genomic marker extraction to assist in genomic research.")),
+            h4("The restful forensics toolkit is an output of the project", strong("Development and validation of an automated web-based tool for efficient genomic marker extraction to assist in genomic research.")),
             h4("This is based on the preliminary work on ancestry marker analysis at the DNA Analysis Laboratory, Natural Sciences Research Institute, University of the Philippines Diliman."),
             p(strong("Primary Developer:"), "Leda Celeste Samin (DNA-NSRI-UPD)"),
             p(strong("Project Leader:"), "Nelvie Fatima Jane Soliven (DNA-NSRI-UPD)"),

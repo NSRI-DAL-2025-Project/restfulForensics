@@ -59,13 +59,13 @@ exploratory_tab <- function() {
             width = 12,
             tabPanel(
                title = "Plots",
-               plotly::plotlyOutput("pcaPlot"),
-               downloadButton("downloadPCAPlot", "Download PCA Plot")
+               plotly::plotlyOutput("pcaPlot")#,
+               #downloadButton("downloadPCAPlot", "Download PCA Plot")
             ),
             tabPanel(
                title = "Bar Plot",
                plotOutput("barPlot"),
-               downloadButton("downloadbarPlot", "Download Bar Plot"),
+               uiOutput("downloadbarPlot_UI")
             )
          )
       )

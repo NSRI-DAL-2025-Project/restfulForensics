@@ -45,7 +45,7 @@ structure_runs <- function() {
                )
             ),
             tabPanel(
-               title = "Sample Input File",
+               title = "Sample Input File/s",
                DT::dataTableOutput("examplePop_STR2UI")
             ),
             tabPanel(

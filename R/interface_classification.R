@@ -58,6 +58,7 @@ classification_tab <- function() {
       ),
       fluidRow(
          tabBox(
+            title = "Results",
             width = 12,
             tabPanel(
                title = "Prediction Table",

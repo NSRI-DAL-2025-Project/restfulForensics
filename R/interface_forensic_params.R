@@ -76,6 +76,7 @@ forensic_params_tab <- function() {
             ),
             fluidRow(
                tabBox(
+                  title = "Results",
                   width = 12,
                   tabPanel(
                      title = "Overall Forensic Params",
