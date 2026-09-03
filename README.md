@@ -1,5 +1,7 @@
-<img src = "www/readme/fulllogo.png" width = "300" height = "200">
-# restful forensics
+<p align = "center">
+<img src = "www/readme/fulllogo.png" width = "500" height = "400">
+</p>
+# restful-forensics  
 ```restful forensics``` is an open-source platform for forensic genetics research
 workflow and method validation. This tool is built as a Shiny app in R and
 incorporates commonly used packages, functions, and software for genetic data preparation,
@@ -13,14 +15,14 @@ University of the Philippines Diliman, Quezon City.
 2. [Software Architecture]()  -- similar with features so 
 3. [Features](#Features)  
 4. [Installation]()  
-   a. [Prerequisites](#A.-Prerequisites)
-   b. [Dependency List](#B.-Dependencies)
-   c. [Installation Guide](#C.-Installation-Guide)
-5. [Usage Guide](#Usage-Guide)  
+   a. [Prerequisites](#A.-Prerequisites)  
+   b. [Dependency List](#B.-Dependencies)  
+   c. [Installation Guide](#C.-Installation-Guide)  
+5. [Usage Guide](#Usage-Guide)
 6. [Example Workflow](#Example-Workflow)  
-7. [Limitations](#Limitations)
+7. [Limitations](#Limitations)  
    a. [Known Limitations](#Known-Limitations)   
-   b. [Planned Enhancements](#Planned-Enhancements) 
+   b. [Planned Enhancements](#Planned-Enhancements)  
 8. [Citation Guide](#Citation-Guide)  
 9. [License](#License)  
 
