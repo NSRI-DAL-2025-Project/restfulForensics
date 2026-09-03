@@ -50,6 +50,7 @@ run_structure_analysis <- function(input, output, session, rv) {
       df_gtype <- strataG::df2gtypes(df, ploidy = 2, id.col = 1, strata.col = 2, loc.col = 3)
       
       incProgress(0.4, detail = "Running STRUCTURE analysis...")
+      
       if (isTRUE(input$inferAlpha)){
         sr <- strataG::structureRun(df_gtype,
                                     k.range = input$kMin:input$kMax,
@@ -57,11 +58,14 @@ run_structure_analysis <- function(input, output, session, rv) {
                                     burnin = input$burnin,
                                     numreps = input$numreps,
                                     noadmix = input$noadmix,
+                                    freqscorr = input$freqScore,
                                     inferalpha = input$inferAlpha,
                                     alpha = input$alphaValStructure,
                                     exec = structure_exec,
                                     delete.files = FALSE,
-                                    label = "structureRun"
+                                    label = "structureRun",
+                                    pop.prior = "usepopinfo",
+                                    popflag = 1
         )
       } else {
         sr <- strataG::structureRun(df_gtype,
@@ -70,9 +74,12 @@ run_structure_analysis <- function(input, output, session, rv) {
                                     burnin = input$burnin,
                                     numreps = input$numreps,
                                     noadmix = input$noadmix,
+                                    freqscorr = input$freqScore,
                                     exec = structure_exec,
                                     delete.files = FALSE,
-                                    label = "structureRun"
+                                    label = "structureRun",
+                                    pop.prior = "usepopinfo",
+                                    popflag = 1
         )
       }
       stray_dir <- file.path(getwd(), "structureRun.structureRun")
