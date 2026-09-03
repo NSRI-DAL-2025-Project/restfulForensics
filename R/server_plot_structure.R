@@ -6,7 +6,9 @@ plot_structure_server <- function(input, output, session, rv) {
    strPlot <- reactiveVal(NULL)
    
    observe({
-      file_ready <- !is.null(input$structureFilesZipped) || (isTRUE(input$plotSR))
+      inhouse_res <- !is.null(rv$structureRes) && (isTRUE(input$plotSR))
+      new_files <- (!isTRUE(input$plotSR)) && !is.null(input$structureFilesZipped)
+      file_ready <- inhouse_res || new_files
       shinyjs::toggleState("plotStructureResults", condition = file_ready)
    })
    
