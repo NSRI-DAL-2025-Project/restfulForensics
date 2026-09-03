@@ -1,13 +1,12 @@
 dashboard_tab <- function() {
-   
-   tabItem(
-      tabName = "dashboard",
-      fluidRow(
-         tabBox(
-            title = "Introduction",
-            side = "right",
-            width = 12,
-            h4("restful forensics (Reproducible and Efficient Sequence Toolkit) is a toolkit dedicated for 
+  tabItem(
+    tabName = "dashboard",
+    fluidRow(
+      tabBox(
+        title = "Introduction",
+        side = "right",
+        width = 12,
+        h4("restful forensics (Reproducible and Efficient Sequence Toolkit) is a toolkit dedicated for
             the forensic analysis of single nucleotide polymorphisms (SNPs) and DNA barcodes. It compiles
                           reference population datasets extracted from publicly available databases
                           for direct evaluation of forensic marker panels. It allows the user to
@@ -17,35 +16,34 @@ dashboard_tab <- function() {
                           for population structure analysis (i.e. STRUCTURE), forensic DNA
                           inference/classification using ancestry or phenotype-informative SNPs, and DNA
                           barcoding (i.e. multiple sequencing alignment).")
-         )
-      ),
-      fluidRow(
-         tabBox(
-            title = "Overview of Features",
-            width = 12,
-            tabPanel(
-               "Workplan",
-               # Zoom features adapted from: https://forum.posit.co/t/zoom-in-zoom-out-in-r-shiny-while-working-with-images/183567
-               div(style = "display:flex; justify-content: space-evenly; margin-bottom:10px;"),
-               actionButton("smaller_workplan", "-"),
-               actionButton("bigger_workplan", "+"),
-               div(
-                  style = "overflow:auto; text-align:center;",
-                  uiOutput("workplanImg")
-               )
-            ),
-            tabPanel(
-               title = "File Conversion Options",
-               div(style = "display:flex; justify-content: space-evenly; margin-bottom:10px;"),
-               actionButton("smaller_fc", "-"),
-               actionButton("bigger_fc", "+"),
-               div(
-                  style = "overflow:auto; text-align:center;",
-                  uiOutput("fileConvTable")
-               )
-            )
-         )
       )
-   )
-   
+    ),
+    fluidRow(
+      tabBox(
+        title = "Overview of Features",
+        width = 12,
+        tabPanel(
+          "Workplan",
+          # Zoom features adapted from: https://forum.posit.co/t/zoom-in-zoom-out-in-r-shiny-while-working-with-images/183567
+          div(style = "display:flex; justify-content: space-evenly; margin-bottom:10px;"),
+          actionButton("smaller_workplan", "-"),
+          actionButton("bigger_workplan", "+"),
+          div(
+            style = "overflow:auto; text-align:center;",
+            uiOutput("workplanImg")
+          )
+        ),
+        tabPanel(
+          title = "File Conversion Options",
+          div(style = "display:flex; justify-content: space-evenly; margin-bottom:10px;"),
+          actionButton("smaller_fc", "-"),
+          actionButton("bigger_fc", "+"),
+          div(
+            style = "overflow:auto; text-align:center;",
+            uiOutput("fileConvTable")
+          )
+        )
+      )
+    )
+  )
 }
