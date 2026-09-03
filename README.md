@@ -36,7 +36,7 @@ for a unified workflow.
 ## Features
 restful forensics has 9 distinct modules.  
 
-Module 1: File Conversion  
+*Module 1: File Conversion*  
 | # | Feature | Description | Related Tools |
 | :---: | :--- | :--- | :---: |
 | 1 | Convert Files | Interconvert single or zipped VCF, BCF, CSV, or PLINK-associated files | PLINK 2.0 |
@@ -46,45 +46,45 @@ Module 1: File Conversion
 | 5 | To STRUCTURE file | Converts .csv or .xlsx files to a STRUCTURE v2.3.4-compatible file | |
 | 6 | To Arlequin file | Converts .csv or .xlsx files to an Arlequin-compatible file | |
 
-Module 2: SNP Data Extraction
+*Module 2: SNP Data Extraction*
 | # | Feature | Description | Related Tools |
 | :---: | :--- | :--- | :---: |
 | 1 | SNP Data Extraction | Extract specific SNP calls from genome-wide data (VCF or PLINK associated files) based on rsID or position | PLINK 2.0 |
 | 2 | Concordance Analysis | Check concordance of calls between datasets with overlapping samples | |
 
-Module 3: Filtering
+*Module 3: Filtering*
 | # | Feature | Description | Related Tools |
 | :---: | :--- | :--- | :---: |
 | 1 | Filtering | Perform quality control/filtering of samples and variants using standard options in PLINK 2.0 | PLINK 2.0 |
 
-Module 4: Exploratory Analysis
+*Module 4: Exploratory Analysis*
 | # | Feature | Description | Related Tools |
 | :---: | :--- | :--- | :---: |
 | 1 | Exploratory Analysis | Perform Principal Components Analysis using multivariate SNP data | Ade4 |
 
-Module 5: Population Summary Statistics
+*Module 5: Population Summary Statistics*
 | # | Feature | Description | Related Tools |
 | :---: | :--- | :--- | :---: |
 | 1 | R-based Calculations | |
 | 2 | Arlecore | | Arlecore |
 
-Module 6: Population Structure Analysis
+*Module 6: Population Structure Analysis*
 | # | Feature | Description | Related Tools |
 | :---: | :--- | :--- | :---: |
 | 1 | Run STRUCTURE v2.3.4 | | STRUCTURE v2.3.4 |
-| 2 | Plot STRUCTURE results | CLUMPP |
+| 2 | Plot STRUCTURE results | | CLUMPP |
 
-Module 7: Forensic Parameters
+*Module 7: Forensic Parameters*
 | # | Feature | Description | Related Tools |
 | :---: | :--- | :--- | :---: |
 | 1 | 
 
-Module 8: Forensic DNA Inference
+*Module 8: Forensic DNA Inference*
 | # | Feature | Description | Related Tools |
 | :---: | :--- | :--- | :---: |
 | 1 | 
 
-Module 9: DNA Barcoding
+*Module 9: DNA Barcoding*
 | # | Feature | Description | Related Tools |
 | :---: | :--- | :--- | :---: |
 | 1 | Multiple Sequence Alignment | | |
@@ -120,6 +120,14 @@ shiny::runApp()
 ## Limitations
 
 ### Known Limitations
+*To STRUCTURE file submodule*
+- No option to add extra information/columns
+
+*To Arlequin file submodule*
+- Datatype is automatically set to "Standard"
+- No option to specify genetic/group structure
+
+
 
 ### Planned Enhancements
 

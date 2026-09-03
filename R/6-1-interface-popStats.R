@@ -109,7 +109,7 @@ popstats_tab <- function() {
                 h4("Calculate common population statistics using Arlecore (terminal-based version of Arlequin)"),
                 p(strong("Input file/s:"), "CSV file containing marker and population data.
                                               Each row should represent multi-locus data for an individual sample."),
-                p(strong("Expected output file/s: .xlsx and .ars file")),
+                p(strong("Expected output file/s:"), ".xlsx and .ars file"),
                 hr(),
                 p(tags$a("Arlequin",
                   href = "https://cmpg.unibe.ch/software/arlequin35/",
