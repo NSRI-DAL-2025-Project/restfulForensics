@@ -19,7 +19,7 @@ calculate_naive_bayes <- function(file) {
     )
     data.frame(
       label = data_fsnps[i, label],
-      pred = e1071::predict(fit, as.matrix(data_fsnps[i, predictors], nrow = 1))
+      pred = predict(fit, as.matrix(data_fsnps[i, predictors], nrow = 1))
     )
   })
 
