@@ -13,91 +13,241 @@
       <nav class="sidebar">
          <h2>Documentation</h2>
          <ul class="nav-list">
-            <li class="nav-item"><a href="#introduction" class="nav-link">Introduction</a></li>
-            <li class="nav-item"><a href="#installation" class="nav-link">Installation</a></li>
+            <li class="nav-item"><a href="#introduction" class="nav-link">1 Introduction</a></li>
+            <li class="nav-item"><a href="#installation" class="nav-link">2 Installation</a></li>
             <li>
                <a href="#features">Features</a> <!-- Parent-->
                <ul>
                   <!-- File conversion module -->
                   <li>
-                     <a href="#fileconversion">File Conversion</a>
+                     <a href="#fileconversion">3 File Conversion</a>
                      <ul>
-                        <li><a href="#convertfiles">Convert Files</a></li>
-                        <li><a href="#addmeta">Add Metadata</a></li>
-                        <li><a href="#widensnp">Widen SNP calls</a></li>
-                        <li><a href="#tosnipper">To SNIPPER file</a></li>
-                        <li><a href="#tostructure">To STRUCTURE file</a></li>
-                        <li><a href="#toarlequin">To Arlequin file</a></li>
+                        <li><a href="#convertfiles">3.1 Convert Files</a></li>
+                        <li><a href="#addmeta">3.2 Add Metadata</a></li>
+                        <li><a href="#widensnp">3.3 Widen SNP calls</a></li>
+                        <li><a href="#tosnipper">3.4 To SNIPPER file</a></li>
+                        <li><a href="#tostructure">3.5 To STRUCTURE file</a></li>
+                        <li><a href="#toarlequin">3.6 To Arlequin file</a></li>
                      </ul>
                   </li>
                   <!-- SNP Data Extraction module -->
                   <li>
-                     <a href="#dataextraction">SNP Data Extraction</a>
+                     <a href="#dataextraction">4 SNP Data Extraction</a>
                      <ul>
-                        <li><a href="#extractiontab">SNP Extraction</a></li>
-                        <li><a href="#concordancetab">Concordance Analysis</a></li>
+                        <li><a href="#extractiontab">4.1 SNP Extraction</a></li>
+                        <li><a href="#concordancetab">4.2 Concordance Analysis</a></li>
                      </ul>
                   </li>
                   <!-- Filtering module -->
-                  <li><a href="#filtering">Filtering</a></li>
+                  <li><a href="#filtering">5 Filtering</a></li>
                   <!-- Exploratory analysis module -->
-                  <li><a href="#exploratory">Exploratory Analysis</a></li>
+                  <li><a href="#exploratory">6 Exploratory Analysis</a></li>
                   <!-- Population summary statistics module -->
                   <li>
-                     <a href="#popsummarystat">Population Summary Statistics</a>
+                     <a href="#popsummarystat">7 Population Summary Statistics</a>
                      <ul>
-                         <li><a href="#rbasedpopstat">R-based Calculations</a></li>
-                        <li><a href="#arlecore">Arlecore</a></li>
+                         <li><a href="#rbasedpopstat">7.1 R-based Calculations</a></li>
+                        <li><a href="#arlecore">7.2 Arlecore</a></li>
                      </ul>
                   </li>
                   <!-- Population structure analysis module -->
                   <li>
-                     <a href="#popstructure">Population Structure Analysis</a>
+                     <a href="#popstructure">8 Population Structure Analysis</a>
                      <ul>
-                         <li><a href="#runstructure">Run STRUCTURE v2.3.4</a></li>
-                        <li><a href="#plotstructure">Plot STRUCTURE results</a></li>
+                         <li><a href="#runstructure">8.1 Run STRUCTURE v2.3.4</a></li>
+                        <li><a href="#plotstructure">8.2 Plot STRUCTURE results</a></li>
                      </ul>
                   </li>
                   <!-- Forensic Parameters module -->
-                  <li><a href="#forensicparams">Forensic Parameters</a></li>
+                  <li><a href="#forensicparams">9 Forensic Parameters</a></li>
                   <!-- Forensic Inferencec module -->
-                  <li><a href="#forensicinference">Forensic DNA Inference</a></li>
+                  <li><a href="#forensicinference">10 Forensic DNA Inference</a></li>
                   <!-- DNA Barcoding module -->
                   <li>
-                     <a href="#dnabarcoding">DNA Barcoding</a>
+                     <a href="#dnabarcoding">11 DNA Barcoding</a>
                      <ul>
-                         <li><a href="#msa">Multiple Sequence Alignment</a></li>
-                        <li><a href="#phylogenetictree">Phylogenetic Tree Analysis</a></li>
-                        <li><a href="#barcoding">Barcoding</a></li>
+                         <li><a href="#msa">11.1 Multiple Sequence Alignment</a></li>
+                        <li><a href="#phylogenetictree">11.2 Phylogenetic Tree Analysis</a></li>
+                        <li><a href="#barcoding">11.3 Barcoding</a></li>
                      </ul>
                   </li>
-                  
-                  
                </ul>
             </li>
-            
-            <li class="nav-item"><a href="#features" class="nav-link">Features</a></li>
-            <li class="nav-item"><a href="#usage" class="nav-link">Usage Guide</a></li>
-            <li class="nav-item"><a href="#workflow" class="nav-link">Workflows</a></li>
-            <li class="nav-item"><a href="#limitations" class="nav-link">Limitations</a></li>
+            <li class="nav-item"><a href="#usage" class="nav-link">12 Usage Guide</a></li>
+            <li class="nav-item"><a href="#workflow" class="nav-link">13 Workflows</a></li>
+            <li class="nav-item"><a href="#limitations" class="nav-link">14 Limitations</a></li>
             <li class="nav-item"><a href="#citation" class="nav-link">Citation</a></li>
          </ul>
       </nav>
       
       <main class="main-content">
          <section id="introduction" class="section">
-            <h2 class="section-title">Introduction</h2>
-            <p>restful forensics is an open-source platform for forensic genetics research workflow and method validation. This tool is built as a Shiny app in R and incorporates commonly used packages, functions, and software for genetic data preparation, pre-processing, and exploratory data analysis.</p>
+            <h1 class="section-title">1 Introduction</h1>
+            <p>restful forensics is an open-source Windows-based platform for forensic genetics research workflow and method validation. This tool is built as a Shiny app in R and incorporates commonly used packages, functions, and software for genetic data preparation, pre-processing, and exploratory data analysis.</p>
             <p>restful forensics is developed at the Natural Sciences Research Institute, University of the Philippines Diliman, Quezon City.</p>
          </section>
          
          <section id="installation" class="section">
-            <h2 class="section-title">Installation</h2>
-            <h3 class="section-title">Prerequisites</h3>
-            <p></p>
+            <h1 class="section-title">2 Installation</h1>
+            <h2 class="section-title">2.1 Prerequisites</h2>
+            <ul>
+               <li><a href="https://cran.r-project.org/bin/windows/base/">R (at least version 4.6.1)</a></li>
+               <li><a href="https://cran.r-project.org/bin/windows/Rtools/">Rtools (should be compatible with R versions above 4.5.0)</a></li>
+               <li><a href="https://docs.posit.co/ide/user/#rstudio-ide-oss-downloads">Integrated Development Environment such as RStudio</a></li>
+            </ul>
+            <h2 class="section-title">Dependency List</h2>
+            <p>The package dependencies are listed in <code>R/packages.R</code> and installed/loaded upon running <code>source("install.R")</code></p>
+            <h2 class="section-title">Installation Guide</h2>
+            <p>Clone the github repository by performing <code>git clone https://github.com/NSRI-DAL-2025-Project/restfulForensics.git</code> in the RStudio terminal. 
+            If using Windows command prompt terminal, ensure that git is installed in the system. To install git, follow these 
+            <a href="https://git-scm.com/install/">instructions</a>.
+            </p>
+            <p>After cloning the repository, download the dependencies by entering <code>source("install.R")</code> within the console and run restful forensics
+            using <code>shiny::runApp()</code>.
+            </p>
          </section>
          
+         <!-- Features section -->
+         <section id="features" class="section">
+            <h1 class="section-title">3 Features</h1>
+            <p>This section dives into the modules and submodules of restful forensics. 
+            The input/output files are defined as well as the parameters (if applicable) 
+            and expected outputs files.</p>
+         </section>
+         
+         <!-- File Conversion module -->
+         <section id="fileconversion" class="section">
+            <h2 class="section-title">3 File Conversion</h2>
+         </section>
+         
+         <section id="convertfiles" class="section">
+            <h3 class="section-title">3.1 Convert Files</h3>
+            <p>This submodule converts common genetic files to other common data structures.
+            The maximume file size accepted is 5GB. It is recommended to split files with sizes larger than 5GB into multiple smaller files.
+            </p>
+            <div class="container">
+               <div class="image-column">
+                  <img src="readme/convert-files.png" alt="">
+               </div>
+            </div>
+            
+            <div class="text-column">
+               <p><strong>Input file</strong>: VCF, BCF, or PLINK (bed/bim/fam) files. Zipped VCF or BCF files are also accepted.</p>
+               <p>If converting a CSV file with sample, population, and genotype information to VCF, 
+               an additional file is required. The additional file should contain marker information with the following columns:
+               <ul>
+                  <li><p>[1] rsID or marker name</p></li>
+                  <li><p>[2] chromosome number (integer only, eg. '1' instead of 'chr1'</p></li>
+                  <li><p>[3] base pair position, should match the build of the data (GRCh37 or GRCh38)</p></li>
+                  <li><p>[4] genetic distance</p></li>
+                  <li><p>[5] reference allele</p></li>
+                  <li><p>[6] alternate allele</p></li>
+               </ul>
+               The <a href="https://besjournals.onlinelibrary.wiley.com/doi/10.1111/2041-210x.70204">tidypopgen</a> R package
+               is used for the CSV to VCF conversion while <a href="https://pubmed.ncbi.nlm.nih.gov/25722852/">PLINK 2.0</a> 
+               is used for the rest.
+               </p>
+               <p><strong>Expected output file</strong>: VCF or PLINK-associated files.</p>
+            </div>
+         </section>
+         
+         <section id="addmeta" class="section">
+            <h3 class="section-title">3.2 Add Metadata</h3>
+            <p>This submodule merges sample and genotype information with user-defined metadata columns.
+            The sample names in the input file should match the samples names in the metadata file for successful matching.
+            If samples come from different populations, there is an additional option to calculate the number of individuals per pouplation.
+            </p>
+            <p><strong>Input file</strong>:
+            <ul>
+               <li><p>Genotype data in PLINK 1.9/2.0, VCF (or vcf.gz), and BCF file formats. Zipped VCF/BCF files are accepted.</p></li>
+               <li><p>Metadata of the samples</p></li>
+            </ul>
+            </p>
+            <p><strong>Expected output file/s</strong>: CSV file containing sample, metadata, and genotype information
+            <ul>
+               <li><p>CSV file containing sample, metadata, and genotype information</p></li>
+               <li><p>CSV file containing the number of samples per population (if samples belong to >1 population)</p></li>
+               <li><p>Text file containing the list of samples from the genotype file with no match in the metadata</p></li>
+            </ul>
+            </p>
+            <p>For missing samples, double check if the sample IDs are the same for the genotype file and the metadata file.</p>
+         </section>
+         
+         <section id="widensnp" class="section">
+            <h3 class="section-title">3.3 Widen SNP calls</h3>
+            <p>This submodule converts zipped .xlsx or .csv files containing long SNP data calls into a wide format.
+            A single .xlsx/.csv file is expected to contain samples from a specific population where columns [1] contain
+            sample ID, [2] marker ID or rsIDs, and [3] haplotype. Given diploid samples, two rows are expected for a
+            single individual per SNP/marker.
+            </p>
+            <p><strong>Input file</strong>: Compressed file (.zip/.tar)</p>
+            <p><strong>Expected output file</strong>: Single CSV file</p>
+         </section>
+         
+         <section id="tosnipper" class="section">
+            <h3 class="section-title">3.4 To SNIPPER file</h3>
+            <p>This submodule converts a genotype file with sample and two levels of population information (population and superpopulation) 
+            to a SNIPPER compatible file for individual classification using ancestry-informative markers.
+            </p>
+            <p>The <a href="https://mathgene.usc.es/snipper3/index.php">SNIPPER</a>
+            app suite is a web portal for classification of individuals into phenotypes and biogeographical ancestry.
+            It is developed and hosted by Universidade de Santiago de Compostella and also has a built-in file
+            generation option with SNIPPER 4.</p>
+            <p><strong>Input file</strong>: CSV/XLSX file with sample identification and two levels of population assignment, 
+            eg. Philippines (country-specific assignment) and Southeast Asia (higher pop assignment). 
+            If input file only contains sample and genotype information, an additional file containing population metadata
+            is required.
+            </p>
+            <p><strong>Expected output file</strong>: Excel (.xlsx) file compatible with SNIPPER 3.5 for ancestry-based individual classification</p>
+         </section>
+         
+         <section id="tostructure" class="section">
+            <h3 class="section-title">3.5 To STRUCTURE file</h3>
+            <p>This submodule converts a genotype file with sample and population information to a standard STRUCTURE-compatible
+            input file. The STRUCTURE software has label requirements that is internally handled during conversion by the app.
+            </p>
+            <p>
+               <a href="https://web.stanford.edu/group/pritchardlab/structure.html">STRUCTURE</a> is a free software used for
+               investigating population structure using multi-locus genotype data (Stephen and Donnelly, 2000; Falush et al., 2003; Falush et al., 2007; Hubisz et al., 2009).
+            </p>
+            <p><strong>Input file</strong>: CSV/XLSX file with marker and population data</p>
+            <p><strong>Parameters/Options</strong>: Choose between 'Linux' or 'Windows' since the format of the STRUCTURE input file 
+            depends on the operating system where the STRUCTURE software is installed</p>
+            <p><strong>Expected output file</strong>: Structure (.str) file and the revised labels</p>
+            <p>
+               There is also a dedicated module within restful forensics that <a href="#runstructure">runs STRUCTURE</a>
+                automatically using the CSV/XLSX file containing genotype and population data directly. 
+            </p>
+         </section>
+         
+         <section id="toarlequin" class="section">
+            <h3 class="section-title">3.6 To Arlequin file</h3>
+            <p>This submodule converts a genotype file with sample and population information to a standard Arlequin-compatible
+            input file.</p>
+            <p>
+               <a href="https://cmpg.unibe.ch/software/arlequin35/">Arlequin</a> is a free software package for population genetic analysis,
+               calculating intra-population and inter-population metrics (Excoffier & Lischer, 2010).
+            </p>
+            <p><strong>Input file</strong>: CSV/XLSX file containing genotype and population information</p>
+            <p><strong>Parameters</strong>:
+             <ul>
+               <li><p>(True/False) Genotypic/Haplotypic data</p></li>
+               <li><p>(True/False) Known Gametic Phase</p></li>
+               <li><p>(True/False) Co-dominant data</p></li>
+               <li><p>(Character) Symbol separating alleles. Default is '/'.</p></li>
+            </ul>
+            </p>
+            <p>
+               There is a dedicated module within restful forensics that runs the terminal version of Arlequin, 
+               <a href="#arlecore">Arlecore</a> and uses the standard CSV/XLSX file with genotype and population data.
+            </p>
+         </section>
+         
+         
+   
       </main>
       
    </body>
+   
+
       

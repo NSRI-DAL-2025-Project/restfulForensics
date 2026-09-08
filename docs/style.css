@@ -131,20 +131,27 @@ body {
    border-bottom: none;
 }
 
-h1 {
+h1.section-title {
    font-size: 32px;
    font-weight: 600;
    margin-bottom: 16px;
 }
 
 h2.section-title {
+   font-size: 28px;
+   font-weight: 600;
+   margin-bottom: 16px;
+   padding-bottom: 12px;
+}
+
+h3.section-title {
    font-size: 24px;
    font-weight: 600;
    margin-bottom: 16px;
    padding-bottom: 8px;
 }
 
-h3.section-title {
+h4.section-title {
    font-size: 20px;
    font-weight: 600;
    margin-bottom: 16px;
@@ -181,8 +188,36 @@ pre code {
    border-radius: 0;
 }
 
+.container {
+   display: flex;
+   align-items: center;
+   gap: 30px;
+   max-width: 1200px;
+   margin: 0 auto;
+   padding: 20px;
+}
 
+.image-column {
+   flex: 1;
+}
 
+.image-column img {
+   width: 100%;
+   height: auto;
+   display: block;
+   border-radius: 8px;
+}
+
+.text-column {
+   flex: 1;
+}
+
+@media (max-width: 768px) {
+   .container {
+      flex-direction: column;
+      text-align: center;
+   }
+}
 
 
 
