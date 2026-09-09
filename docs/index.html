@@ -545,8 +545,8 @@
             whether the profile per marker are homozygous or heterozygous and sets the values of p and q.
             The genotype frequencies are then calculated where:
             <ul>
-               <li><p>Homozygous: p^2 and/or q^2</p></li>
-               <li><p>Heterozygous: 2pq</p></li>
+               <li><p>Homozygous: $p^2$ and/or $q^2$</p></li>
+               <li><p>Heterozygous: $2pq$</p></li>
             </ul>
             </p>
             <p>The calculation returns the genotype frequencies for each marker per population</p>
@@ -556,14 +556,14 @@
                The random match probability (RMP), also known as matching probability or probability of match, 
                estimates the probability of observing two identical genotypes in a population. 
                It is calculated by adding the squared frequencies per loci:
-               $$\sum_{i}^N(P_{i})^2$$
+               $$\sum_{i}^n(P_{i})^2$$
             </p>
             
             <h4 class="section-title">Power of Discrimination</h4>
             <p>
                The power of discrimination (PD) is the probability that two random individuals will
                have different profiles given a set of loci.
-               $$\PD=1-PM$$
+               $$PD=1-PM$$
             </p>
             
             <h4 class="section-title">Polymorphism Information Content</h4>
@@ -572,9 +572,29 @@
                to detect polymorphisms among individuals in a population
                <a href="https://www.sciencedirect.com/science/article/pii/S0378111919308340">(Serrote et al., 2020)</a>.
                The higher PIC value, the more effective the genetic marker is at discriminating between
-               two unrelated individuals.
+               two unrelated individuals. This measure is calculated using:
+               $$ PIC=1-sum_{i=1}^n p_i^2 - sum_{i=1}^{n-1} sum_{j=i+1}^n 2p_i^2p_j^2 $$
+               where $p_i$ and $p_j$ are frequencies of alleles $i$ and $j$.
+               This is interpreted as:
+               $$PIC=1-(p^2+q^2) - 2*(p^2*q^2)$$
             </p>
-
+            
+            <h4 class="section-title">Power of Exclusion</h4>
+            <p>
+               The power of exclusion (PE) is the "fraction of individuals having a DNA profile that
+               is different from that of a selected individual in a typical paternity case" 
+               <a href="https://www.promega.com/-/media/files/resources/profiles-in-dna/103/statistical-analysis-of-str-data.pdf">
+                  (Huston, 1998)
+               </a>.
+               $$ PE=h^2(1-2hH^2) $$
+            </p>
+            
+            <h4 class="section-title">Typical Paternity Index</h4>
+            <p>
+               The typical paternity index (TPI) is an odds ratio that estimates how likely an 
+               individual is the biological father compared to a random individual.
+               $$ TPI=\frac{1}{2H}$$
+            </p>
             
          </section>
          
@@ -660,7 +680,7 @@
                <section id="barcodinggap" class="section">
                   <h4 class="section-title">9.3.3 Calculate Barcoding Gap</h4>
                   <p>This submodule calculates the DNA barcoding gap.</p>
-                  <p><strong></strong>Input file</strong>:  Aligned reference sequences (.msa, .fasta, .msf, .aln, .faa, .fas, .mase, .phylip)</p>
+                  <p><strong>Input file</strong>:  Aligned reference sequences (.msa, .fasta, .msf, .aln, .faa, .fas, .mase, .phylip)</p>
                   <p><strong>Parameter/Option</strong>: Distance for the calculation of the gap</p>
                   <p><strong>Expected output</strong>: A table of summary statistics of genetic distance</p>
                </section>
