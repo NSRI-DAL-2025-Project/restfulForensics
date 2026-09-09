@@ -68,7 +68,15 @@
                      <ul>
                          <li><a href="#msa">11.1 Multiple Sequence Alignment</a></li>
                         <li><a href="#phylogenetictree">11.2 Phylogenetic Tree Analysis</a></li>
-                        <li><a href="#barcoding">11.3 Barcoding</a></li>
+                        <li><a href="#barcoding">11.3 Barcoding</a>
+                        <ul>
+                           <li><a href="#speciesidentification">11.3.1 Species Identification</a></li>
+                           <li><a href="#optimizekmer">11.3.2 Optimize kmer values</a></li>
+                           <li><a href="#barcodinggap">11.3.3 Calculate Barcoding Gap</a></li>
+                           <li><a href="#evaluatebarcodes">11.3.4 Evaluate Barcodes</a></li>
+                           <li><a href="#calcspeciesmembership">11.3.5 Calculate Species Membership Value</a></li>
+                        </ul>
+                        </li>
                      </ul>
                   </li>
                </ul>
@@ -117,10 +125,11 @@
               <!-- File Conversion module -->
          <section id="fileconversion" class="section">
             <h2 class="section-title">3 File Conversion</h2>
-                 <section id="convertfiles" class="section">
+            
+            <section id="convertfiles" class="section">
             <h3 class="section-title">3.1 Convert Files</h3>
             <p>This submodule converts common genetic files to other common data structures.
-            The maximume file size accepted is 5GB. It is recommended to split files with sizes larger than 5GB into multiple smaller files.
+            The maximum file size accepted is 5GB. It is recommended to split files with sizes larger than 5GB into multiple smaller files.
             </p>
             <div class="container">
                <div class="image-column">
@@ -243,16 +252,353 @@
          <!-- End of file conv section -->
          </section>
          
+         <!-- SNP Data Extraction module -->
+         <section id="dataextraction" class="section">
+            <h2 class="section-title">4 SNP Data Extraction</h2>
+            
+            <section id="extractiontab" class="section">
+               <h3 class="section-title">4.1 SNP Extraction</h3>
+               <p>This submodule extracts markers by their reference SNP cluster ID (rsID) 
+               or base pair position using PLINK 2.0. restful forensics first validates whether rsIDs are present 
+               in the input file before proceeding with the extraction. 
+               If rsIDs are present in the file, users have the option to extract markers by either rsIDs 
+               or their GRCh37/38 base pair position. Otherwise, extraction can only be done using bp positions.
+               If there are no rsIDs and markers are extracted using their bp position, there is an additional option
+               for restful forensics to add rsIDs on the output file.
+               </p>
+               <p><strong>Input file</strong>:
+               <ul>
+                  <li><p>Data files (.vcf, .vcf.gz, .bcf, or plink files)</p></li>
+                  <li><p>(If rsIDs are present) Marker names/rsIDs can be typed manually or uploaded as a .txt/.csv/.xlsx file</p></li>
+                  <li><p>(If no rsIDs) A file with the following columns: [1] rsID/marker name, [2] chromosome number, and [3] base pair position</p></li>
+               </ul>
+               </p>
+               <p><strong>Expected output file</strong>: VCF file</p>
+               <p> The maximum file size accepted is 5GB. It is recommended to split files with sizes larger than 5GB into multiple smaller files 
+               or process on a per chromosome basis.</p>
+            </section>
+            
+            <section id="concordancetab" class="section">
+               <h3 class="section-title">4.2 Concordance Analysis</h3>
+               <p>This submodule performs concordance analysis between files or datasets with overlapping samples,
+               usually profiles generated using different sequencing technologies.
+               </p>
+               <p><strong>Input file</strong>: Two files (.csv or .xlsx) with the same formatting and at least one column with similar contents (eg. sample IDs)</p>
+               <p><strong>Parameter/Option</strong>: Phased genotypes. Check if TRUE. Markers will be directly compared
+               and the order of alleles is considered during matching.</p>
+               <p><strong>Expected outputs</strong>:
+               <ul>
+                  <li><p>Concordance table (.xlsx file)</p></li>
+                  <li><p>Concordance plot (.png file)</p></li>
+               </ul>
+               </p>
+            </section>
+         <!-- End of SNP Data Extraction Module -->
+         </section>
+         
+         <section id="filtering" class="section">
+            <h2 class="section-title">5 Filtering</h2>
+            <p>
+               This module filters individuals and variants using standard filtering options available in
+               <a href="https://www.cog-genomics.org/plink/2.0/">PLINK 2.0</a>. If the input is a VCF file,
+               there is an option to generate a depth of coverage plot using the 
+               <a href=" https://CRAN.R-project.org/package=vcfR">vcfR R package</a>.
+            </p>
+            <p><strong>Input file</strong>: Data files (.vcf, .vcf.gz, .bcf, or plink files)</p>
+            <p><strong>Standard Parameters</strong>:
+            <ul>
+               <li><p>'--mind' to filter individuals based on their missing genotype rate</p></li>
+               <li><p>'--geno' to filter variants based on their missing genotype rate</p></li>
+               <li><p>'--qual-threshold' to exclude variants below the quality score threshold</p></li>
+               <li><p>'--hwe' to exclude variants deviating from the hwe threshold</p></li>
+               <li><p>'--indep-pairwise' to prune variants in approx. linkage equilibrium</p></li>
+               <li><p>'--king-cutoff' to exclude a member of a pair with a certain level of inferred relationship</p></li>
+            </ul>
+            At least one filtering option should be set. Additional PLINK flags can also be manually typed with restful forensics
+            supporting the upload of at most two supplemental files that will be matched to the first two typed flags. 
+            See 
+            <a href="https://www.cog-genomics.org/plink/2.0/">PLINK 2.0 Documentation</a> for more options.
+            </p>
+            <p><strong>Expected outputs</strong>:
+            <ul>
+               <li><p>VCF file</p></li>
+               <li><p>Depth of Coverage plot (.png file)</p></li>
+            </ul>
+            </p>
+         </section>
+         
+         <section id="exploratory" class="section">
+            <h2 class="section-title">6 Exploratory Analysis</h2>
+            <p>
+               This module performs exploratory analysis by running principal component analysis using the 
+               <a href="https://CRAN.R-project.org/package=ade4">ade4 R package</a>. 
+               Population information is required. The analysis will still be performed even when all samples
+               belong to the same population.
+            </p>
+            <p><strong>Input file</strong>: CSV/XLSX file containing genotype and population information</p>
+            <p><strong>Standard Parameters</strong>: If using custom colors and labels, a file (.csv/.xlsx) should
+            be provided with the columns as follows: [1] population name, [2] color (name or hex code), and [3] 
+            <a href="https://ggplot2.tidyverse.org/reference/scale_shape.html">shape</a>. 
+            The principal component for the x-axis and y-axis can also be set.
+            </p>
+            <p><strong>Expected outputs</strong>: PCA plots (.png file)</p>
+         </section>
+         
+         <!-- Population Summary Statistics module -->
+         <section id="popsummarystat" class="section">
+            <h2 class="section-title">7 Population Summary Statistics</h2>
+            
+            <section id="rbasedpopstat" class="section">
+               <h3 class="section-title">7.1 R-based Calculations</h3>
+               <p>This submodule calculates common population statistics using R-based packages. 
+               The included statistics are private alleles, mean allelic richness, heterozygosities, 
+               inbreeding coefficient, allele frequencies, and HWE and FST calculations. The R packages used are 
+               <a href="https://CRAN.R-project.org/package=poppr">poppr</a>,
+               <a href="https://CRAN.R-project.org/package=hierfstat">hierfstat</a>, and
+               <a href="https://CRAN.R-project.org/package=adegenet">adegenet</a>.
+               </p>
+               <p><strong>Input file</strong>: CSV/XLSX file containing genotype and population information</p>
+               <p><strong>Expected output file</strong>:
+               <ul>
+                  <li><p>All resulting tables (.xlsx file)</p></li>
+                  <li><p>PNG plots (heterozygosity and FST plots)</p></li>
+               </ul>
+               </p>
+            </section>
+            
+            <section id="arlecore" class="section">
+               <h3 class="section-title">7.2 Arlecore</h3>
+               <p>This submodule calculates common population statistics using Arlecore v3.5.2, the console version
+               of the <a href="https://cmpg.unibe.ch/software/arlequin35/Arl35Downloads.html">Arlequin</a> software.
+               There is only a fixed set of calculations in Arlecore included in this module: Diversity and HWE, 
+               expected heterozygosities, FST matrix, coancestry coefficient, and loci in linkage disequilibrium.
+               </p>
+               <p><strong>Input file</strong>: CSV/XLSX file containing genotype and population information</p>
+               <p><strong>Parameter/Option</strong>: Check if to perform linkage disequilibrium test. Default is False.</p>
+               <p><strong>Expected outputs</strong>:
+               <ul>
+                  <li><p>Arlequin input file (.arp file)</p></li>
+                  <li><p>All resulting tables (.xlsx file)</p></li>
+                  <li><p>PNG plots (heterozygosity, FST matrix, and Coancestry coefficient matrix)</p></li>
+               </ul>
+               </p>
+            </section>
+         <!-- End of Population Summary Statistics Module -->
+         </section>
+         
+         <!-- Population Structure Analysis module -->
+         <section id="popstructure" class="section">
+            <h2 class="section-title">8 Population Structure Analysis</h2>
+            
+            <section id="runstructure" class="section">
+               <h3 class="section-title">8.1 Run STRUCTURE v2.3.4</h3>
+               <p>This submodule analyzes genetic data and investigates population genetic structure using the
+               <a href="https://web.stanford.edu/group/pritchardlab/structure.html">STRUCTURE v2.3.4</a> software 
+               integrated in R by the <a href="https://github.com/EricArcher/strataG/tree/master/R">strataG</a> R
+               package.
+               </p>
+               <p><strong>Input file</strong>: CSV/XLSX file containing genotype and population information</p>
+               <p><strong>Parameter/Options</strong>: The adjustable parameters are limited and fixed to the standard 
+               K range, replicates per K, burn-in, and MCMC reps after burnin. Users can set whether to use admixture 
+               or no admixture model, set the alpha value, and use of the correlated frequencies model.
+               </p>
+               <p><strong>Expected output files</strong>:
+               <ul>
+                  <li><p>Input (.str) file</p></li>
+                  <li><p>Structure files</p></li>
+                  <li><p>Zipped Q matrices</p></li>
+                  <li><p>Individual (.ind) files</p></li>
+               </ul>
+               </p>
+               <p>
+                  The STRUCTURE files, qmatrices, and/or indiv files can be used directly for other programs such
+                  as <a href="https://github.com/ramachandran-lab/pong">pong</a> and <a href="https://rosenberglab.stanford.edu/clumpp.html">CLUMPP</a>. 
+                  restful forensics also integrates the CLUMPP program under the <a href="#plotstructure">Plot Structure tab</a>.
+               </p>
+            </section>
+            
+            <section id="plotstructure" class="section">
+               <h3 class="section-title">8.2 Plot STRUCTURE results</h3>
+               <p>This submodule directly accepts the structure result files as an uploaded zipped file or use the results from the
+               <a href="#runstructure">Run Structure tab</a> for plotting using the CLUMPP program.
+               </p>
+               <p><strong>Input file</strong>: Zipped file containing structure results or use generated output from Run Structure tab</p>
+               <p><strong>Parameter/Option</strong>: 
+               <ul>
+                  <li><p>Target K value or the K value to be plotted</p></li>
+                  <li><p>Algorithm to be used for aligning clusters</p></li>
+                  <li><p>Pairwise matrix similarity statistic to be used</p></li>
+                  <li><p>Order of runs to be tested. If 'all', test all possible input orders of runs while
+                  'ran.order' tests only a specified number of random inputs</p></li>
+                  <li><p>If using 'ran.order', the number of input orders of runs for testing should be specified.</p></li>
+                  <li><p>Option to permute the clusters according to the cluster order.</p></li>
+               </ul>
+               </p>
+               <p><strong>Expected outputs</strong>: PNG plot</p>
+            </section>
+         <!-- End of Population Structure Analysis Module -->
+         </section>
+         
+         <section id="forensicparams" class="section">
+            <h2 class="section-title">9 Forensic Parameters</h2>
+            <p>
+               This module calculates standard forensic parameters for individual identification using markers such as
+               individual identity SNPs and are statistics which are commonly used for STR data. 
+               These are based on the standard 
+               <a href="https://agouy.github.io/straf_book/forensic-parameters.html">guides</a> for calculation and 
+               <a href="https://dfs.dc.gov/sites/default/files/dc/sites/dfs/page_content/attachments/FBS22%20-%20STR%20Statistical%20Calculations%20Guidelines.pdf">interpretations</a>,
+               but adjusted to be specific for SNPs as performed by 
+               <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC1686077/">Botstein et al (1980)</a> and 
+               <a href="https://www.nature.com/articles/s41598-025-33012-8">Kim et al. (2025)</a>.
+            </p>
+            <p><strong>Input file</strong>: CSV/XLSX file containing genotype and population information or an allele frequency table 
+            where the first column contains the marker and allele information (eg. rs101.A) while the succeeding columns 
+            are the frequencies per population.</p>
+            <p><strong>Parameters/Options</strong>: 
+            <ul>
+               <li><p>Use 5/2n rule in the calculation of genotype frequencies</p></li>
+               <li><p>Upload an individual's marker profile for identification</p></li>
+            </ul>
+            </p>
+            <p><strong>Expected output</strong>: Tabled results in an excel (.xlsx) file</p>
+         </section>
+         
+         <section id="forensicinference" class="section">
+            <h2 class="section-title">10 Forensic DNA Inference</h2>
+            <p>
+               This module performs a NaÏve Bayes classification and leave-one-out cross-validation of individuals
+               with SNP data (ancestry or phenotype-informative) using the 
+               <a href="https://CRAN.R-project.org/package=e1071">e1071</a> and 
+               <a href="https://CRAN.R-project.org/package=caret">caret</a> R packages. It can be used for rapid
+               assessment of marker sets and training datasets. However, for a more comprehensive forensic DNA inference 
+               of an individual, it is recommended to use this submodule in conjunction with 
+               <a href="#exploratory">PCA</a>, <a href="#runstructure">STRUCTURE</a>, and 
+               <a href="https://mathgene.usc.es/snipper3/index.php">SNIPPER</a>.
+            </p>
+            <p><strong>Input file</strong>: CSV/XLSX file containing genotype and population information</p>
+            <p><strong>Expected output</strong>: Tabled results in an excel (.xlsx) file</p>
+         </section>
+         
+         <!-- DNA Barcoding module -->
+         <section id="dnabarcoding" class="section">
+            <h2 class="section-title">11 DNA Barcoding</h2>
+            
+            <section id="msa" class="section">
+               <h3 class="section-title">11.1 Multiple Sequence Alignment</h3>
+               <p>This submodule performs global multiple sequence alignment on DNA sequences using the 
+               <a href="https://www.bioconductor.org/packages/release/bioc/html/msa.html">msa</a> R package.
+               </p>
+               <p><strong>Input file</strong>: Zipped FASTA files</p>
+               <p><strong>Parameters</strong>: Option to use ClustalW, ClustalOmega, or MUSCLE</p>
+               <p><strong>Expected output</strong>:
+               <ul>
+                  <li><p>PDF of alignment</p></li>
+                  <li><p>FASTA file of the alignment</p></li>
+                  The alignment is adjusted using the
+                  <a href="https://bioconductor.org/packages/release/bioc/html/DECIPHER.html">DECIPHER</a> R package 
+                  and are provided as an additional option for download. The output can also be used directly as input 
+                  for the <a href="#phylogenetictree">Phylogenetic Tree Analysis</a> tab.
+               </ul>
+               </p>
+            </section>
+            
+            <section id="phylogenetictree" class="section">
+               <h3 class="section-title">11.2 Phylogenetic Tree Analysis</h3>
+               <p>This submodule constructs a phylogenetic tree based on a multiple sequence alignment.
+               </p>
+               <p><strong>Input file</strong>: MSA file or MSA result from the 
+               <a href="#msa">MSA tab</a>.</p>
+               <p><strong>Parameters</strong>: The parameters required depend on the method chosen for tree construction.
+               <ul>
+                  <li><p>Neighbor-Joining: substitution models, seed value, and outgroup (optional)</p></li>
+                  <li><p>UPGMA: substitution models, seed value, and outgroup (optional)</p></li>
+                  <li><p>Parsimony:  seed value and outgroup (optional)</p></li>
+                  <li><p>Maximum Likelihood: bootstrap value, seed value, and outgroup (optional)</p></li>
+               </ul>
+               </p>
+               <p><strong>Expected output file</strong>: Phylogenetic tree (.png file)</p>
+            </section>
+            
+            
+            <section id="barcoding" class="section">
+               <h3 class="section-title">11.3 Barcoding11.3 Barcoding</h3>
+               <p>This section uses the
+               <a href="https://CRAN.R-project.org/package=BarcodingR">BarcodingR</a> R package.
+               </p>
+               
+               <section id="speciesidentification" class="section">
+                  <h4 class="section-title">11.3.1 Species Identification</h4>
+                  <p>This submodule performs species identification using protein-coding barcodes using
+                  different methods.
+                  </p>
+                  <p><strong>Input files</strong>: Aligned query and reference sequences (.msa, .fasta, .msf, .aln, .faa, .fas)</p>
+                  <p><strong>Parameters/Options</strong>: Method for training model and/or infer species membership</p>
+                  <p><strong>Expected output</strong>: Table of results</p>
+               </section>
+               
+               <section id="optimizekmer" class="section">
+                  <h4 class="section-title">11.3.2 Optimize kmer values</h4>
+                  <p>This submodule calculates the optimal kmer length for maximal species identification success rate.</p>
+                  <p><strong>Input file</strong>: Aligned reference sequences (.msa, .fasta, .msf, .aln, .faa, .fas, .mase, .phylip)</p>
+                  <p><strong>Parameter/Option</strong>: Maximum Kmer value</p>
+                  <p><strong>Expected output</strong>: PNG plot</p>
+               </section>
+            
+               <section id="barcodinggap" class="section">
+                  <h4 class="section-title">11.3.3 Calculate Barcoding Gap</h4>
+                  <p>This submodule calculates the DNA barcoding gap.</p>
+                  <p><strong></strong>Input file</strong>:  Aligned reference sequences (.msa, .fasta, .msf, .aln, .faa, .fas, .mase, .phylip)</p>
+                  <p><strong>Parameter/Option</strong>: Distance for the calculation of the gap</p>
+                  <p><strong>Expected output</strong>: A table of summary statistics of genetic distance</p>
+               </section>
+               
+               <section id="evaluatebarcodes" class="section">
+                  <h4 class="section-title">11.3.4 Evaluate Barcodes</h4>
+                  <p>This submodule evaluates two barcodes using the species identification success rate criteria.</p>
+                  <p><strong>Input file</strong>: Two DNA barcode sequences</p>
+                  <p><strong>Parameter/Option</strong>: Kmer length for barcodes 1 and 2</p>
+                  <p><strong>Expected output</strong>: Table listing the p values</p>
+               </section>
+               
+               <section id="calcspeciesmembership" class="section">
+                  <h4 class="section-title">11.3.5 Calculate Species Membership Value</h4>
+                  <p>This module calculates the TDR value for a set of query and reference species. 
+                  TDR or Two-Dimensional Non-Parametric Resampling is a statistical method that evaluates uncertainties
+                  in multi-variable or structure datasets and is a robust method in assessing species membership 
+                  <a href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0050831"> (Jin et al., 2012)</a>
+                  Values range from [0,1] where 0 indicates extremely weak species membership and values close to 1 
+                  indicate strong species membership.</p>
+                  <p><strong>Input files</strong>: DNA sequences from a single query species and set of reference samples</p>
+                  <p><strong>Parameter/Options</strong>: Bootstrap values for the query and reference samples</p>
+                  <p><strong>Expected output</strong>: Numeric value representing the TDR values for each query against the species</p>
+               </section>
+               
+            </section>
+         <!-- End of DNA Barcoding Module -->
+         </section>
          
          <!-- End of Features section -->
          </section>
          
-       
+         <section id="usage" class="section">
+            <h1 class="section-title">12 Usage Guide</h1>
+         </section>
          
+         <section id="workflow" class="section">
+            <h1 class="section-title">13 Workflows</h1>
+         </section>
    
+         <section id="limitations" class="section">
+            <h1 class="section-title">14 Limitations</h1>
+         </section>
+         
+         <section id="citation" class="section">
+            <h1 class="section-title">Citation</h1>
+         </section>
+         
       </main>
       
    </body>
-   
+
 
       
