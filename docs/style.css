@@ -213,7 +213,7 @@ pre code {
 }
 
 @media (max-width: 768px) {
-   .container {
+   .columns-container {
       flex-direction: column;
       text-align: center;
    }
