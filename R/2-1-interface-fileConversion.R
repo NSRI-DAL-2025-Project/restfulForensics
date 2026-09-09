@@ -219,8 +219,8 @@ file_conversion_tab <- function() {
             tabPanel(
               title = "Instructions",
               h4("Convert zipped files (.xlsx/.csv) containing SNP calls in long format into a single .xslx file in a wide format"),
-              p(strong("Input file/s:"), "Compressed folder (.zip or .tar) containing .xlsx files."),
-              p(strong("Expected output file/s:"), "Single CSV file (merged .xlsx files).")
+              p(strong("Input file/s:"), "Compressed folder (.zip or .tar) containing .csv/.xlsx files."),
+              p(strong("Expected output file/s:"), "Single CSV file (merged .csv/.xlsx files).")
             ),
             tabPanel(
               title = "Sample Input Format/s",
@@ -273,7 +273,7 @@ file_conversion_tab <- function() {
               h4("Convert file into a SNIPPER-compatible input file for individual classification using ancestry-informative markers"),
               p(strong("Input file/s:"), "CSV or Excel (.xlsx) file"),
               p(strong("Parameter/s:"), "(optional) Target population name for classification."),
-              p(strong("Expected output file/s:"), ".xlsx"),
+              p(strong("Expected output file/s:"), "Excel (.xslx) file"),
               hr(),
               p(
                 "The ",
@@ -420,8 +420,8 @@ file_conversion_tab <- function() {
             tabPanel(
               title = "Instructions",
               h4("Convert genotype and population data (.xlsx/.csv) to Arlequin-compatible file"),
-              p(strong("Input file/s:"), "CSV file containing marker and population data.
-                                              Each row should represent multi-locus data for an individual sample."),
+              p(strong("Input file/s:"), "File (.csv/.xlsx) containing marker and population data.
+                                            Each row should represent multi-locus data for an individual sample."),
               p(strong("Expected output file/s: .ars file")),
               hr(),
               p(tags$a("Arlequin",

@@ -24,18 +24,15 @@ exploratory_tab <- function() {
           title = "Instructions",
           h4("Run principal component analysis using the ade4 (Dray and Dufour, 2007) package in R"),
           p(strong("Input file:"), "CSV or XLSX file and color labels (optional)"),
-          p(strong("Optional additional input file/s:")),
-          tags$ul(
-            tags$li("PCA labels (.txt with one population per line)"),
-            tags$li("Color palette (.txt with one hex code per line)"),
-            tags$li(
-              "Desired point shapes (.txt with one number/name indicating the",
-              tags$a("shapes",
+          p(strong("Optional additional input file/s:"),
+            "If using custom visualizations, upload a file (.csv/.xlsx) with columns containing 
+            [1] Unique population name/s that matches the input file,
+            [2] Color for a given population (name or hex code), and
+            [3] Desired point", tags$a("shapes",
                 href = "https://ggplot2.tidyverse.org/reference/scale_shape.html",
                 target = "_blank"
-              ), " per line)"
-            )
-          ),
+              ), "for a given population"
+            ),
           p(strong("Expected output file:"), "PNG plots")
         ),
         tabPanel(

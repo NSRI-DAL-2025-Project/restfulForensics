@@ -97,8 +97,13 @@
       <main class="main-content">
          <section id="introduction" class="section">
             <h1 class="section-title">I Introduction</h1>
-            <p>restful forensics is an open-source Windows-based platform for forensic genetics research workflow and method validation. This tool is built as a Shiny app in R and incorporates commonly used packages, functions, and software for genetic data preparation, pre-processing, and exploratory data analysis.</p>
-            <p>restful forensics is developed at the Natural Sciences Research Institute, University of the Philippines Diliman, Quezon City.</p>
+            <p>restful forensics is an open-source Windows-based platform for 
+            forensic genetics research workflow and method validation. This tool 
+            is built as a Shiny app in R and incorporates commonly used packages, 
+            functions, and software for genetic data preparation, pre-processing, 
+            and exploratory data analysis.</p>
+            <p>restful forensics is developed at the Natural Sciences Research Institute, 
+            University of the Philippines Diliman, Quezon City.</p>
          </section>
          
          <section id="installation" class="section">
@@ -107,10 +112,12 @@
             <section id="prerequisites" class="section">
                <h2 class="section-title">Prerequisites</h2>
                <ul>
-                  <li><p><a href="https://cran.r-project.org/bin/windows/base/">R</a> (at least version 4.6.1)</p></li>
+                  <li><p><a href="https://cran.r-project.org/bin/windows/base/">R</a> 
+                  (at least version 4.6.1)</p></li>
                   <li><p><a href="https://cran.r-project.org/bin/windows/Rtools/">Rtools</a> 
                      (should be compatible with R versions above 4.5.0)</p></li>
-                  <li><p>Integrated Development Environment such as  <a href="https://docs.posit.co/ide/user/#rstudio-ide-oss-downloads">RStudio</a></p></li>
+                  <li><p>Integrated Development Environment such as  
+                  <a href="https://docs.posit.co/ide/user/#rstudio-ide-oss-downloads">RStudio</a></p></li>
                </ul>
             </section>
             
@@ -144,68 +151,79 @@
             The input/output files are defined as well as the parameters (if applicable) 
             and expected outputs files.</p>
             
-              <!-- File Conversion module -->
+         <!-- File Conversion module -->
          <section id="fileconversion" class="section">
             <h2 class="section-title">3 File Conversion</h2>
             
             <section id="convertfiles" class="section">
             <h3 class="section-title">3.1 Convert Files</h3>
             <p>This submodule converts common genetic files to other common data structures.
-            The maximum file size accepted is 5GB. It is recommended to split files with sizes larger than 5GB into multiple smaller files.
+            The maximum file size accepted is 5GB. It is recommended to split files with 
+            sizes larger than 5GB into multiple smaller files.
             </p>
-            <div class="container">
+            <div class="columns-container">
                <div class="image-column">
-                  <img src="./www/readme/convert-files.png" alt="">
+                  <img src="./www/readme/convert-files.png" alt="File Interconversion Options">
+               </div>
+               
+               <div class="text-column">
+                  <p><strong>Input file</strong>: VCF, BCF, or PLINK (bed/bim/fam) files. 
+                  Zipped VCF or BCF files are also accepted.</p>
+                  <p>If converting a CSV file with sample, population, and genotype 
+                  information to VCF, an additional file is required. The additional 
+                  file should contain marker information with the following columns:
+                  <ul>
+                     <li><p>[1] rsID or marker name</p></li>
+                     <li><p>[2] chromosome number (integer only, eg. '1' instead of 'chr1'</p></li>
+                     <li><p>[3] base pair position, should match the build of the data (GRCh37 or GRCh38)</p></li>
+                     <li><p>[4] genetic distance</p></li>
+                     <li><p>[5] reference allele</p></li>
+                     <li><p>[6] alternate allele</p></li>
+                  </ul>
+                  The <a href="https://besjournals.onlinelibrary.wiley.com/doi/10.1111/2041-210x.70204">tidypopgen</a> R package
+                  is used for the CSV to VCF conversion while <a href="https://pubmed.ncbi.nlm.nih.gov/25722852/">PLINK 2.0</a> 
+                  is used for the rest.
+                  </p> 
+                  <p><strong>Expected output file</strong>: VCF or PLINK-associated files.</p>
                </div>
             </div>
-            
-            <div class="text-column">
-               <p><strong>Input file</strong>: VCF, BCF, or PLINK (bed/bim/fam) files. Zipped VCF or BCF files are also accepted.</p>
-               <p>If converting a CSV file with sample, population, and genotype information to VCF, 
-               an additional file is required. The additional file should contain marker information with the following columns:
-               <ul>
-                  <li><p>[1] rsID or marker name</p></li>
-                  <li><p>[2] chromosome number (integer only, eg. '1' instead of 'chr1'</p></li>
-                  <li><p>[3] base pair position, should match the build of the data (GRCh37 or GRCh38)</p></li>
-                  <li><p>[4] genetic distance</p></li>
-                  <li><p>[5] reference allele</p></li>
-                  <li><p>[6] alternate allele</p></li>
-               </ul>
-               The <a href="https://besjournals.onlinelibrary.wiley.com/doi/10.1111/2041-210x.70204">tidypopgen</a> R package
-               is used for the CSV to VCF conversion while <a href="https://pubmed.ncbi.nlm.nih.gov/25722852/">PLINK 2.0</a> 
-               is used for the rest.
-               </p> 
-               <p><strong>Expected output file</strong>: VCF or PLINK-associated files.</p>
-            </div>
+
          </section>
          
          <section id="addmeta" class="section">
             <h3 class="section-title">3.2 Add Metadata</h3>
             <p>This submodule merges sample and genotype information with user-defined metadata columns.
-            The sample names in the input file should match the samples names in the metadata file for successful matching.
-            If samples come from different populations, there is an additional option to calculate the number of individuals per pouplation.
+            The sample names in the input file should match the samples names in the 
+            metadata file for successful matching. If samples come from different populations, 
+            there is an additional option to calculate the number of individuals per pouplation.
             </p>
             <p><strong>Input file</strong>:
             <ul>
-               <li><p>Genotype data in PLINK 1.9/2.0, VCF (or vcf.gz), and BCF file formats. Zipped VCF/BCF files are accepted.</p></li>
+               <li><p>Genotype data in PLINK 1.9/2.0, VCF (or vcf.gz), and BCF file formats. 
+               Zipped VCF/BCF files are accepted.</p></li>
                <li><p>Metadata of the samples</p></li>
             </ul>
             </p>
-            <p><strong>Expected output file/s</strong>: CSV file containing sample, metadata, and genotype information
+            <p><strong>Expected output file/s</strong>: CSV file containing sample, metadata, 
+            and genotype information
             <ul>
                <li><p>CSV file containing sample, metadata, and genotype information</p></li>
-               <li><p>CSV file containing the number of samples per population (if samples belong to >1 population)</p></li>
-               <li><p>Text file containing the list of samples from the genotype file with no match in the metadata</p></li>
+               <li><p>CSV file containing the number of samples per population (if samples 
+               belong to >1 population)</p></li>
+               <li><p>Text file containing the list of samples from the genotype file with 
+               no match in the metadata</p></li>
             </ul>
             </p>
-            <p>For missing samples, double check if the sample IDs are the same for the genotype file and the metadata file.</p>
+            <p>For missing samples, double check if the sample IDs are the same for the 
+            genotype file and the metadata file.</p>
          </section>
          
          <section id="widensnp" class="section">
             <h3 class="section-title">3.3 Widen SNP calls</h3>
-            <p>This submodule converts zipped .xlsx or .csv files containing long SNP data calls into a wide format.
-            A single .xlsx/.csv file is expected to contain samples from a specific population where columns [1] contain
-            sample ID, [2] marker ID or rsIDs, and [3] haplotype. Given diploid samples, two rows are expected for a
+            <p>This submodule converts zipped .xlsx or .csv files containing long SNP data 
+            calls into a wide format. A single .xlsx/.csv file is expected to contain samples 
+            from a specific population where columns [1] contain sample ID, [2] marker ID 
+            or rsIDs, and [3] haplotype. Given diploid samples, two rows are expected for a
             single individual per SNP/marker.
             </p>
             <p><strong>Input file</strong>: Compressed file (.zip/.tar)</p>
@@ -214,33 +232,41 @@
          
          <section id="tosnipper" class="section">
             <h3 class="section-title">3.4 To SNIPPER file</h3>
-            <p>This submodule converts a genotype file with sample and two levels of population information (population and superpopulation) 
-            to a SNIPPER compatible file for individual classification using ancestry-informative markers.
+            <p>This submodule converts a genotype file with sample and two levels of 
+            population information (population and superpopulation) 
+            to a SNIPPER compatible file for individual classification using 
+            ancestry-informative markers.
             </p>
             <p>The <a href="https://mathgene.usc.es/snipper3/index.php">SNIPPER</a>
-            app suite is a web portal for classification of individuals into phenotypes and biogeographical ancestry.
-            It is developed and hosted by Universidade de Santiago de Compostella and also has a built-in file
-            generation option with SNIPPER 4.</p>
-            <p><strong>Input file</strong>: CSV/XLSX file with sample identification and two levels of population assignment, 
-            eg. Philippines (country-specific assignment) and Southeast Asia (higher pop assignment). 
-            If input file only contains sample and genotype information, an additional file containing population metadata
+            app suite is a web portal for classification of individuals into phenotypes and 
+            biogeographical ancestry. It is developed and hosted by Universidade de Santiago 
+            de Compostella and also has a built-in file generation option with SNIPPER 4.</p>
+            <p><strong>Input file</strong>: CSV/XLSX file with sample identification and two 
+            levels of population assignment, eg. Philippines (country-specific assignment) 
+            and Southeast Asia (higher pop assignment). If input file only contains sample 
+            and genotype information, an additional file containing population metadata
             is required.
             </p>
-            <p><strong>Expected output file</strong>: Excel (.xlsx) file compatible with SNIPPER 3.5 for ancestry-based individual classification</p>
+            <p><strong>Expected output file</strong>: Excel (.xlsx) file compatible with 
+            SNIPPER 3.5 for ancestry-based individual classification</p>
          </section>
          
          <section id="tostructure" class="section">
             <h3 class="section-title">3.5 To STRUCTURE file</h3>
-            <p>This submodule converts a genotype file with sample and population information to a standard STRUCTURE-compatible
-            input file. The STRUCTURE software has label requirements that is internally handled during conversion by the app.
+            <p>This submodule converts a genotype file with sample and population information 
+            to a standard STRUCTURE-compatible input file. The STRUCTURE software has label 
+            requirements that is internally handled during conversion by the app.
             </p>
             <p>
-               <a href="https://web.stanford.edu/group/pritchardlab/structure.html">STRUCTURE</a> is a free software used for
-               investigating population structure using multi-locus genotype data (Stephen and Donnelly, 2000; Falush et al., 2003; Falush et al., 2007; Hubisz et al., 2009).
+               <a href="https://web.stanford.edu/group/pritchardlab/structure.html">STRUCTURE</a> 
+               is a free software used for investigating population structure using multi-locus 
+               genotype data (Stephen and Donnelly, 2000; Falush et al., 2003; Falush et al., 2007; 
+               Hubisz et al., 2009).
             </p>
             <p><strong>Input file</strong>: CSV/XLSX file with marker and population data</p>
-            <p><strong>Parameters/Options</strong>: Choose between 'Linux' or 'Windows' since the format of the STRUCTURE input file 
-            depends on the operating system where the STRUCTURE software is installed</p>
+            <p><strong>Parameters/Options</strong>: Choose between 'Linux' or 'Windows' since the 
+            format of the STRUCTURE input file depends on the operating system where the STRUCTURE 
+            software is installed</p>
             <p><strong>Expected output file</strong>: Structure (.str) file and the revised labels</p>
             <p>
                There is also a dedicated module within restful forensics that <a href="#runstructure">runs STRUCTURE</a>
@@ -250,11 +276,12 @@
          
          <section id="toarlequin" class="section">
             <h3 class="section-title">3.6 To Arlequin file</h3>
-            <p>This submodule converts a genotype file with sample and population information to a standard Arlequin-compatible
-            input file.</p>
+            <p>This submodule converts a genotype file with sample and population information to a 
+            standard Arlequin-compatible input file.</p>
             <p>
-               <a href="https://cmpg.unibe.ch/software/arlequin35/">Arlequin</a> is a free software package for population genetic analysis,
-               calculating intra-population and inter-population metrics (Excoffier & Lischer, 2010).
+               <a href="https://cmpg.unibe.ch/software/arlequin35/">Arlequin</a> is a free software 
+               package for population genetic analysis, calculating intra-population and inter-population 
+               metrics (Excoffier & Lischer, 2010).
             </p>
             <p><strong>Input file</strong>: CSV/XLSX file containing genotype and population information</p>
             <p><strong>Parameters</strong>:
@@ -281,23 +308,25 @@
             <section id="extractiontab" class="section">
                <h3 class="section-title">4.1 SNP Extraction</h3>
                <p>This submodule extracts markers by their reference SNP cluster ID (rsID) 
-               or base pair position using PLINK 2.0. restful forensics first validates whether rsIDs are present 
-               in the input file before proceeding with the extraction. 
+               or base pair position using PLINK 2.0. restful forensics first validates whether 
+               rsIDs are present in the input file before proceeding with the extraction. 
                If rsIDs are present in the file, users have the option to extract markers by either rsIDs 
                or their GRCh37/38 base pair position. Otherwise, extraction can only be done using bp positions.
-               If there are no rsIDs and markers are extracted using their bp position, there is an additional option
-               for restful forensics to add rsIDs on the output file.
+               If there are no rsIDs and markers are extracted using their bp position, there is an additional 
+               option for restful forensics to add rsIDs on the output file.
                </p>
                <p><strong>Input file</strong>:
                <ul>
                   <li><p>Data files (.vcf, .vcf.gz, .bcf, or plink files)</p></li>
-                  <li><p>(If rsIDs are present) Marker names/rsIDs can be typed manually or uploaded as a .txt/.csv/.xlsx file</p></li>
-                  <li><p>(If no rsIDs) A file with the following columns: [1] rsID/marker name, [2] chromosome number, and [3] base pair position</p></li>
+                  <li><p>(If rsIDs are present) Marker names/rsIDs can be typed manually or uploaded 
+                  as a .txt/.csv/.xlsx file</p></li>
+                  <li><p>(If no rsIDs) A file with the following columns: [1] rsID/marker name, 
+                  [2] chromosome number, and [3] base pair position</p></li>
                </ul>
                </p>
                <p><strong>Expected output file</strong>: VCF file</p>
-               <p> The maximum file size accepted is 5GB. It is recommended to split files with sizes larger than 5GB into multiple smaller files 
-               or process on a per chromosome basis.</p>
+               <p> The maximum file size accepted is 5GB. It is recommended to split files with sizes 
+               larger than 5GB into multiple smaller files or process on a per chromosome basis.</p>
             </section>
             
             <section id="concordancetab" class="section">
@@ -305,9 +334,10 @@
                <p>This submodule performs concordance analysis between files or datasets with overlapping samples,
                usually profiles generated using different sequencing technologies.
                </p>
-               <p><strong>Input file</strong>: Two files (.csv or .xlsx) with the same formatting and at least one column with similar contents (eg. sample IDs)</p>
-               <p><strong>Parameter/Option</strong>: Phased genotypes. Check if TRUE. Markers will be directly compared
-               and the order of alleles is considered during matching.</p>
+               <p><strong>Input file</strong>: Two files (.csv or .xlsx) with the same formatting and at 
+               least one column with similar contents (eg. sample IDs)</p>
+               <p><strong>Parameter/Option</strong>: Phased genotypes. Check if TRUE. 
+               Markers will be directly compared and the order of alleles is considered during matching.</p>
                <p><strong>Expected outputs</strong>:
                <ul>
                   <li><p>Concordance table (.xlsx file)</p></li>
@@ -336,9 +366,9 @@
                <li><p>'--indep-pairwise' to prune variants in approx. linkage equilibrium</p></li>
                <li><p>'--king-cutoff' to exclude a member of a pair with a certain level of inferred relationship</p></li>
             </ul>
-            At least one filtering option should be set. Additional PLINK flags can also be manually typed with restful forensics
-            supporting the upload of at most two supplemental files that will be matched to the first two typed flags. 
-            See 
+            At least one filtering option should be set. Additional PLINK flags can also be manually 
+            typed with restful forensics supporting the upload of at most two supplemental files 
+            that will be matched to the first two typed flags. See 
             <a href="https://www.cog-genomics.org/plink/2.0/">PLINK 2.0 Documentation</a> for more options.
             </p>
             <p><strong>Expected outputs</strong>:
@@ -434,17 +464,21 @@
                </p>
                <p>
                   The STRUCTURE files, qmatrices, and/or indiv files can be used directly for other programs such
-                  as <a href="https://github.com/ramachandran-lab/pong">pong</a> and <a href="https://rosenberglab.stanford.edu/clumpp.html">CLUMPP</a>. 
-                  restful forensics also integrates the CLUMPP program under the <a href="#plotstructure">Plot Structure tab</a>.
+                  as <a href="https://github.com/ramachandran-lab/pong">pong</a> and 
+                  <a href="https://rosenberglab.stanford.edu/clumpp.html">CLUMPP</a>. 
+                  restful forensics also integrates the CLUMPP program under the 
+                  <a href="#plotstructure">Plot Structure tab</a>.
                </p>
             </section>
             
             <section id="plotstructure" class="section">
                <h3 class="section-title">8.2 Plot STRUCTURE results</h3>
-               <p>This submodule directly accepts the structure result files as an uploaded zipped file or use the results from the
+               <p>This submodule directly accepts the structure result files as an uploaded zipped file or 
+               use the results from the
                <a href="#runstructure">Run Structure tab</a> for plotting using the CLUMPP program.
                </p>
-               <p><strong>Input file</strong>: Zipped file containing structure results or use generated output from Run Structure tab</p>
+               <p><strong>Input file</strong>: Zipped file containing structure results or use generated 
+               output from Run Structure tab</p>
                <p><strong>Parameter/Option</strong>: 
                <ul>
                   <li><p>Target K value or the K value to be plotted</p></li>
@@ -464,18 +498,18 @@
          <section id="forensicparams" class="section">
             <h2 class="section-title">9 Forensic Parameters</h2>
             <p>
-               This module calculates standard forensic parameters for individual identification using markers such as
-               individual identity SNPs and are statistics which are commonly used for STR data. 
-               These are based on the standard 
+               This module calculates standard forensic parameters for individual identification 
+               using markers such as individual identity SNPs and are statistics which are commonly 
+               used for STR data. These are based on the standard 
                <a href="https://agouy.github.io/straf_book/forensic-parameters.html">guides</a> for calculation and 
                <a href="https://dfs.dc.gov/sites/default/files/dc/sites/dfs/page_content/attachments/FBS22%20-%20STR%20Statistical%20Calculations%20Guidelines.pdf">interpretations</a>,
                but adjusted to be specific for SNPs as performed by 
                <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC1686077/">Botstein et al (1980)</a> and 
                <a href="https://www.nature.com/articles/s41598-025-33012-8">Kim et al. (2025)</a>.
             </p>
-            <p><strong>Input file</strong>: CSV/XLSX file containing genotype and population information or an allele frequency table 
-            where the first column contains the marker and allele information (eg. rs101.A) while the succeeding columns 
-            are the frequencies per population.</p>
+            <p><strong>Input file</strong>: CSV/XLSX file containing genotype and population information or 
+            an allele frequency table where the first column contains the marker and allele information 
+            (eg. rs101.A) while the succeeding columns are the frequencies per population.</p>
             <p><strong>Parameters/Options</strong>: 
             <ul>
                <li><p>Use 5/2n rule in the calculation of genotype frequencies</p></li>
@@ -492,8 +526,8 @@
                with SNP data (ancestry or phenotype-informative) using the 
                <a href="https://CRAN.R-project.org/package=e1071">e1071</a> and 
                <a href="https://CRAN.R-project.org/package=caret">caret</a> R packages. It can be used for rapid
-               assessment of marker sets and training datasets. However, for a more comprehensive forensic DNA inference 
-               of an individual, it is recommended to use this submodule in conjunction with 
+               assessment of marker sets and training datasets. However, for a more comprehensive forensic DNA 
+               inference of an individual, it is recommended to use this submodule in conjunction with 
                <a href="#exploratory">PCA</a>, <a href="#runstructure">STRUCTURE</a>, and 
                <a href="https://mathgene.usc.es/snipper3/index.php">SNIPPER</a>.
             </p>
@@ -540,7 +574,6 @@
                </p>
                <p><strong>Expected output file</strong>: Phylogenetic tree (.png file)</p>
             </section>
-            
             
             <section id="barcoding" class="section">
                <h3 class="section-title">11.3 Barcoding11.3 Barcoding</h3>

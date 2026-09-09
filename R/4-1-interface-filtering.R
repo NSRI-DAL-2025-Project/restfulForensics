@@ -64,7 +64,9 @@ filtering_tab <- function() {
           numericInput("ldR2", "r2 Threshold", value = 0.2, min = 0, max = 1, step = 0.01)
         ),
         checkboxInput("cutoffKing", "Filter based on Relationships (--king-cutoff)", value = FALSE),
-        helpText("Exclude a member of a pair with a kinship coefficient greater than the threshold. Use '0.354' to screen for monozygotic twins and duplicate amples, '0.177' for 1st-degree, '0.0884' for 2nd-degree, and '0.0442' for 3rd-degree relationships."),
+        helpText("Exclude a member of a pair with a kinship coefficient greater than the threshold. 
+                 Use '0.354' to screen for monozygotic twins and duplicate samples, '0.177' for 1st-degree, 
+                 '0.0884' for 2nd-degree, and '0.0442' for 3rd-degree relationships."),
         conditionalPanel(
           "input.cutoffKing == true",
           selectInput("kingThresh", "Kinship Coefficient", choices = c("0.354", "0.177", "0.0884", "0.0442"), selected = "0.354")
