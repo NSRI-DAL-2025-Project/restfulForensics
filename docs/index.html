@@ -164,7 +164,7 @@
             </p>
             <div class="columns-container">
                <div class="image-column">
-                  <img src="readme/convert-files.png" alt="File Interconversion Options">
+                  <img src="convert-files.png" alt="File Interconversion Options">
                </div>
                
                <div class="text-column">
@@ -527,8 +527,8 @@
             </ul>
             </p>
             <br>
-            <p>restful forensics calculates these parameters for SNPs, but there are multiple tools and
-            software specific for STR data.</p>
+            <p style="background-color: lightblue;">restful forensics calculates these parameters 
+            for SNPs, but there are multiple tools and software specific for STR data.</p>
             
             <h4 class="section-title">Genotype frequency</h4>
             <p>If the input contains allele profiles per sample instead of genotype frequencies, 
@@ -547,9 +547,15 @@
                The random match probability (RMP), also known as matching probability or probability of match, 
                estimates the probability of observing two identical genotypes in a population. 
                It is calculated by adding the squared frequencies per loci:
-               $$\sum_{i}^N\ (P_{i})^2$$
+               $$ \sum_{i}^N (P_{i})^2\ $$
             </p>
-               
+            
+            <h4 class="section-title">Power of Discrimination</h4>
+            <p>
+               The power of discrimination (PD) is the probability that two random individuals will
+               have different profiles given a set of loci.
+               $$ \PD = 1 - PM\ $$
+            </p>
 
             
          </section>

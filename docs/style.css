@@ -154,12 +154,12 @@ h3.section-title {
 h4.section-title {
    font-size: 20px;
    font-weight: 600;
-   margin-bottom: 16px;
+   margin-bottom: 10px;
    padding-bottom: 8px;
 }
 
 p {
-   margin-bottom: 8px;
+   margin-bottom: 10px;
    font-size: 16px;
    color: var(--text-color);
 }
