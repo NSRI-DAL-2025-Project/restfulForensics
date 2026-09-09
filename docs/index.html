@@ -32,7 +32,7 @@
                </ul>
             </li>
             <li>
-               <a href="#features">III Features</a> <!-- Parent-->
+               <a href="#features">III Features/Usage</a> <!-- Parent-->
                <ul>
                   <!-- File conversion module -->
                   <li>
@@ -97,13 +97,12 @@
                   </li>
                </ul>
             </li>
-            <li class="nav-item"><a href="#usage" class="nav-link">IV Usage Guide</a></li>
-            <li class="nav-item"><a href="#workflow" class="nav-link">V Workflows</a></li>
-            <li class="nav-item"><a href="#limitations" class="nav-link">VI Limitations</a></li>
-            <li class="nav-item"><a href="#citation" class="nav-link">VII Citation</a></li>
+            <li class="nav-item"><a href="#workflow" class="nav-link">IV Workflows</a></li>
+            <li class="nav-item"><a href="#limitations" class="nav-link">V Limitations</a></li>
+            <li class="nav-item"><a href="#citation" class="nav-link">VI Citation</a></li>
          </ul>
       </nav>
-                  
+      
       <main class="main-content">
          <section id="introduction" class="section">
             <h1 class="section-title">I Introduction</h1>
@@ -156,10 +155,10 @@
          
          <!-- Features section -->
          <section id="features" class="section">
-            <h1 class="section-title">III Features</h1>
+            <h1 class="section-title">III Features/Usage</h1>
             <p>This section dives into the modules and submodules of restful forensics. 
-            The input/output files are defined as well as the parameters (if applicable) 
-            and expected outputs files.</p>
+            It describes the purpose of the submodule, links relevant supplementary files,
+            and defines the expected input/output files as well as the parameters (if applicable.)</p>
             
          <!-- File Conversion module -->
          <section id="fileconversion" class="section">
@@ -167,13 +166,15 @@
             
             <section id="convertfiles" class="section">
             <h3 class="section-title">1.1 Convert Files</h3>
-            <p>This submodule converts common genetic files to other common data structures.
-            The maximum file size accepted is 5GB. It is recommended to split files with 
+            <p>This submodule converts genetic files to commonly parsed data structures,
+            namely VCF and PLINK files. It also uniquely offers the conversion of a standard 
+            CSV to VCF with the upload of a supplementary file.</p>
+            <p>The maximum file size accepted is 5GB. It is recommended to split files with 
             sizes larger than 5GB into multiple smaller files.
             </p>
             <div class="columns-container">
                <div class="image-column">
-                  <img src="convert-files.png" alt="File Interconversion Options">
+                  <img src="convert-files.png" alt="Figure 1. File Interconversion Options">
                </div>
                
                <div class="text-column">
@@ -203,7 +204,9 @@
          <section id="addmeta" class="section">
             <h3 class="section-title">1.2 Add Metadata</h3>
             <p>This submodule merges sample and genotype information with user-defined metadata columns.
-            The sample names in the input file should match the samples names in the 
+            Population information is generally required for downstream analysis. Users can also merge other
+            information, population- or sample-based, to serve as a larger database on hand.</p>
+            <p>The sample names in the input file should match the samples names in the 
             metadata file for successful matching. If samples come from different populations, 
             there is an additional option to calculate the number of individuals per pouplation.
             </p>
@@ -318,12 +321,16 @@
             <section id="extractiontab" class="section">
                <h3 class="section-title">2.1 SNP Extraction</h3>
                <p>This submodule extracts markers by their reference SNP cluster ID (rsID) 
-               or base pair position using PLINK 2.0. restful forensics first validates whether 
-               rsIDs are present in the input file before proceeding with the extraction. 
+               or base pair position from large genetic sequences generated using
+               whole genome or next generation sequencing. The assumption is that only select markers
+               or regions in a genetic sequence will be used for forensic analysis and should be subsetted prior.
+               </p>
+               <p>restful forensics first validates whether rsIDs are present in the input file before proceeding with the extraction. 
                If rsIDs are present in the file, users have the option to extract markers by either rsIDs 
                or their GRCh37/38 base pair position. Otherwise, extraction can only be done using bp positions.
                If there are no rsIDs and markers are extracted using their bp position, there is an additional 
-               option for restful forensics to add rsIDs on the output file.
+               option for restful forensics to add rsIDs on the output file. All steps will be performed
+               using PLINK 2.0.
                </p>
                <p><strong>Input file</strong>:
                <ul>
@@ -342,7 +349,8 @@
             <section id="concordancetab" class="section">
                <h3 class="section-title">2.2 Concordance Analysis</h3>
                <p>This submodule performs concordance analysis between files or datasets with overlapping samples,
-               usually profiles generated using different sequencing technologies.
+               usually profiles generated using different sequencing technologies. Performing a concordance
+               analysis is a step towards validating the sequenced results.
                </p>
                <p><strong>Input file</strong>: Two files (.csv or .xlsx) with the same formatting and at 
                least one column with similar contents (eg. sample IDs)</p>
@@ -362,9 +370,14 @@
             <h2 class="section-title">3 Filtering</h2>
             <p>
                This module filters individuals and variants using standard filtering options available in
-               <a href="https://www.cog-genomics.org/plink/2.0/">PLINK 2.0</a>. If the input is a VCF file,
-               there is an option to generate a depth of coverage plot using the 
+               PLINK 2.0. If the input is a VCF file, there is an option to generate a depth of coverage plot using the 
                <a href=" https://CRAN.R-project.org/package=vcfR">vcfR R package</a>.
+            </p>
+            <p>Similar with the extraction tab, this module assumes that the input is a relatively large genetic sequence
+            generated by whole genome or next generation technologies. To avoid including low quality data in the analysis 
+            that may skew the results, filtering or exclusion of individuals and/or variants should be performed. There 
+            are also assumptions in certain analysis methods that should be considered in finalizing the data. For example, 
+            there are methods that assumes loci are in Hardy-Weinberg equilibrium.
             </p>
             <p><strong>Input file</strong>: Data files (.vcf, .vcf.gz, .bcf, or plink files)</p>
             <p><strong>Standard Parameters</strong>:
@@ -393,8 +406,10 @@
             <h2 class="section-title">4 Exploratory Analysis</h2>
             <p>
                This module performs exploratory analysis by running principal component analysis using the 
-               <a href="https://CRAN.R-project.org/package=ade4">ade4 R package</a>. 
-               Population information is required. The analysis will still be performed even when all samples
+               <a href="https://CRAN.R-project.org/package=ade4">ade4 R package</a>. This method 
+               extracts information and detects patterns based on the marker panel used.</p>
+               
+            <p>Population information is required. The analysis will still be performed even when all samples
                belong to the same population.
             </p>
             <p><strong>Input file</strong>: CSV/XLSX file containing genotype and population information</p>
@@ -549,14 +564,14 @@
                <li><p>Heterozygous: $2pq$</p></li>
             </ul>
             </p>
-            <p>The calculation returns the genotype frequencies for each marker per population</p>
+            <p>This calculation returns the genotype frequencies for each marker per population</p>
             
             <h4 class="section-title">Random Match Probability</h4>
             <p>
                The random match probability (RMP), also known as matching probability or probability of match, 
                estimates the probability of observing two identical genotypes in a population. 
                It is calculated by adding the squared frequencies per loci:
-               $$\sum_{i}^n(P_{i})^2$$
+               $$RMP=\sum_{i}^n(P_{i})^2$$ or in plainer terms: $RMP=p^2 + 2pq + q^2$ for each loci.
             </p>
             
             <h4 class="section-title">Power of Discrimination</h4>
@@ -573,7 +588,7 @@
                <a href="https://www.sciencedirect.com/science/article/pii/S0378111919308340">(Serrote et al., 2020)</a>.
                The higher PIC value, the more effective the genetic marker is at discriminating between
                two unrelated individuals. This measure is calculated using:
-               $$ PIC=1-sum_{i=1}^n p_i^2 - sum_{i=1}^{n-1} sum_{j=i+1}^n 2p_i^2p_j^2 $$
+               $$ PIC=1-\sum_{i=1}^n p_i^2 - \sum_{i=1}^{n-1}\sum_{j=i+1}^n 2p_i^2p_j^2 $$
                where $p_i$ and $p_j$ are frequencies of alleles $i$ and $j$.
                This is interpreted as:
                $$PIC=1-(p^2+q^2) - 2*(p^2*q^2)$$
@@ -587,6 +602,8 @@
                   (Huston, 1998)
                </a>.
                $$ PE=h^2(1-2hH^2) $$
+               where $h$ is the proportion of heterozygous individuals, calculated using $h=2pq$,
+               and $H$ of homozygous individuals, $H=p^2+q^2$.
             </p>
             
             <h4 class="section-title">Typical Paternity Index</h4>
@@ -594,6 +611,7 @@
                The typical paternity index (TPI) is an odds ratio that estimates how likely an 
                individual is the biological father compared to a random individual.
                $$ TPI=\frac{1}{2H}$$
+               where $H$ is the proportion of homozygous individuals, $H=p^2+q^2$.
             </p>
             
          </section>
@@ -654,9 +672,10 @@
             </section>
             
             <section id="barcoding" class="section">
-               <h3 class="section-title">9.3 Barcoding11.3 Barcoding</h3>
+               <h3 class="section-title">9.3 Barcoding</h3>
                <p>This section uses the
-               <a href="https://CRAN.R-project.org/package=BarcodingR">BarcodingR</a> R package.
+               <a href="https://CRAN.R-project.org/package=BarcodingR">BarcodingR</a> R package
+               for all the calculations.
                </p>
                
                <section id="speciesidentification" class="section">
@@ -713,20 +732,34 @@
          <!-- End of Features section -->
          </section>
          
-         <section id="usage" class="section">
-            <h1 class="section-title">IV Usage Guide</h1>
-         </section>
-         
          <section id="workflow" class="section">
-            <h1 class="section-title">V Workflows</h1>
+            <h1 class="section-title">IV Workflows</h1>
+            <img src="chart.png" alt="Figure 2. Workflow">
+            <p>
+                The features in restful forensics are modularized and can be
+                used independently or consecutively (Fig. 2).
+            </p>
+            <p>Sample workflow:</p>
+            <p>Given a sample input file such as 1000 Genome Project's VCF file</p>
+            <p> 
+               <ul>
+                  <li><p>[1] Filter individuals/variants using the Filtering module</p></li>
+                  <li><p>[2] Extract markers using the SNP Data Extraction module</p></li>
+                  <li><p>[3] Merge and add population data using 'Add Metadata' submodule</p></li>
+                  <li><p>[4] Perform analysis using any/all of the following modules:
+                  Exploratory Analysis, Population Summary Statistics, Population Structure Analysis, and
+                  Forensic DNA inference
+                  </p></li>
+               </ul>
+            </p>
          </section>
    
          <section id="limitations" class="section">
-            <h1 class="section-title">VI Limitations</h1>
+            <h1 class="section-title">V Limitations</h1>
          </section>
          
          <section id="citation" class="section">
-            <h1 class="section-title">VII Citation</h1>
+            <h1 class="section-title">VI Citation</h1>
          </section>
          
       </main>
