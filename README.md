@@ -129,8 +129,9 @@ Figure 2 shows a more detailed pipeline:
 | 1 | File Conversion | To STRUCTURE File | No option to add extra information/columns, standard parameters are set based on strataG |
 | 2 | File Conversion | To Arlequin File | <ul><li>Datatype is automatically set to "Standard"</li><li>No option to specify genetic/group structure</li></ul> |
 | 3 | Population Summary Statistics | Arlecore | <ul><li>Parameters for running arlecore are set with performing LD test the only provided additional option</li><li>Statistics calculated: Diversity and HWE metrics, Expected Heterozygosities, FST, Coancestry Coefficient, and Loci in LD</li></ul> |
-| 4 | Population Structure Analysis | Run STRUCTURE v2.3.4 | Same limited parameters as set in the strataG R package
-| 5 | DNA Barcoding | Multiple Sequence Alignment | Only global alignment can be performed |
+| 4 | Population Structure Analysis | Run STRUCTURE v2.3.4 | Same limited parameters as set in the strataG R package |
+| 5 | Forensic Parameters | Forensic Parameters | Calculation of Random Match Probability given a profile is untested |
+| 6 | DNA Barcoding | Multiple Sequence Alignment | Only global alignment can be performed |
 
 ### Planned Enhancements
 1. *File Conversion: To STRUCTURE File*
