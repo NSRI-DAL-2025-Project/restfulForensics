@@ -164,6 +164,10 @@
             <p>This section dives into the modules and submodules of restful forensics. 
             It describes the purpose of the submodule, links relevant supplementary files,
             and defines the expected input/output files as well as the parameters (if applicable.)</p>
+            <p>
+               restful forensics is structured such that each submodule has its own tab detailing the 
+               instructions for use, sample format/s required as input or as a supplementary, and sample file/s.
+            </p>
             
          <!-- File Conversion module -->
          <section id="fileconversion" class="section">
@@ -196,14 +200,13 @@
                      <li><p>[5] reference allele</p></li>
                      <li><p>[6] alternate allele</p></li>
                   </ul>
-                  The <a href="https://besjournals.onlinelibrary.wiley.com/doi/10.1111/2041-210x.70204">tidypopgen</a> R package
-                  is used for the CSV to VCF conversion while <a href="https://pubmed.ncbi.nlm.nih.gov/25722852/">PLINK 2.0</a> 
-                  is used for the rest.
                   </p> 
                   <p><strong>Expected output file</strong>: VCF or PLINK-associated files.</p>
                </div>
             </div>
-
+            <p>The <a href="https://besjournals.onlinelibrary.wiley.com/doi/10.1111/2041-210x.70204">tidypopgen</a> R package
+                  is used for the CSV to VCF conversion while <a href="https://pubmed.ncbi.nlm.nih.gov/25722852/">PLINK 2.0</a> 
+                  is used for the rest.</p>
          </section>
          
          <section id="addmeta" class="section">
@@ -217,7 +220,7 @@
             </p>
             <p><strong>Input file</strong>:
             <ul>
-               <li><p>Genotype data in PLINK 1.9/2.0, VCF (or vcf.gz), and BCF file formats. 
+               <li><p>Genotype data in PLINK 1.9/2.0, VCF (or vcf.gz), BCF, CSV (genotype) file formats. 
                Zipped VCF/BCF files are accepted.</p></li>
                <li><p>Metadata of the samples</p></li>
             </ul>
@@ -310,6 +313,7 @@
                <li><p>(Character) Symbol separating alleles. Default is '/'.</p></li>
             </ul>
             </p>
+            <p><strong>Expected output file</strong>: Arlequin (.arp) file</p>
             <p>
                There is a dedicated module within restful forensics that runs the terminal version of Arlequin, 
                <a href="#arlecore">Arlecore</a> and uses the standard CSV/XLSX file with genotype and population data.
@@ -760,22 +764,22 @@
                While the analysis modules within restful forensics require a genotype file with a single-level population assignment,
                the Add Metadata submodule provides the option to merge multiple columns/information (Fig. 4).
             </p>
-            <img src="metadata.png" alt="Figure 4. Add Metadata submodule parameters from restful forensics" class="responsive-img">
+            <img src="metadata.jpg" alt="Figure 4. Add Metadata submodule parameters from restful forensics" class="responsive-img">
             <p>
                Following Fig. 2 and Fig. 3, the genotype file with population information is used as input
                for exploratory analysis (Fig. 5). Note that the module will not run without a population column.
             </p>
-            <img src="pca.png" alt="Figure 5. Sample results using the Exploratory Analysis module from restful forensics" class="responsive-img">
+            <img src="pca.jpg" alt="Figure 5. Sample results using the Exploratory Analysis module from restful forensics" class="responsive-img">
             <p>
                For the calculation of population summary statistics, there is an option to use R-based packages or the terminal-version 
                of Arlequin called Arlecore. For the example (Fig. 6), the <a href="#arlecore">arlecore</a> submodule was used.
             </p>
-            <img src="arlecore.png" alt="Figure 6. Sample results using the Arlecore submodule from restful forensics" class="responsive-img">
+            <img src="arlecore.jpg" alt="Figure 6. Sample results using the Arlecore submodule from restful forensics" class="responsive-img">
             <p>
                The same genotype and population file is used as input to run population structure analysis and directly
                visualized using CLUMPP (Fig. 7).
             </p>
-            <img src="structure_plot.png" alt="Figure 7. Sample results using the Plot STRUCTURE results submodule from restful forensics" class="responsive-img">
+            <img src="structure_plot.jpg" alt="Figure 7. Sample results using the Plot STRUCTURE results submodule from restful forensics" class="responsive-img">
          </section>
    
          <section id="limitations" class="section">
@@ -790,44 +794,44 @@
                      <th>Limitation</th>
                   </tr>
                   <tr>
-                     <th>File Conversion</th>
-                     <th>To STRUCTURE File</th>
-                     <th>No option to add extra information/columns. Parameters are set based on the strataG package.</th>
+                     <td>File Conversion</td>
+                     <td>To STRUCTURE File</td>
+                     <td>No option to add extra information/columns. Parameters are set based on the strataG package.</td>
                   </tr>
                   <tr>
-                     <th>File Conversion</th>
-                     <th>To Arlequin File</th>
-                     <th>
+                     <td>File Conversion</td>
+                     <td>To Arlequin File</td>
+                     <td>
                         <ul>
                            <li>Datatype is automatically set to "Standard"</li>
                            <li>No option to specify genetic/group structure</li>
                         </ul>
-                     </th>
+                     </td>
                   </tr>
                   <tr>
-                     <th>Population Summary Statistics</th>
-                     <th>Arlecore</th>
-                     <th>
+                     <td>Population Summary Statistics</td>
+                     <td>Arlecore</td>
+                     <td>
                         <ul>
                            <li>Parameters for running arlecore are set with performing LD test the only provided additional option</li>
                            <li>Statistics calculated: Diversity and HWE metrics, Expected Heterozygosities, FST, Coancestry Coefficient, and Loci in LD</li>
                         </ul>
-                     </th>
+                     </td>
                   </tr>
                   <tr>
-                     <th>Population Structure Analysis</th>
-                     <th>Run STRUCTURE v2.3.4</th>
-                     <th>Same limited parameters as set in the strataG R package</th>
+                     <td>Population Structure Analysis</td>
+                     <td>Run STRUCTURE v2.3.4</td>
+                     <td>Same limited parameters as set in the strataG R package</td>
                   </tr>
                   <tr>
-                     <th>Forensic Paramaters</th>
-                     <th>Forensic Paramaters</th>
-                     <th>Calculation of Random Match Probability given a profile is untested</th>
+                     <td>Forensic Paramaters</td>
+                     <td>Forensic Paramaters</td>
+                     <td>Calculation of Random Match Probability given a profile is untested</td>
                   </tr>
                   <tr>
-                     <th>DNA Barcoding</th>
-                     <th>Multiple Sequence Alignment</th>
-                     <th>Only global alignment can be performed</th>
+                     <td>DNA Barcoding</td>
+                     <td>Multiple Sequence Alignment</td>
+                     <td>Only global alignment can be performed</td>
                   </tr>
                </table>
             </section>
@@ -835,9 +839,9 @@
             <section id="enhancements" class="section">
                <h2 class="section-title">Planned Enhancements</h2>
                <ol>
-                  <li>File Conversion: To Structure File - Additional options to set in the main and extra parameter file</li>
-                  <li>DNA Barcoding - Add option to perform local sequence alignment</li>
-                  <li>Additional Feature - Incorporation of ADMIXTURE software</li>
+                  <li><strong>File Conversion: To Structure File</strong> - Additional options to set in the main and extra parameter file</li>
+                  <li><strong>DNA Barcoding</strong> - Add option to perform local sequence alignment</li>
+                  <li><strong>Additional Feature</strong> - Incorporation of ADMIXTURE software</li>
                </ol>
 
             </section>
