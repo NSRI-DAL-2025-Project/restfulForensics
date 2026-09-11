@@ -11,13 +11,21 @@ structure_runs <- function() {
         numericInput("numKRep", "Replicates per K", value = 10, min = 1),
         numericInput("burnin", "Burn-in Period", value = 100000),
         numericInput("numreps", "MCMC Reps After Burn-in", value = 100000),
-        checkboxInput("noadmix", "Use 'No Admixture' Model", value = TRUE),
-        checkboxInput("freqScore", "Use 'Correlated Frequencies' Model?", value = FALSE),
+        br(),
         checkboxInput("advancedStructure", "See Advanced Parameters", value = FALSE),
         conditionalPanel(
-          condition = "input.advancedStructure == 'true' && input.noadmix == 'false'",
-          checkboxInput("inferAlpha", "Infer the value of model parameters", value = FALSE),
-          numericInput("alphaValStructure", "Alpha Value", value = 0.05, max = 1)
+          condition = "input.advancedStructure == true",
+          checkboxInput("freqScore", "Use 'Correlated Frequencies' Model", value = FALSE),
+          #checkboxInput("popAlpha", "Infer separate alpha per population", value = TRUE),
+          checkboxInput("noadmix", "Use 'No Admixture' Model", value = TRUE),
+          conditionalPanel(
+            condition = "input.noadmix == false",
+            checkboxInput("inferAlpha", "Infer the value of model parameters", value = TRUE),
+            conditionalPanel(
+              condition = "input.inferAlpha == false",
+              numericInput("alphaValStructure", "Alpha Value", value = 0.05, max = 1)
+            )
+          )
         ),
         actionButton("runStructure", "Run STRUCTURE", icon = icon("play")),
         uiOutput("downloadButtons")
