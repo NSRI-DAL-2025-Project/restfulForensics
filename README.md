@@ -13,7 +13,7 @@ University of the Philippines Diliman, Quezon City.
 
 ## Table of Contents
 1. [About restful forensics](#About)  
-2. [Software Architecture]()  -- similar with features so 
+2. [Software Architecture]()  
 3. [Features](#Features)  
 4. [Installation]() <br>
    a. [Prerequisites](#A.-Prerequisites) <br>

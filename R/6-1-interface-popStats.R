@@ -9,10 +9,10 @@ popstats_tab <- function() {
           title = "R-based Calculations",
           fluidRow(
             box(
-              fileInput("popStatsFile", "Upload CSV or XLSX Dataset", accept = c(".zip", ".tar")),
-              actionButton("runPopStats", "Analyze", icon = icon("magnifying-glass-chart")),
+              fileInput("popStatsFile", "Upload CSV or XLSX Dataset", accept = c(".xlsx", ".csv")),
               selectInput("correctionModel", "Select Correction Model", choices = c("Bonferroni" = "Bonferroni", "FDR" = "FDR")),
               numericInput("alphaValue", "Set Alpha Value", value = 0.05, min = 0.00, max = 1),
+              actionButton("runPopStats", "Analyze", icon = icon("magnifying-glass-chart")),
               uiOutput("downloadStatsXLSX_UI")
             ),
             tabBox(

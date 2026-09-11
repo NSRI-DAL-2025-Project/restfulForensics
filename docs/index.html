@@ -98,7 +98,12 @@
                </ul>
             </li>
             <li class="nav-item"><a href="#workflow" class="nav-link">IV Workflows</a></li>
-            <li class="nav-item"><a href="#limitations" class="nav-link">V Limitations</a></li>
+            <li class="nav-item"><a href="#limitations" class="nav-link">V Limitations</a>
+               <ul>
+                  <li><a href="#knownlimitations">Known Limitations</a></li>
+                  <li><a href="#enhancements">Planned Enhancements</a></li>
+               </ul>
+            </li>
             <li class="nav-item"><a href="#citation" class="nav-link">VI Citation</a></li>
          </ul>
       </nav>
@@ -410,7 +415,10 @@
                extracts information and detects patterns based on the marker panel used.</p>
                
             <p>Population information is required. The analysis will still be performed even when all samples
-               belong to the same population.
+               belong to the same population. To change the principal components on the x and y axis, 
+               change the values on the "PC Axis X/Y" and click <code>Run PCA Analysis</code>. 
+               Populations can be highlighted by ticking their associated checkboxes and can even be used as reference for
+               for the recalculation of the principal components.
             </p>
             <p><strong>Input file</strong>: CSV/XLSX file containing genotype and population information</p>
             <p><strong>Standard Parameters</strong>: If using custom colors and labels, a file (.csv/.xlsx) should
@@ -515,7 +523,7 @@
                   <li><p>Option to permute the clusters according to the cluster order.</p></li>
                </ul>
                </p>
-               <p><strong>Expected outputs</strong>: PNG plot</p>
+               <p><strong>Expected outputs</strong>: Structure plot (.png and .pdf files)</p>
             </section>
          <!-- End of Population Structure Analysis Module -->
          </section>
@@ -736,15 +744,106 @@
             <h1 class="section-title">IV Workflows</h1>
             <p>
                 The features in restful forensics are modularized and can be
-                used independently or together following a certain workflow (Fig. 3).
+                used independently or together following a certain workflow (Fig. 2).
             </p>
-            <img src="chart.png" alt="Figure 2. Workflow">
-            <img src="workflow.png" alt="Figure 3. Sample workflow for different forensic marker panels">
+            <img src="workflow.png" alt="Figure 2. Sample workflow for different forensic marker panels" class="responsive-img">
+            <p>
+               restful forensics have been tested using data from the 1000 Genomes Project and Human Genome Diversity Project. 
+               Quality control was performed on the per chromosome VCF files using the <a href="#filtering">filtering</a> 
+               module before extracting markers using the <a href="extractiontab">SNP Data Extraction</a> submodule.
+               This process is represented in Fig. 3 with the dotted arrows indicating a two-way interaction. 
+               Extraction results were then zipped together for subsequent processing.
+            </p>
+            <img src="chart.png" alt="Figure 3. restful forensics workflows" class="responsive-img">
+            <p>
+               Population data were matched and merged with samples using the <a href="#addmeta">"Add Metadata"</a> submodule.
+               While the analysis modules within restful forensics require a genotype file with a single-level population assignment,
+               the Add Metadata submodule provides the option to merge multiple columns/information (Fig. 4).
+            </p>
+            <img src="metadata.png" alt="Figure 4. Add Metadata submodule parameters from restful forensics" class="responsive-img">
+            <p>
+               Following Fig. 2 and Fig. 3, the genotype file with population information is used as input
+               for exploratory analysis (Fig. 5). Note that the module will not run without a population column.
+            </p>
+            <img src="pca.png" alt="Figure 5. Sample results using the Exploratory Analysis module from restful forensics" class="responsive-img">
+            <p>
+               For the calculation of population summary statistics, there is an option to use R-based packages or the terminal-version 
+               of Arlequin called Arlecore. For the example (Fig. 6), the <a href="#arlecore">arlecore</a> submodule was used.
+            </p>
+            <img src="arlecore.png" alt="Figure 6. Sample results using the Arlecore submodule from restful forensics" class="responsive-img">
+            <p>
+               The same genotype and population file is used as input to run population structure analysis and directly
+               visualized using CLUMPP (Fig. 7).
+            </p>
+            <img src="structure_plot.png" alt="Figure 7. Sample results using the Plot STRUCTURE results submodule from restful forensics" class="responsive-img">
          </section>
    
          <section id="limitations" class="section">
             <h1 class="section-title">V Limitations</h1>
+            
+            <section id="knownlimitations" class="section">
+               <h2 class="section-title">Known Limitations</h2>
+               <table style="width:100%">
+                  <tr>
+                     <th>Module</th>
+                     <th>Submodule</th>
+                     <th>Limitation</th>
+                  </tr>
+                  <tr>
+                     <th>File Conversion</th>
+                     <th>To STRUCTURE File</th>
+                     <th>No option to add extra information/columns. Parameters are set based on the strataG package.</th>
+                  </tr>
+                  <tr>
+                     <th>File Conversion</th>
+                     <th>To Arlequin File</th>
+                     <th>
+                        <ul>
+                           <li>Datatype is automatically set to "Standard"</li>
+                           <li>No option to specify genetic/group structure</li>
+                        </ul>
+                     </th>
+                  </tr>
+                  <tr>
+                     <th>Population Summary Statistics</th>
+                     <th>Arlecore</th>
+                     <th>
+                        <ul>
+                           <li>Parameters for running arlecore are set with performing LD test the only provided additional option</li>
+                           <li>Statistics calculated: Diversity and HWE metrics, Expected Heterozygosities, FST, Coancestry Coefficient, and Loci in LD</li>
+                        </ul>
+                     </th>
+                  </tr>
+                  <tr>
+                     <th>Population Structure Analysis</th>
+                     <th>Run STRUCTURE v2.3.4</th>
+                     <th>Same limited parameters as set in the strataG R package</th>
+                  </tr>
+                  <tr>
+                     <th>Forensic Paramaters</th>
+                     <th>Forensic Paramaters</th>
+                     <th>Calculation of Random Match Probability given a profile is untested</th>
+                  </tr>
+                  <tr>
+                     <th>DNA Barcoding</th>
+                     <th>Multiple Sequence Alignment</th>
+                     <th>Only global alignment can be performed</th>
+                  </tr>
+               </table>
+            </section>
+            
+            <section id="enhancements" class="section">
+               <h2 class="section-title">Planned Enhancements</h2>
+               <ol>
+                  <li>File Conversion: To Structure File - Additional options to set in the main and extra parameter file</li>
+                  <li>DNA Barcoding - Add option to perform local sequence alignment</li>
+                  <li>Additional Feature - Incorporation of ADMIXTURE software</li>
+               </ol>
+
+            </section>
+            
          </section>
+         
          
          <section id="citation" class="section">
             <h1 class="section-title">VI Citation</h1>
