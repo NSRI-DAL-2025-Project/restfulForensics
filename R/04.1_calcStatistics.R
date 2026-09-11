@@ -467,7 +467,7 @@ calc_iisnps_params <- function(geno_freqs, profile = NULL, theta = 0) {
       PIC = 1 - (homozygous1 + homozygous2) - (2 * (homozygous1 * homozygous2)), # 2 * homozygous1 * homozygous2 * (1-2*homozygous1*homozygous2),
       H = homozygous1 + homozygous2,
       h = heterozygous,
-      PE = (h^2) * (1 - 2 * h * H),
+      PE = (h^2) * (1 - (2 * h * (H^2))),
       TPI = 1 / (2 * H)
     ) %>%
     dplyr::select(marker, population, RMP, PD, PIC, PE, TPI) %>%

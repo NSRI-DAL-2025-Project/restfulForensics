@@ -96,8 +96,7 @@ phylogeny_tab <- function() {
           ),
           conditionalPanel(
             condition = "input.uploadMSA == false",
-            fileInput("msaFileforPhylogen", "Upload MSA file"),
-            helpText("Accepted MSA formats: .msa, .fasta, .msf, .aln, .faa, .fas")
+            fileInput("msaFileforPhylogen", "Upload MSA file")
           ),
           selectInput("treeType", "Choose Method for Tree Construction",
             choices = c("NJ", "UPGMA", "Parsimony", "Maximum Likelihood")
@@ -111,17 +110,18 @@ phylogeny_tab <- function() {
           ),
           conditionalPanel(
             condition = "input.treeType == 'Maximum Likelihood'",
-            textInput("bootstrapSamples", "Set number of bootstrap samples", placeholder = "100")
+            textInput("bootstrapSamples", "Set number of bootstrap samples", value = 100)
           ),
           textInput("outgroup", "Outgroup (optional)", placeholder = "e.g. Sample1"),
-          textInput("seed", "Set Seed Value", placeholder = "123"),
+          textInput("seed", "Set Seed Value", value = 123),
           actionButton("buildTree", "Build Tree", icon = icon("tree"))
         ),
         tabBox(
           title = "Instructions",
           h4("Perform phylogenetic tree reconstruction"),
           p(strong("Input file"), "is a multiple sequence alignment. Results from the 'MSA' tab are also accepted.
-                                     If using outputs from the 'MSA' tab, there is an option to use the raw, adjusted, or staggered alignment for tree construction."),
+                                     If using outputs from the 'MSA' tab, there is an option to use the raw, adjusted, or staggered alignment for tree construction.
+                                  Accepted MSA formats: .msa, .fasta, .msf, .aln, .faa, .fas"),
           p(strong("Parameters"), "vary based on the method."),
           p(strong("Expected output"), "is the phylogenetic tree in PNG format."),
           hr(),

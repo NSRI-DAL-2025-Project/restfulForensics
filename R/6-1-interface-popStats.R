@@ -9,10 +9,10 @@ popstats_tab <- function() {
           title = "R-based Calculations",
           fluidRow(
             box(
-              fileInput("popStatsFile", "Upload CSV or XLSX Dataset", accept = c(".zip", ".tar")),
-              actionButton("runPopStats", "Analyze", icon = icon("magnifying-glass-chart")),
+              fileInput("popStatsFile", "Upload CSV or XLSX Dataset", accept = c(".xlsx", ".csv")),
               selectInput("correctionModel", "Select Correction Model", choices = c("Bonferroni" = "Bonferroni", "FDR" = "FDR")),
               numericInput("alphaValue", "Set Alpha Value", value = 0.05, min = 0.00, max = 1),
+              actionButton("runPopStats", "Analyze", icon = icon("magnifying-glass-chart")),
               uiOutput("downloadStatsXLSX_UI")
             ),
             tabBox(
@@ -109,7 +109,7 @@ popstats_tab <- function() {
                 h4("Calculate common population statistics using Arlecore (terminal-based version of Arlequin)"),
                 p(strong("Input file/s:"), "CSV file containing marker and population data.
                                               Each row should represent multi-locus data for an individual sample."),
-                p(strong("Expected output file/s: .xlsx and .ars file")),
+                p(strong("Expected output file/s:"), ".xlsx and .ars file"),
                 hr(),
                 p(tags$a("Arlequin",
                   href = "https://cmpg.unibe.ch/software/arlequin35/",

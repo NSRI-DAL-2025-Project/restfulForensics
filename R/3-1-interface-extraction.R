@@ -33,7 +33,7 @@ snp_extraction_tab <- function() {
               h4("Extract SNPs based on reference SNP cluster ID (rsID) or GRCh37/GRCh38 position"),
               p(strong("Input file/s:")),
               p("(1) VCF, BCF, or PLINK (.bed, .bim, .fam) files."),
-              p("(2) Markers/position list — type rsIDs manually, upload a list, or use a POS .txt/.csv file."),
+              p("(2) Markers/position list — type rsIDs manually, upload a list, or use a POS .txt/.csv/.xlsx file."),
               p("Position list format:"),
               tags$ul(
                 tags$li("[1] (optional) rsID/marker name"),

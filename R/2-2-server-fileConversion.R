@@ -169,7 +169,8 @@ file_conversion_server <- function(input, output, session, rv) {
   timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
 
   observe({
-    fileready <- !is.null(input$genotypeFile) || (!is.null(input$firstPLINK) && !is.null(input$secondPLINK) && !is.null(input$thirdPLINK))
+    fileready <- !is.null(input$genotypeFile) || 
+      (!is.null(input$firstPLINK) && !is.null(input$secondPLINK) && !is.null(input$thirdPLINK))
     singlePop <- nzchar(input$typePop_meta)
     multiPop <- !is.null(input$refMetadata)
     metaReady <- singlePop || multiPop
