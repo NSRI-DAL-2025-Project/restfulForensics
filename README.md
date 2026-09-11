@@ -15,10 +15,10 @@ University of the Philippines Diliman, Quezon City.
 1. [About restful forensics](#About)  
 2. [Software Architecture]()  
 3. [Features](#Features)  
-4. [Installation]() <br>
-   a. [Prerequisites](#A.-Prerequisites) <br>
-   b. [Dependency List](#B.-Dependencies) <br>
-   c. [Installation Guide](#C.-Installation-Guide) <br>
+4. [Installation](#Installation) <br>
+   a. [Prerequisites](#A-Prerequisites) <br>
+   b. [Dependency List](#B-Dependencies) <br>
+   c. [Installation Guide](#C-Installation-Guide) <br>
 6. [Example Workflow](#Example-Workflow)  
 7. [Limitations](#Limitations) <br>
    a. [Known Limitations](#Known-Limitations) <br>
