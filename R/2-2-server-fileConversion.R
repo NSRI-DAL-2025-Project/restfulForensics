@@ -296,7 +296,7 @@ file_conversion_server <- function(input, output, session, rv) {
     },
     content = function(file) {
       req(missingData())
-      readr::write_csv(missingData(), file)
+      readr::write_tsv(missingData(), file)
     }
   )
 
