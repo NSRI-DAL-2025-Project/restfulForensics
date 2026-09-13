@@ -50,6 +50,10 @@ exploratory_analysis_server <- function(input, output, session, rv) {
           is_a_char <- stringr::str_count(val, "[A-Za-z]") == 2
 
           with_popinfo <- !isTRUE(is_a_char)
+          
+          if (isTRUE(is_a_char)) {
+             stop("Population information required.")
+          }
 
           fsnps_gen <- convert_to_genind(cleaned, to_str = FALSE, popinfo = with_popinfo)
           GenindData(fsnps_gen)
