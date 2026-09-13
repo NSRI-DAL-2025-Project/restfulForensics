@@ -476,6 +476,12 @@
                   <li><p>PNG plots (heterozygosity, FST matrix, and Coancestry coefficient matrix)</p></li>
                </ul>
                </p>
+               <p>The zipped arlecore v3.5.2 package includes R functions for parsing sections from the resulting file.
+               Select R functions were reused and adapted for compatibility with a more recent R version. 
+               The functions reused are coancestryCoeff.R, fStat_Pvalues_Func.R, pairFstMatrix.R, pairwiseDiffMatrix.R,
+               sumExpectedHeterozygosity.R, sumNumAllelesFunction.R, and sumThetaHFunction.R. 
+               The mentioned scripts can be found within the R folder as helper functions.
+               </p>
             </section>
          <!-- End of Population Summary Statistics Module -->
          </section>
@@ -792,17 +798,22 @@
             
             <section id="knownlimitations" class="section">
                <h2 class="section-title">Known Limitations</h2>
-               <table style="styled-table">
+               <table class="styled-table">
+                  <thead>
                   <tr>
                      <th>Module</th>
                      <th>Submodule</th>
                      <th>Limitation</th>
                   </tr>
+                  </thead>
+                  
+                  <tbody>
                   <tr>
                      <td>File Conversion</td>
                      <td>To STRUCTURE File</td>
                      <td>No option to add extra information/columns. Parameters are set based on the strataG package.</td>
                   </tr>
+                  
                   <tr>
                      <td>File Conversion</td>
                      <td>To Arlequin File</td>
@@ -813,6 +824,7 @@
                         </ul>
                      </td>
                   </tr>
+                  
                   <tr>
                      <td>Population Summary Statistics</td>
                      <td>Arlecore</td>
@@ -823,21 +835,25 @@
                         </ul>
                      </td>
                   </tr>
+                  
                   <tr>
                      <td>Population Structure Analysis</td>
                      <td>Run STRUCTURE v2.3.4</td>
                      <td>Same limited parameters as set in the strataG R package</td>
                   </tr>
+                  
                   <tr>
                      <td>Forensic Paramaters</td>
                      <td>Forensic Paramaters</td>
                      <td>Calculation of Random Match Probability given a profile is untested</td>
                   </tr>
+                  
                   <tr>
                      <td>DNA Barcoding</td>
                      <td>Multiple Sequence Alignment</td>
                      <td>Only global alignment can be performed</td>
                   </tr>
+                  </tbody>
                </table>
             </section>
             

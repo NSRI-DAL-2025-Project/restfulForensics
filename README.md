@@ -6,14 +6,16 @@
 ```restful forensics``` is an open-source platform for forensic genetics research
 workflow and method validation. This tool is built as a Shiny app in R and
 incorporates commonly used packages, functions, and software for genetic data preparation,
-pre-processing, and exploratory data analysis.
+pre-processing, and exploratory data analysis. 
+See the [documentation](https://nsri-dal-2025-project.github.io/restfulForensics/) for more information.
+
 
 restful forensics is developed at the Natural Sciences Research Institute,
 University of the Philippines Diliman, Quezon City.
 
 ## Table of Contents
-1. [About restful forensics](#About)  
-2. [Software Architecture]()  
+1. [About](#About)  
+2. [Software Architecture](#Software-Architecture)  
 3. [Features](#Features)  
 4. [Installation](#Installation) <br>
    a. [Prerequisites](#A-Prerequisites) <br>
@@ -33,8 +35,17 @@ genetic data preprocessing and method validation into one interactive platform u
 widely used R packages and the incorporation of external software/executables into R
 for a unified workflow.
 
+## Software Architecture
+As a shiny application, restful forensics is divided into the user interface (UI)
+and server functions. The app is modularized by having a separate UI and server
+R files for each feature. The ui section is responsible for input requests 
+which are then read and processed into the associated server files and exposed 
+by the ui.
+
 ## Features
-restful forensics has 9 distinct modules.  
+restful forensics has 9 distinct modules with submodules for more specific tasks.
+The following tables describe the functionalities and general requirements
+for sub/modules:
 
 *Module 1: File Conversion*  
 | # | Feature | Description | Input file/s | Output | Related Tools |
