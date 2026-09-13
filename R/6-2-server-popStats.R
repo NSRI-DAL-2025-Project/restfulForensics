@@ -114,7 +114,15 @@ pop_stats_server <- function(input, output, session, rv) {
   })
 
   output$heterozygosity_table <- DT::renderDataTable({
-    popStats()$heterozygosity
+    req(popStats())
+     
+     het <- popStats()$heterozygosity
+     het <- tidyr::pivot_wider(
+        data = het,
+        names_from = Variable,
+        values_from = Value
+     )
+     het
   })
 
   output$heterozygosity_plot <- renderImage(
