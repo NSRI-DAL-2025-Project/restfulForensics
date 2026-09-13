@@ -25,29 +25,82 @@ classification_server <- function(input, output, session, rv) {
     shinyjs::toggleState("runNaiveBayes", condition = file_ready)
   })
 
-  predResults <- reactiveVal(NULL)
-
+  predTable <- reactiveVal(NULL)
+  predStat <- reactiveVal(NULL)
+  predModel <- reactiveVal(NULL)
+  PredictionList <- reactiveVal(NULL)
+  
   observeEvent(input$runNaiveBayes, {
     disable("runNaiveBayes")
     req(input$forPredFile)
 
     result <- calculate_naive_bayes(input$forPredFile$datapath)
-    predResults(result)
+    stats <- as.data.frame(result$predStat)
+    stats <- data.frame(rowname(stats), stats)
+    other_stat <- t(as.data.frame(result$otherStat))
+    other_stat <- data.frame(rowname(other_stat), other_stat)
+    
+    predTable(as.data.frame(result$predTable))
+    predStat(stats)
+    predModel(other_stat)
+    PredictionList(result$preds)
+    enable("runNaiveBayes")
   })
 
-  output$predictionTableResult <- renderPrint({
-    req(predResults())
-    predResults()$predTable
+  output$predictionTableResult <- DT::renderDataTable({
+     req(predTable())
+     DT::datatable(
+        predTable(),
+        options = list(
+           pageLength = 10,
+           autoWidth = TRUE,
+           searchHighlight = TRUE
+        ),
+        filter = "top",
+        selection = "multiple"
+     )
   })
 
-  output$statbyClassResult <- renderPrint({
-    req(predResults())
-    predResults()$otherStat
+  output$statbyClassResult <- DT::renderDataTable({
+    req(predModel())
+     DT::datatable(
+        predModel(),
+        options = list(
+           pageLength = 10,
+           autoWidth = TRUE,
+           searchHighlight = TRUE
+        ),
+        filter = "top",
+        selection = "multiple"
+     )
   })
 
-  output$overallStatResult <- renderPrint({
-    req(predResults())
-    predResults()$predStat
+  output$overallStatResult <- DT::renderDataTable({
+    req(predStat())
+     DT::datatable(
+        predStat(),
+        options = list(
+           pageLength = 10,
+           autoWidth = TRUE,
+           searchHighlight = TRUE
+        ),
+        filter = "top",
+        selection = "multiple"
+     )
+  })
+  
+  output$predictionList <- DT::renderDataTable({
+     req(PredictionList())
+     DT::datatable(
+        PredictionList(),
+        options = list(
+           pageLength = 10,
+           autoWidth = TRUE,
+           searchHighlight = TRUE
+        ),
+        filter = "top",
+        selection = "multiple"
+     )
   })
 
   output$downloadClassification <- downloadHandler(
@@ -57,16 +110,16 @@ classification_server <- function(input, output, session, rv) {
     },
     content = function(file) {
       dataset <- list(
-        "Table" = as.data.frame(predResults()$predTable),
-        "Stats per Class" = as.data.frame(predResults()$otherStat),
-        "Overall Stats" = as.data.frame(predResults()$predStat)
+        "Table" = predTable(),
+        "Stats per Class" = predModel(),
+        "Overall Stats" = predStat(),
+        "Predictions by Individual" = PredictionList()
       )
       openxlsx::write.xlsx(dataset, file = file)
     }
   )
 
   output$downloadClassification_UI <- renderUI({
-    req(predResults())
     downloadButton("downloadClassification", "Download Results")
   })
 }

@@ -61,15 +61,19 @@ classification_tab <- function() {
         width = 12,
         tabPanel(
           title = "Prediction Table",
-          verbatimTextOutput("predictionTableResult")
+          DT::dataTableOutput("predictionTableResult")
         ),
         tabPanel(
           title = "Statistics by Population",
-          verbatimTextOutput("statbyClassResult")
+          DT::dataTableOutput("statbyClassResult")
         ),
         tabPanel(
           title = "Overall Statistics",
-          verbatimTextOutput("overallStatResult")
+          DT::dataTableOutput("overallStatResult")
+        ),
+        tabPanel(
+           title = "Prediction by Individual",
+           DT::dataTableOutput("predictionList")
         )
       )
     )

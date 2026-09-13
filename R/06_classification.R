@@ -43,10 +43,14 @@ calculate_naive_bayes <- function(file) {
 
   # get other stats
   otherStat <- as.data.frame(confMatrix$byClass)
+  
+  Sample <- data_fsnps$Sample
+  predictions <- data.frame(Sample, res)
 
   return(list(
     predTable = predWide,
     predStat = predStat,
-    otherStat = otherStat
+    otherStat = otherStat,
+    preds = predictions
   ))
 }
