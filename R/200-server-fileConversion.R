@@ -235,20 +235,34 @@ file_conversion_server <- function(input, output, session, rv) {
           for_merging <- input$typePop_meta
         }
 
-        print(input_file)
-        print(input$genotypeFile$name)
-
         prepared <- prepare_input_dataset(
           input_file = input_file,
           output.dir = output.dir
         )
+        
+        if (prepared == "CSV") {
+           # unpack files then merge
+           files_raw <- unpack_input_file(input_file, output.dir)
+           data_list <- files_raw$data_files
+           all.list <- list()
+           
+           for (x in data_list) {
+              all.list[[x]] <- read.csv(x, check.names = FALSE, row.names = 1)
+           }
+           
+           merged <- dplyr::bind_rows(all.list, fill = TRUE)
+           merged <- as.data.frame(merged)
+           result <- add_metadata(merged, for_merging)
+           
+        } else {
+           result <- convert_from_plink2(
+              prefix = prepared$prefix,
+              output_type = "csv2",
+              output.dir = output.dir,
+              ref = for_merging
+           )
+        }
 
-        result <- convert_from_plink2(
-          prefix = prepared$prefix,
-          output_type = "csv2",
-          output.dir = output.dir,
-          ref = for_merging
-        )
         convertedCSV(result$with_meta)
         missingData(result$missing)
 

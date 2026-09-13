@@ -278,7 +278,7 @@ prepare_input_dataset_archive <- function(input_file, output.dir = ".") {
     merge_list = merge_list_path,
     output_prefix = merged_prefix
   )
-  print("files are merged")
+
   return(list(pgen_prefix = merged_prefix))
 }
 
@@ -311,20 +311,9 @@ prepare_input_dataset <- function(input_file, output.dir = ".") {
   )
   
   if (res == "CSV") {
-    # unpack files then merge
-    files_raw <- unpack_input_file(input_file, output.dir)
-    data_list <- files_raw$data_files
-    all.list <- list()
-    
-    for (x in data_list) {
-      all.list[[x]] <- read.csv(x, check.names = FALSE, row.names = 1)
-    }
-    
-    # merge as df then match
-    # use reduce function by purrr and full_join, need to revise first column to same key
+     return("CSV")
   }
   
-
   return(list(
     prefix = res$pgen_prefix
   ))
@@ -448,30 +437,43 @@ vcf_to_csv <- function(files, ref = NULL, output.dir = ".") {
   final_df <- raw_file
 
   if (is.null(ref)) {
-    return(as.data.frame(final_df))
+     
+    return(list(
+       with_meta = as.data.frame(final_df),
+       missing = NULL
+    ))
   } else {
-    ref_data <- data.frame(ref)
-    ref_data <- dplyr::rename(ref_data, Sample = 1)
-
-    samples_vcf <- final_df$Sample
-    samples_ref <- ref_data$Sample
-
-    if (sum(samples_vcf %in% samples_ref) == 0) {
-      stop("Sample IDS do not match between VCF and metadata.")
-    }
-
-    cols <- colnames(ref_data)
-
-    with_meta_data <- final_df %>%
-      dplyr::inner_join(ref_data, by = "Sample") %>%
-      relocate(cols, .after = 1) # changed to involve df instead of col names
-
-    missing_meta <- final_df %>% dplyr::anti_join(ref_data, by = "Sample")
+    merged <- add_metadata(final_df, ref)
+    return(merged)
   }
-  return(list(
-    with_meta = with_meta_data,
-    missing = missing_meta
-  ))
+}
+
+
+#' Add metadata to dataframes
+add_metadata <- function(df, metadata) {
+   ref_data <- data.frame(metadata)
+   ref_data <- dplyr::rename(ref_data, Sample = 1)
+   final_df <- dplyr::rename(df, Sample = 1)
+   
+   samples_vcf <- final_df$Sample
+   samples_ref <- ref_data$Sample
+   
+   if (sum(samples_vcf %in% samples_ref) == 0) {
+      stop("Sample IDS do not match between VCF and metadata.")
+   }
+   
+   cols <- colnames(ref_data)
+   
+   with_meta_data <- final_df %>%
+      dplyr::inner_join(ref_data, by = "Sample") %>%
+      relocate(cols, .after = 1) 
+   
+   missing_meta <- final_df %>% dplyr::anti_join(ref_data, by = "Sample")
+   
+   return(list(
+      with_meta = with_meta_data,
+      missing = missing_meta
+   ))
 }
 
 #' Convert SNP genotypes to dosages
