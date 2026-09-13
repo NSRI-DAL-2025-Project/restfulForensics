@@ -233,6 +233,11 @@ prepare_input_dataset_archive <- function(input_file, output.dir = ".") {
   dir.create(work_dir, showWarnings = FALSE, recursive = TRUE)
   merge_list_path <- file.path(work_dir, "merge_list.txt")
   prefixes <- c()
+  
+  csv_files <- files[grepl("\\.csv?$|\\.xlsx$", files, ignore.case = TRUE)]
+  if (!is.null(csv_files)) {
+    return("CSV")
+  }
 
   bed_files <- files[grepl("\\.bed", files, ignore.case = TRUE)]
   plink_prefixes <- tools::file_path_sans_ext(bed_files)
@@ -304,6 +309,21 @@ prepare_input_dataset <- function(input_file, output.dir = ".") {
     input_file,
     output.dir
   )
+  
+  if (res == "CSV") {
+    # unpack files then merge
+    files_raw <- unpack_input_file(input_file, output.dir)
+    data_list <- files_raw$data_files
+    all.list <- list()
+    
+    for (x in data_list) {
+      all.list[[x]] <- read.csv(x, check.names = FALSE, row.names = 1)
+    }
+    
+    # merge as df then match
+    # use reduce function by purrr and full_join, need to revise first column to same key
+  }
+  
 
   return(list(
     prefix = res$pgen_prefix
