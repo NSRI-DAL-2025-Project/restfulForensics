@@ -85,6 +85,13 @@ forensic_params_server <- function(input, output, session, rv) {
       computed_af <- compute_af(file)
       pop <- nrow(file)
     } else if (data_type == "freqs") {
+       val <- snpsFile()[1, 2]
+       is_numeric <- is.numeric(val)
+       
+       if (!isTRUE(is_numeric)){
+          stop("Allele frequency table should contain markers on the first column
+               and frequencies per population in a column.")
+       }
       computed_af <- snpsFile()
     }
 
