@@ -33,28 +33,33 @@ unpack_input_file <- function(files, output.dir = ".") {
   if (!file.exists(files)) {
     stop("File does not exist in the working directory")
   } else {
+    archive_ext <- tolower(tools::file_ext(files))
+    data_path <- tempfile(pattern = "unpacked_", tmpdir = output.dir)
+    dir.create(data_path, recursive = TRUE, showWarnings = FALSE)
+    
     if (tools::file_ext(files) == "zip") {
       utils::unzip(files,
         files = NULL,
         list = FALSE,
         overwrite = TRUE,
-        exdir = file.path(output.dir, "unpacked")
+        exdir = data_path
       )
 
-      data_path <- file.path(output.dir, "unpacked")
-      data_files <- list.files(path = data_path, recursive = TRUE, full.names = TRUE, include.dirs = FALSE)
     } else if (tools::file_ext(files) == "tar") {
-      untar(files, files = NULL, list = FALSE, exdir = file.path(output.dir, "unpacked"))
+      untar(files, 
+            files = NULL, 
+            list = FALSE, 
+            exdir = data_path
+            )
 
-      new <- list.files(path = file.path(output.dir, "unpacked"), recursive = TRUE, full.names = TRUE)
-      file.copy(from = new, to = file.path(output.dir, "unpacked"), overwrite = TRUE)
-
-      data_path <- file.path(output.dir, "unpacked")
-      data_files <- list.files(path = data_path, recursive = TRUE, full.names = TRUE, include.dirs = FALSE)
     } else {
       stop("Not a zipped file. Accepted are zipped (.zip) and tar (.tar) files")
     }
 
+    data_files <- list.files(
+      path = data_path, recursive = TRUE, full.names = TRUE, include.dirs = FALSE
+    )
+    data_files <- data_files[!file.info(data_files)$isdir]
     return(list(data_path = data_path, data_files = data_files))
   }
 }

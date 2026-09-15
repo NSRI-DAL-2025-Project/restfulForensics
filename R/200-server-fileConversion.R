@@ -169,8 +169,7 @@ file_conversion_server <- function(input, output, session, rv) {
   timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
 
   observe({
-    fileready <- !is.null(input$genotypeFile) || 
-      (!is.null(input$firstPLINK) && !is.null(input$secondPLINK) && !is.null(input$thirdPLINK))
+    fileready <- !is.null(input$genotypeFile)
     singlePop <- nzchar(input$typePop_meta)
     multiPop <- !is.null(input$refMetadata)
     metaReady <- singlePop || multiPop
@@ -213,61 +212,70 @@ file_conversion_server <- function(input, output, session, rv) {
   observeEvent(input$addMetadata, {
     disable("addMetadata")
 
-    # check input file
     tryCatch(
       {
-        if (!is.null(input$genotypeFile)) {
-          input_file <- input$genotypeFile$datapath
-        } else {
-          input_file <- input$firstPLINK$datapath
-        }
+        input_file <- input$genotypeFile$datapath
 
-        # PROCESS METADATA
         if (!is.null(input$refMetadata)) {
           ref_file <- load_csv_xlsx_files(input$refMetadata$datapath)
 
           if (length(input$col_targets) <= 0) {
             stop("Select at least one column to merge")
           }
-
-          for_merging <- as.data.frame(subset(ref_file, select = input$col_targets))
+          
+          id_col <- colnames(ref_file)[1]
+          selected_cols <- unique(c(id_col, input$col_targets))
+          for_merging <- data.frame(ref_file[
+            ,
+            selected_cols,
+            drop = FALSE
+          ])
+          #for_merging <- as.data.frame(subset(ref_file, select = input$col_targets))
         } else {
           for_merging <- input$typePop_meta
         }
-
-        prepared <- prepare_input_dataset(
-          input_file = input_file,
-          output.dir = output.dir
-        )
         
-        if (prepared == "CSV") {
-           # unpack files then merge
-           files_raw <- unpack_input_file(input_file, output.dir)
-           data_list <- files_raw$data_files
-           all.list <- list()
-           
-           for (x in data_list) {
-              all.list[[x]] <- read.csv(x, check.names = FALSE, row.names = 1)
-           }
-           
-           merged <- dplyr::bind_rows(all.list, fill = TRUE)
-           merged <- as.data.frame(merged)
-           result <- add_metadata(merged, for_merging)
-           
+        # Unpack to determine the data type
+        unpacked <- unpack_input_file(input_file, output.dir)
+        files <- unpacked$data_files
+        ext <- tools::file_ext(files[[1]])
+        
+        if (ext == "csv") {
+          all.list <- list()
+          
+          for (x in files) {
+            all.list[[x]] <- read.csv(x, check.names = FALSE, row.names = 1)
+          }
+          
+          merged <- dplyr::bind_rows(all.list)
+          merged <- data.frame(rownames(merged), merged)
+          result <- add_metadata(merged, for_merging)
         } else {
-           result <- convert_from_plink2(
-              prefix = prepared$prefix,
-              output_type = "csv2",
-              output.dir = output.dir,
-              ref = for_merging
-           )
+          if (ext %in% c("vcf", "bcf", "gz")) {
+            merged_plink <- convert_merge_to_plink(files, output.dir = output.dir, plink_files = FALSE)
+          } else if (ext %in% c("bed", "bim", "fam")) {
+            unique_files <- unique(unlist(lapply(files, tools::file_path_sans_ext), use.names = FALSE))
+            unique_files <- as.list(unique_files)
+            merged_plink <- convert_merge_to_plink(unique_files, output.dir = output.dir, plink_files = TRUE)
+          }
+          
+          # convert to vcf
+          vcf_file <- convert_from_plink2(merged_plink$pgen_prefix,
+                                          output_type = "vcf2",
+                                          output.dir = output.dir)
+          # vcf to csv and merge
+          csv_file <- convert_from_plink2(vcf_file, 
+                                          output_type = "csv2",
+                                          output.dir = output.dir,
+                                          ref = for_merging)
+          
+          result <- csv_file
         }
 
         convertedCSV(result$with_meta)
         missingData(result$missing)
 
         if (input$breakdownPop == "YesBreakdown") {
-          req(input$popForBreakdown)
 
           if (length(input$popForBreakdown) <= 0) {
             stop("No column selected.")

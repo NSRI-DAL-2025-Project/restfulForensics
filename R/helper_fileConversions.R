@@ -225,46 +225,27 @@ convert_to_plink <- function(input.file, name = "converted_to_plink") {
 #' @param output.dir The directory to save the unpacked files. Default is the working directory.
 #'
 #' @returns The prefix of the merged dataset.
-prepare_input_dataset_archive <- function(input_file, output.dir = ".") {
-  unpacked <- unpack_input_file(input_file, output.dir)
-  files <- unpacked$data_files
-
+#prepare_input_dataset_archive <- function(df_list, ext, output.dir = ".") {
+convert_merge_to_plink <- function(df_list, plink_files = FALSE, output.dir = ".") {
+  
   work_dir <- file.path(output.dir, "for_processing")
   dir.create(work_dir, showWarnings = FALSE, recursive = TRUE)
   merge_list_path <- file.path(work_dir, "merge_list.txt")
   prefixes <- c()
-  
-  csv_files <- files[grepl("\\.csv?$|\\.xlsx$", files, ignore.case = TRUE)]
-  if (!is.null(csv_files)) {
-    return("CSV")
-  }
 
-  bed_files <- files[grepl("\\.bed", files, ignore.case = TRUE)]
-  plink_prefixes <- tools::file_path_sans_ext(bed_files)
-
-
-  if (!is.null(bed_files)) {
-    for (pref in plink_prefixes) {
-      out_pref <- file.path(work_dir, paste0(basename(pref), "_p2"))
-
+  if (isFALSE(plink_files)){  
+    for (f in df_list) {
+      base <- sub("\\.vcf(\\.gz)?$|\\.bcf$", "", basename(f), ignore.case = TRUE)
+      out_pref <- file.path(work_dir, paste0(base, "_p2"))
       converted <- convert_to_plink(
-        input.file = pref,
+        input.file = f,
         name = out_pref
       )
+      prefixes <- c(prefixes, converted)
     }
-  }
-
-  vcf_bcf_files <- files[grepl("\\.(vcf(\\.gz)?|bcf)$", files, ignore.case = TRUE)]
-
-  for (f in vcf_bcf_files) {
-    base <- sub("\\.vcf(\\.gz)?$|\\.bcf$", "", basename(f), ignore.case = TRUE)
-    out_pref <- file.path(work_dir, paste0(base, "_p2"))
-    converted <- convert_to_plink(
-      input.file = f,
-      name = out_pref
-    )
-    prefixes <- c(prefixes, converted)
-  }
+  } else {
+      prefixes <- df_list
+    }
 
   if (length(prefixes) == 0) {
     stop("No valid files in the directory.")
@@ -280,43 +261,6 @@ prepare_input_dataset_archive <- function(input_file, output.dir = ".") {
   )
 
   return(list(pgen_prefix = merged_prefix))
-}
-
-#' Handle file conversion to PLINK
-#'
-#' @inheritParams prepare_input_dataset_archive
-#'
-#' @returns The prefix of the converted dataset.
-prepare_input_dataset <- function(input_file, output.dir = ".") {
-  ext <- tools::file_ext(input_file)
-  is_archive <- ext %in% c("zip", "tar")
-
-  if (!is_archive) {
-    prefix <- file.path(output.dir, "single_input")
-
-    converted <- convert_to_plink2(
-      input.file = input_file,
-      original_name = NULL,
-      name = prefix
-    )
-
-    return(list(
-      prefix = converted
-    ))
-  }
-
-  res <- prepare_input_dataset_archive(
-    input_file,
-    output.dir
-  )
-  
-  if (res == "CSV") {
-     return("CSV")
-  }
-  
-  return(list(
-    prefix = res$pgen_prefix
-  ))
 }
 
 #' Convert PLINK 1.9 files to other formats

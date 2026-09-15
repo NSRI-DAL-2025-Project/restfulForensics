@@ -107,17 +107,7 @@ file_conversion_tab <- function() {
         title = "Add Metadata",
         fluidRow(
           box(
-            checkboxInput("isPLINKmeta", "Use PLINK files", value = FALSE),
-            conditionalPanel(
-              condition = "input.isPLINKmeta == false",
-              fileInput("genotypeFile", "Genotype File (.vcf/.vcf.gz/.bcf) or zipped files", accept = c(".vcf", ".bcf", ".gz", ".zip", ".tar"))
-            ),
-            conditionalPanel(
-              condition = "input.isPLINKmeta == true",
-              fileInput("firstPLINK", "Upload BED/PGEN file", accept = c(".bed", ".pgen")),
-              fileInput("secondPLINK", "Upload BIM/PVAR file", accept = c(".bim", ".pvar")),
-              fileInput("thirdPLINK", "Upload FAM/PSAM file", accept = c(".fam", ".psam"))
-            ),
+            fileInput("genotypeFile", "Genotype File or zipped files", accept = c(".vcf", ".bcf", ".gz", ".zip", ".tar")),
             radioButtons("populationType", "Do samples come from a single population?",
               choices = c("Yes" = "single", "No" = "multiplepop")
             ),
@@ -149,7 +139,7 @@ file_conversion_tab <- function() {
               h4("Merge select metadata to genotype/sample data"),
               p(strong("Input file/s:")),
               tags$ul(
-                tags$li("Genotype data (.vcf, .vcf.gz, .bcf, or PLINK files"),
+                tags$li("Genotype data (.vcf, .vcf.gz, .bcf, or PLINK 1.9 files) or CSV genotype data. Zipped files are also accepted as long as it consists a single file type."),
                 tags$li("Sample metadata (.xlsx or .xsv). Select column names to be merged with the genotype data. Ensure sample IDs are the same.")
               ),
               p(strong("Expected output file/s:"), "CSV file of sample with metadata.")
